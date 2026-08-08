@@ -71,6 +71,10 @@ Private Declare Function SafeArrayAccessData Lib "OleAut32.dll" (ByVal pSA As Lo
 Private Declare Function SafeArrayUnaccessData Lib "OleAut32.dll" (ByVal pSA As Long) As Long
 Private Declare Function SafeArrayGetElemsize Lib "OleAut32.dll" (ByVal pSA As Long) As Long
 Private Declare Sub SafeArrayCopyData Lib "OleAut32.dll" (ByVal psaSource As Any, ByVal psaTarget As Any)
+Private Declare Function SafeArrayAllocDescriptor Lib "OleAut32.dll" (ByVal cDims As Long, ppsaOut As Any) As Long
+Private Declare Function SafeArrayDestroyDescriptor Lib "OleAut32.dll" (ByVal ppsa As Long) As Long
+
+
 Private Type SAFEARRAY1D
     cDims As Integer
     fFeatures As Integer
@@ -619,6 +623,29 @@ Dim BI As BigInteger
     Err.Clear
 Loop
 End Sub
+Private Sub Make1dArrayIntoNdArray(addr_out As Long)
+    Dim pSaOld
+    ' addr_v has the VarPtr of a copy of ActualData, becasue this
+    pSaOld = MemLong(addr_out + 8&)
+    Dim pSaNew As Long
+    Call SafeArrayAllocDescriptor(dnum, pSaNew)
+    MemCopy pSaNew + 2, pSaOld + 2, 22&
+    Dim i As Long
+    If RevOrder Then
+    For i = 0 To dnum - 1
+     MemLong(pSaNew + 16& + i * 8&) = limit(i)
+     MemLong(pSaNew + 20& + i * 8&) = -limBase(i)
+    Next
+    Else
+    For i = 0 To dnum - 1
+     MemLong(pSaNew + 16& + i * 8&) = limit(dnum - i - 1)
+     MemLong(pSaNew + 20& + i * 8&) = -limBase(dnum - i - 1)
+    Next
+    End If
+    Call SafeArrayDestroyDescriptor(pSaOld)
+    MemLong(addr_out + 8&) = pSaNew
+End Sub
+
 Public Sub Neg(v As Long)
 Select Case VarType(itemnumeric(v))
 Case vbBoolean
@@ -675,8 +702,16 @@ Property Get Value() As Variant
 If index >= 0 And index <= maxitems1 Then
 
 If IsObject(actualData(index)) Then
-    If Typename(actualData(index)) = "PropReference" Then
-        Value = actualData(index)
+    If actualData(index) Is Nothing Then
+    Stop
+    ElseIf TypeOf actualData(index) Is PropReference Then
+        On Error Resume Next
+        
+        Value = CVar(actualData(index).Value)
+        If actualData(index).LastHasObject Then
+            
+            Set Value = actualData(index).lastobjfinal
+        End If
     Else
         Set Value = actualData(index)
     End If
@@ -685,8 +720,10 @@ Else
                
                     Value = actualData(index)
                 ElseIf VarType(actualData(index)) = 20 Then
-                
-                    CopyMemory ByVal VarPtr(Value) + 8, ByVal VarPtr(actualData(index)) + 8, 8
+                ' MEMLONG(MEMLONG(VARPTR(ACTUALDATA)+8)+12)
+                    MemCopy VarPtr(Value) + 8, MemLong(MemLong(VarPtr(actualData) + 8) + 12) + index * 8, 8
+                   
+                   ' CopyMemory ByVal VarPtr(Value) + 8, ByVal VarPtr(actualData(index)) + 8, 8
                     PutMem2 VarPtr(Value), 20
                 Else
                     Value = actualData(index)
@@ -765,15 +802,15 @@ PushDim rCount, limBase(dimActual - 1)
 Else
 PushDim rCount
 End If
-Dim sum As Long
-sum = rCount
+Dim SUM As Long
+SUM = rCount
 again:
 dummy = dimActual
 On Error GoTo ok1
 tst = UBound(a(), dimActual + 1)
 rCount = UBound(a(), dimActual + 1) - LBound(a, dimActual + 1) + 1
 dimActual = dimActual + 1
-sum = sum * rCount
+SUM = SUM * rCount
 ok1:
 If dimActual <> dummy Then
 If dnum >= dimActual Then
@@ -786,7 +823,7 @@ End If
 If dimActual <> 1 Then
 MyEr "wrong array dimensions", "λάθος διαστάσεις πίνακα"
 Else
-actualData = makeonedim(sum)
+actualData = makeonedim(SUM)
 ii = LBound(a)
 For i = LBound(actualData, 1) To UBound(actualData, 1)
 actualData(i) = a(ii)
@@ -821,15 +858,15 @@ PushDim rCount, limBase(dimActual - 1)
 Else
 PushDim rCount
 End If
-Dim sum As Long
-sum = rCount
+Dim SUM As Long
+SUM = rCount
 again:
 dummy = dimActual
 On Error GoTo ok1
 tst = UBound(actualData, dimActual + 1)
 rCount = UBound(actualData, dimActual + 1) - LBound(actualData, dimActual + 1) + 1
 dimActual = dimActual + 1
-sum = sum * rCount
+SUM = SUM * rCount
 ok1:
 If dimActual <> dummy Then
 If dnum >= dimActual Then
@@ -839,70 +876,226 @@ PushDim rCount
 End If
 GoTo again
 End If
-If oldmaxitems <> sum Then
+If oldmaxitems <> SUM Then
 hlp = actualData
-actualData = makeonedim(sum)
+actualData = makeonedim(SUM)
 CopySerialize hlp
 End If
 
 PushEnd
-'Dim z As Long, i As Long
-'If count <> rCount Then
-'i = count
-'maxitems1 = UBound(actualdata()) - LBound(actualdata)
-'maxitems = maxitems1 + 1
-'z = 1
-'If dnum > 1 Then
-
-  'z = i \ limit(dnum - 1)
-
-'   If maxitems Mod z <> 0 Then
-'  maxitems = maxitems + z - maxitems Mod z
-'  maxitems1 = maxitems - 1
-'  ReDim Preserve actualdata(maxitems1)
-'  End If
-'  limit(dnum - 1) = maxitems \ z
-'Else
-'If maxitems > 0 Then dnum = 1
-' dtable(0) = 1
-'limit(0) = maxitems
-'End If
 End If
 '
 
 End Sub
+Private Sub MakeNdArrayInto1dArray(addr_v As Long, thatmax As Long, Optional iLBound As Long)
+    Dim pSaOld As Long
+    pSaOld = MemLong(addr_v + 8&)
+    'cDims             As Integer
+    'fFeatures         As Integer
+    'cbElements        As Long ' +4
+    'cLocks            As Long ' +8
+    'pvData            As Long + 12
+    'Bounds(0 To 1)    As SAFEARRAYBOUND
+    ' All set, so let's make a new SafeArray descriptor.
+    Const iNewDim As Integer = 1&
+    Dim pSaNew As Long
+    Call SafeArrayAllocDescriptor(CLng(iNewDim), pSaNew)
+    MemCopy pSaNew + 2, pSaOld + 2, 22&
+    MemLong(pSaNew + 16&) = thatmax
+    MemLong(pSaNew + 20&) = iLBound
+    Call SafeArrayDestroyDescriptor(pSaOld)
+    MemLong(addr_v + 8&) = pSaNew
+End Sub
 Friend Sub LoadTuple(ar As Variant)
-Dim z As Long, i As Long
-actualData = ar
-If Count <> UBound(actualData) - LBound(actualData) + 1 Then
-i = Count
-maxitems1 = UBound(actualData) - LBound(actualData)
-maxitems = maxitems1 + 1
-z = 1
-
-If dnum > 1 Then
-
-  z = i \ limit(dnum - 1)
-
-   If maxitems Mod z <> 0 Then
-  maxitems = maxitems + z - maxitems Mod z
-  maxitems1 = maxitems - 1
-  ReDim Preserve actualData(maxitems1)
-  End If
-  limit(dnum - 1) = maxitems \ z
-
+Dim z As Long, i As Long, mX As Long
+If MemInt(VarPtr(ar) + 8) = 0 Then
+Me.EmptyArraySameType
+Exit Sub
+End If
+' by reference
+Dim s1, s2
+If (MemInt(VarPtr(ar)) And &H4000) <> 0 Then
+    actualData = ar
 Else
-dnum = 1
+    SwapVariant actualData, ar
+End If
+    MyTypeToBe = MemInt(VarPtr(actualData)) And &H7FF
+    If Count <> UBound(actualData) - LBound(actualData) + 1 Then
+        i = Count
+        maxitems1 = UBound(actualData) - LBound(actualData)
+        maxitems = maxitems1 + 1
+        z = 1
+        If dnum > 1 Then
+            z = i \ limit(dnum - 1)
+            If maxitems Mod z <> 0 Then
+                  maxitems = maxitems + z - maxitems Mod z
+                  maxitems1 = maxitems - 1
+                  ReDim Preserve actualData(maxitems1)
+            End If
+            limit(dnum - 1) = maxitems \ z
+        Else
+On Error Resume Next
+Dim Dimensions As Long, prob
+dnum = 0
+z = 1
+For i = 1 To 10
+    prob = UBound(actualData, i)
+    If Err.Number Then Exit For
+    dnum = dnum + 1
+    z = z * (UBound(actualData, dnum) - LBound(actualData, dnum) + 1)
+Next
+maxitems = z
+'dnum = 1
+RevOrder = True
 dtable(0) = 1
 limit(0) = maxitems
+    If dnum > 1 Then
+        limit(0) = 0
+        For i = 0 To dnum - 1
+        limBase(i) = -LBound(actualData, dnum - i)
+        limit(i) = (UBound(actualData, dnum - i) - LBound(actualData, dnum - i) + 1)
+        Next
+        mX = maxitems
+        For i = 0 To dnum - 1
+            dtable(i) = mX \ limit(i)
+            mX = dtable(i)
+        Next i
+        MakeNdArrayInto1dArray VarPtr(actualData), maxitems, 0
+    Else
+    ReDim Preserve actualData(0 To maxitems - 1)
+    End If
+    maxitems1 = maxitems - 1
 End If
+Else
+    ReDim Preserve actualData(0 To maxitems - 1)
+    maxitems1 = maxitems - 1
+
 End If
-'
+End Sub
+Friend Sub LoadArray(addr_v As Long)
+Dim z As Long, i As Long, mX As Long
+If MemInt(addr_v + 8) = 0 Then
+Me.EmptyArraySameType
+Exit Sub
+End If
+' by reference
+Dim s1, s2
+actualData = Empty
+MemCopy VarPtr(actualData), addr_v, 16
+MemLong(addr_v + 8) = 0 '
+
+    MyTypeToBe = MemInt(VarPtr(actualData)) And &H7FF
+    If Count <> UBound(actualData) - LBound(actualData) + 1 Then
+        i = Count
+        maxitems1 = UBound(actualData) - LBound(actualData)
+        maxitems = maxitems1 + 1
+        z = 1
+        If dnum > 1 Then
+            z = i \ limit(dnum - 1)
+            If maxitems Mod z <> 0 Then
+                  maxitems = maxitems + z - maxitems Mod z
+                  maxitems1 = maxitems - 1
+                  ReDim Preserve actualData(maxitems1)
+            End If
+            limit(dnum - 1) = maxitems \ z
+        Else
+On Error Resume Next
+Dim Dimensions As Long, prob
+dnum = 0
+z = 1
+For i = 1 To MemInt(MemLong(VarPtr(actualData) + 8))
+    prob = UBound(actualData, i)
+    If Err.Number Then Exit For
+    dnum = dnum + 1
+    z = z * (UBound(actualData, dnum) - LBound(actualData, dnum) + 1)
+Next
+Err.Clear
+maxitems = z
+'dnum = 1
+RevOrder = True
+dtable(0) = 1
+limit(0) = maxitems
+    If dnum > 1 Then
+        limit(0) = 0
+        For i = 0 To dnum - 1
+        limBase(i) = -LBound(actualData, dnum - i)
+        limit(i) = (UBound(actualData, dnum - i) - LBound(actualData, dnum - i) + 1)
+        Next
+        mX = maxitems
+        For i = 0 To dnum - 1
+            dtable(i) = mX \ limit(i)
+            mX = dtable(i)
+        Next i
+        MakeNdArrayInto1dArray VarPtr(actualData), maxitems, 0
+    Else
+    ReDim Preserve actualData(0 To maxitems - 1)
+    End If
+    maxitems1 = maxitems - 1
+End If
+Else
+    ReDim Preserve actualData(0 To maxitems - 1)
+    maxitems1 = maxitems - 1
+
+End If
+End Sub
+
+Public Function VariantArray() As Variant
+Dim s1, s2, rA As refArray
+If MyIsObject(actualData) Then
+Set rA = actualData
+Set rA = rA.Copy
+rA.CreateLastRef VarPtr(s1)
+SwapVariant VariantArray, s1
+
+MemCopy VarPtr(s1), VarPtr(s2), 16 ' delete reference
+If MemInt(VarPtr(VariantArray)) = 8212 Then
+'MemInt(VarPtr(VariantArray)) = 8198
+End If
+Make1dArrayIntoNdArray VarPtr(VariantArray)
+Else
+VariantArray = actualData
+Make1dArrayIntoNdArray VarPtr(VariantArray)
+End If
+End Function
+Public Sub ExportVariant(VariantArray As Variant)
+Dim s1, s2, rA As refArray
+If MyIsObject(actualData) Then
+Set rA = actualData
+Set rA = rA.Copy
+rA.CreateLastRef VarPtr(s1)
+SwapVariant VariantArray, s1
+
+MemCopy VarPtr(s1), VarPtr(s2), 16 ' delete reference
+If MemInt(VarPtr(VariantArray)) = 8212 Then
+'MemInt(VarPtr(VariantArray)) = 8198
+End If
+Make1dArrayIntoNdArray VarPtr(VariantArray)
+Else
+VariantArray = actualData
+Make1dArrayIntoNdArray VarPtr(VariantArray)
+End If
+End Sub
+Friend Sub ExportAndDestroy(addr_v As Long)
+    Dim rA As refArray, p
+    If Count = 0 Then
+    actualData = LibMemory.EmptyArray(1, MyTypeToBe)
+    MemCopy addr_v, VarPtr(actualData), 16
+    MemCopy VarPtr(actualData), VarPtr(p), 16
+    
+    Else
+    If MyIsObject(actualData) Then
+        Set rA = actualData
+        rA.CreateLastRef VarPtr(actualData)
+    End If
+    Make1dArrayIntoNdArray VarPtr(actualData)
+    MemCopy addr_v, VarPtr(actualData), 16
+    MemCopy VarPtr(actualData), VarPtr(p), 16
+    End If
+    
 End Sub
 Friend Sub JustACopy(mmm As Variant)
     actualData = mmm
 End Sub
-
 Friend Sub CopySerialize(mmm As Variant)
 ' may we get an exception here
     
@@ -923,7 +1116,6 @@ R2 = SafeArrayAccessData(ByVal m_base_0, first12_0)
 'GetMem4 m_base_0 + 12, first1_0
 PutMem4 m_base + 12, first12_0
 PutMem4 m_base_0 + 12, first12
-Debug.Print "bingo"
 R2 = SafeArrayUnaccessData(ByVal m_base_0)
 r1 = SafeArrayUnaccessData(ByVal m_base)
 R2 = SafeArrayUnlock(m_base_0)
@@ -1828,7 +2020,14 @@ Public Property Get ItemTypeNum(curitem) As Integer
 On Error GoTo there1
 If arr Then
     If maxitems1 >= curitem Then
+        If MyIsObject(actualData) Then
         ItemTypeNum = MemInt(VarPtr(actualData(curitem)))
+        Else
+        ItemTypeNum = MemInt(VarPtr(actualData)) And &H7FF
+        If ItemTypeNum = 12 Then
+        ItemTypeNum = MemInt(MemLong(MemLong(VarPtr(actualData) + 8) + 12) + curitem * 16)
+        End If
+        End If
     End If
 Else
 If curitem = -2 Then
@@ -1891,8 +2090,9 @@ If arr Then
                         item = actualData(curitem)
                     End If
                 ElseIf VarType(actualData(curitem)) = 20 Then
-                
-                    CopyMemory ByVal VarPtr(item) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
+                    MemCopy VarPtr(item) + 8, MemLong(MemLong(VarPtr(actualData) + 8) + 12) + curitem * 8, 8
+                   
+                 '   CopyMemory ByVal VarPtr(item) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
                     PutMem2 VarPtr(item), 20
                 Else
                     item = actualData(curitem)
@@ -1966,14 +2166,14 @@ If arr Then
             ElseIf Typename(actualData(curitem)) = mHdlr Then
                 Set usehandler = actualData(curitem)
                 If usehandler.t1 = 4 Then
-                If myVarType(usehandler.index_cursor, vbString) Then
-                    itemnumeric = usehandler.index_cursor
-                Else
-                    If usehandler.sign = -1 Then
-                        itemnumeric = CDbl(-usehandler.index_cursor)
+                    If myVarType(usehandler.index_cursor, vbString) Then
+                        itemnumeric = usehandler.index_cursor
                     Else
-                        itemnumeric = CDbl(usehandler.index_cursor)
-                    End If
+                        If usehandler.sign = -1 Then
+                            itemnumeric = CDbl(-usehandler.index_cursor)
+                        Else
+                            itemnumeric = CDbl(usehandler.index_cursor)
+                        End If
                     End If
                 Else
                     itemnumeric = 0
@@ -1982,17 +2182,20 @@ If arr Then
                 itemnumeric = 0
             End If
         Else
-                If myVarType(actualData, vbObject) Then
-                    itemnumeric = actualData(curitem)
-                ElseIf VarType(actualData(curitem)) = 20 Then
-                
-                    CopyMemory ByVal VarPtr(itemnumeric) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
-                    PutMem2 VarPtr(itemnumeric), 20
+            If myVarType(actualData, vbObject) Then
+                itemnumeric = actualData(curitem)
+            ElseIf VarType(actualData(curitem)) = 20 Then
+                If myVarArrType(actualData, vbLongLong) Then
+                    MemCopy VarPtr(itemnumeric) + 8, MemLong(MemLong(VarPtr(actualData) + 8) + 12) + curitem * 8, 8
                 Else
-                    itemnumeric = actualData(curitem)
+                    CopyMemory ByVal VarPtr(itemnumeric) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
                 End If
+                PutMem2 VarPtr(itemnumeric), 20
                 
-            'End If
+                
+            Else
+                itemnumeric = actualData(curitem)
+            End If
         End If
         Exit Property
     End If
@@ -2060,21 +2263,31 @@ ElseIf myVarType(actualData, vbObject) Then
     End Select
 ElseIf Not MyIsObject(actualData(curitem)) Then
 
-If myVarType(item, 20) Then
-actualData(curitem) = Empty
-SwapVariant actualData(curitem), item
+If MyTypeToBe = 20 Then
+    If Not myVarType(item, 20) Then
+        item = cInt64(item)
+    End If
+    MemCopy MemLong(MemLong(VarPtr(actualData) + 8) + 12) + curitem * 8, VarPtr(item) + 8, 8
+ElseIf myVarType(item, 20) And MyTypeToBe = vbVariant Then
+    If myVarArrType(actualData, vbLongLong) Then
+        MemCopy MemLong(MemLong(VarPtr(actualData) + 8) + 12) + curitem * 16, VarPtr(item), 16
+    Else
+        actualData(curitem) = Empty
+        SwapVariant actualData(curitem), item
+    End If
 ElseIf MyTypeToBe = 200 Then
-If TypeOf item Is Complex Then
-    SwapVariant actualData(curitem), item
-Else
-    actualData(curitem) = nMath2.cxNew(CDbl(item), 0)
-    If Err.Number > 0 Then
+    If TypeOf item Is Complex Then
+        SwapVariant actualData(curitem), item
+    Else
+        actualData(curitem) = nMath2.cxNew(CDbl(item), 0)
+        If Err.Number > 0 Then
         WrongType
         Exit Property
     End If
 End If
+
 Else
-actualData(curitem) = item
+    actualData(curitem) = item
 End If
 Else
 If Not MyIsObject(item) Then
@@ -2747,10 +2960,22 @@ MyEr "Invalid item for sorting, I found " + VarTypeNameList(n), "Αδύνατη η ταξιν
 Exit Sub
 End If
 Next i
+
+
 If MyIsObject(actualData) Then
     QuickSortItemsWithSameKeyO Low, high
-Else
+ElseIf myVarArrType(actualData, vbVariant) Then
     QuickSortItemsWithSameKey Low, high
+Else
+    Dim ar As refArray
+    Set ar = New refArray
+    'Debug.Print "in :"; Hex$(MemLong(MemLong(VarPtr(actualData) + 8) + 12))
+    ar.writevalueOnce actualData
+    Set actualData = ar
+    QuickSortItemsWithSameKeyO Low, high
+    ar.LastUse actualData
+    'Debug.Print "out:"; Hex$(MemLong(MemLong(VarPtr(actualData) + 8) + 12))
+    
 End If
 
 End If
@@ -2813,8 +3038,18 @@ If (n > 8 Or n < 2) And Not (n = 14 Or n = 20) Then Exit Sub
 Next i
 If MyIsObject(actualData) Then
 QuickSortItemsRevWithSameKeyO Low, high
-Else
+ElseIf myVarArrType(actualData, vbVariant) Then
 QuickSortItemsRevWithSameKey Low, high
+Else
+    Dim ar As refArray
+    Set ar = New refArray
+    'Debug.Print "in :"; Hex$(MemLong(MemLong(VarPtr(actualData) + 8) + 12))
+    ar.writevalueOnce actualData
+    Set actualData = ar
+    QuickSortItemsRevWithSameKeyO Low, high
+    ar.LastUse actualData
+    'Debug.Print "out:"; Hex$(MemLong(MemLong(VarPtr(actualData) + 8) + 12))
+    
 End If
 End If
 End Sub
@@ -2995,7 +3230,10 @@ Private Sub FeedPiv(ByVal a1)
     For k = 0 To sortmult - 1
         GetMem1 VarPtr(actualData(a1 + k)), n
         If n = 20 Then
-           CopyMemory ByVal VarPtr(piv1(k)), ByVal VarPtr(actualData(a1 + k)), 16
+        
+        'MemCopy VarPtr(piv1(k)) + 8, MemLong(MemLong(VarPtr(actualData) + 8) + 12) + (a1 + k) * 8, 8
+                   
+            CopyMemory ByVal VarPtr(piv1(k)), ByVal VarPtr(actualData(a1 + k)), 16
         Else
             piv1(k) = actualData(a1 + k)
         End If
@@ -3271,7 +3509,7 @@ If myVarType(actualData, vbObject) Then
         ArrPtr = ar.ArrPtr
     End If
 ElseIf Elements(actualData) > 0 Then
-    ArrPtr = VarPtr(actualData(0))
+ArrPtr = MemLong(MemLong(VarPtr(actualData) + 8) + 12)
 End If
 End Property
 Function Elements(vArray As Variant) As Long
@@ -3306,12 +3544,12 @@ AppendArray M
 
 End Sub
 
-Private Property Let iBoxArray_Arr(ByVal RHS As Boolean)
+Private Property Let iBoxArray_arr(ByVal RHS As Boolean)
 arr = RHS
 End Property
 
-Private Property Get iBoxArray_Arr() As Boolean
-iBoxArray_Arr = arr
+Private Property Get iBoxArray_arr() As Boolean
+iBoxArray_arr = arr
 End Property
 
 Private Property Let iBoxArray_arrname(ByVal RHS As String)
@@ -3396,8 +3634,8 @@ CopyArraySliceFast M, fromS, toS
 Set k = M
 End Sub
 
-Private Property Get iBoxArray_count() As Long
-iBoxArray_count = Count
+Private Property Get iBoxArray_Count() As Long
+iBoxArray_Count = Count
 End Property
 
 Private Function iBoxArray_EmptyArraySameType() As Object
@@ -3444,12 +3682,12 @@ Private Property Get iBoxArray_IhaveClass() As Boolean
     iBoxArray_IhaveClass = IhaveClass
 End Property
 
-Private Property Let iBoxArray_Index(ByVal RHS As Long)
+Private Property Let iBoxArray_index(ByVal RHS As Long)
     index = RHS
 End Property
 
-Private Property Get iBoxArray_Index() As Long
-iBoxArray_Index = index
+Private Property Get iBoxArray_index() As Long
+iBoxArray_index = index
 End Property
 
 Private Property Get iBoxArray_IsEmpty() As Variant
@@ -3464,8 +3702,8 @@ Private Function iBoxArray_IsEnum2(curitem As Long, p As Variant) As Boolean
 iBoxArray_IsEnum2 = IsEnum2(curitem, p)
 End Function
 
-Private Function iBoxArray_isObj() As Boolean
-    iBoxArray_isObj = IsObj
+Private Function iBoxArray_IsObj() As Boolean
+    iBoxArray_IsObj = IsObj
 End Function
 
 Private Function iBoxArray_IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
@@ -3476,16 +3714,16 @@ Private Function iBoxArray_IsStringItem(curitem As Long) As Variant
 iBoxArray_IsStringItem = IsStringItem(curitem)
 End Function
 
-Private Property Set iBoxArray_Item(curitem As Long, RHS As Variant)
+Private Property Set iBoxArray_item(curitem As Long, RHS As Variant)
 Set item(curitem) = RHS
 End Property
 
-Private Property Let iBoxArray_Item(curitem As Long, RHS As Variant)
+Private Property Let iBoxArray_item(curitem As Long, RHS As Variant)
 item(curitem) = RHS
 End Property
 
-Private Property Get iBoxArray_Item(curitem As Long) As Variant
-SwapVariant iBoxArray_Item, Me.item(curitem)
+Private Property Get iBoxArray_item(curitem As Long) As Variant
+SwapVariant iBoxArray_item, Me.item(curitem)
 End Property
 
 Private Function iBoxArray_ItemIsObject(curitem As Variant) As Boolean
@@ -3603,11 +3841,11 @@ End Sub
 Private Function iBoxArray_UpperMonoLimit() As Variant
 iBoxArray_UpperMonoLimit = UpperMonoLimit
 End Function
-Private Property Get iBoxArray_value() As Variant
+Private Property Get iBoxArray_Value() As Variant
     If IsObj Then
-        Set iBoxArray_value = Value
+        Set iBoxArray_Value = Value
     Else
-        iBoxArray_value = Value
+        iBoxArray_Value = Value
     End If
 End Property
 Private Function IsGroup(v) As Boolean

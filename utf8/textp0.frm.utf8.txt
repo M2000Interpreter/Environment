@@ -291,7 +291,7 @@ Public Function commandW() As String
 Static mm$
 If mm$ <> "" Then commandW = mm$: Exit Function
 If m_bInIDE Then
-mm$ = Command
+mm$ = Left$(Command, 4000)
 Else
 Dim Ptr As Long: Ptr = GetCommandLineW
     If Ptr Then
@@ -740,9 +740,9 @@ TEXT1.SelStartSilent = TEXT1.SelStart  'MOVE CHARPOS TO SELSTART
 
 el = TEXT1.Charpos  ' charpos maybe is in the start or the end of block
 s$ = TEXT1.SelText
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 
 l = el + 1
 If EditTextWord Then
@@ -776,7 +776,7 @@ End If
 Loop Until (W = eW And l = el) Or safety = 2
 
 End If
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 TEXT1.mDoc.WrapAgain
 
 TEXT1.Render
@@ -802,9 +802,9 @@ Else
 neo$ = InputBoxN("Replace " & IIf(anystr, "part of ", "") & "Word", "Text Editor", s$, noinp)
 End If
 If noinp <> 1 Then Exit Sub
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 Set mDoc10 = New Document
 mDoc10 = neo$
 If mDoc10.DocLines > 1 Then
@@ -935,7 +935,7 @@ If prof1.MARKTWO > 1000 Then ProcTask2 Basestack1: prof1.MARKONE
 Loop Until safety = 2 Or KeyPressed(16)
 TEXT1.glistN.DropKey = False
 End If
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 If w2 > 0 Then TEXT1.mDoc.WrapAgainBlock w2, w2:  TEXT1.mDoc.ColorThis w2
 TEXT1.glistN.SuspDraw = False
 TEXT1.Render
@@ -963,9 +963,9 @@ Else
 l = TEXT1.Charpos
 End If
 
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
     If anystr Then
   If Not TEXT1.mDoc.FindStrDown(s$, W, l) Then GoTo sdnOut
@@ -982,7 +982,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdnOut:
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 TEXT1_Inform TEXT1.glistN.ListIndex + 1, TEXT1.glistN.SelStart
 End Sub
 
@@ -1008,9 +1008,9 @@ l = TEXT1.Charpos + Len(s$)
 End If
 
 'l = TEXT1.Charpos + Len(s$)
-OldLcid = TEXT1.mDoc.LCID
+OldLcid = TEXT1.mDoc.lcid
 TempLcid = FoundLocaleId(s$)
-If TempLcid <> 0 Then TEXT1.mDoc.LCID = TempLcid
+If TempLcid <> 0 Then TEXT1.mDoc.lcid = TempLcid
 If EditTextWord Or anystr Then
    If anystr Then
    If TEXT1.SelText = s$ Then l = l - 1
@@ -1029,7 +1029,7 @@ TEXT1.ParaSelStart = l
 TEXT1.glistN.enabled = True
 TEXT1.SelLength = Len(s$)
 sdupOut:
-TEXT1.mDoc.LCID = OldLcid
+TEXT1.mDoc.lcid = OldLcid
 TEXT1_Inform TEXT1.glistN.ListIndex + 1, TEXT1.glistN.SelStart
 End Sub
 Public Function InIDECheck() As Boolean
@@ -1103,13 +1103,13 @@ End Sub
 
 
 Private Sub dSprite_MouseDown(index As Integer, Button As Integer, shift As Integer, X As Single, Y As Single)
-Dim P As Long, u2 As Long
+Dim p As Long, u2 As Long
 If lockme Then Exit Sub
 If Not NoAction Then
 NoAction = True
 Dim sel&
-P = val("0" & dSprite(index).Tag)
-With players(P)
+p = val("0" & dSprite(index).Tag)
+With players(p)
     u2 = .uMineLineSpace * 2
 
         If Button > 0 And Targets Then
@@ -3564,16 +3564,16 @@ TEXT1.mDoc.ColorEvent = Not TEXT1.NoColor
 
 End Sub
 Private Sub mywait11(bstack As basetask, ByVal pp)
-    Dim P As Boolean, e As Boolean
+    Dim p As Boolean, e As Boolean
     On Error Resume Next
     If bstack.Process Is Nothing Then
         If pp = 0 Then Exit Sub
     Else
         Err.Clear
-        P = bstack.Process.Done
+        p = bstack.Process.Done
         If Err.Number = 0 Then
             e = True
-            If P <> 0 Then
+            If p <> 0 Then
                 Exit Sub
             End If
         End If
@@ -3590,9 +3590,9 @@ Private Sub mywait11(bstack As basetask, ByVal pp)
             MyDoEvents
         End If
         If e Then
-            P = bstack.Process.Done
+            p = bstack.Process.Done
             If Err.Number = 0 Then
-                If P <> 0 Then
+                If p <> 0 Then
                     Exit Do
                 End If
             End If
@@ -3605,7 +3605,7 @@ Private Sub mywait11(bstack As basetask, ByVal pp)
 End Sub
 Private Function UnsignedSub(a As Long, b As Long)
     Static ua, UB
-    If ua = Empty Then
+    If MemInt(VarPtr(ua)) = 0 Then
         MemInt(VarPtr(ua)) = 20
         MemInt(VarPtr(UB)) = 20
     End If
@@ -3615,6 +3615,240 @@ Private Function UnsignedSub(a As Long, b As Long)
     UnsignedSub = MemLong(VarPtr(ua) + 8)
 End Function
 Public Function NeoASK(bstack As basetask) As Double
+If ASKINUSE Then Exit Function
+On Error GoTo recover
+Dim safety As Long, XX As GuiM2000
+Dim oldesc As Boolean, zz As Form
+    oldesc = escok
+'using AskTitle$, AskText$, AskCancel$, AskOk$, AskDIB$
+Static once As Boolean
+If once Then Exit Function
+once = True
+ASKINUSE = True
+Dim aForm As Form
+Set aForm = Screen.ActiveForm
+If Not aForm Is Nothing Then
+    If TypeOf aForm Is GuiM2000 Then aForm.UNhookMe
+    Set zz = aForm
+End If
+Dim INFOONLY As Boolean
+k1 = 0
+If AskTitle$ = vbNullString Then AskTitle$ = MesTitle$
+If AskCancel$ = vbNullString Then INFOONLY = True
+If AskOk$ = vbNullString Then AskOk$ = "OK"
+
+
+If Not aForm Is Nothing Then
+If aForm Is MyPopUp Then
+   If MyPopUp.LASTActiveForm Is Form1 Then
+        NeoMsgBox.Show , Form1
+        MoveFormToOtherMonitorOnly NeoMsgBox, False
+   ElseIf Not MyPopUp.LASTActiveForm Is Nothing Then
+     NeoMsgBox.Show , MyPopUp.LASTActiveForm
+     MoveFormToOtherMonitorOnly NeoMsgBox, True
+   Else
+    NeoMsgBox.Show , Me
+     MoveFormToOtherMonitorOnly NeoMsgBox, True
+   End If
+ElseIf aForm Is Form1 Then
+NeoMsgBox.Show , aForm
+MoveFormToOtherMonitorOnly NeoMsgBox, False
+ElseIf Not aForm Is Nothing Then
+On Error Resume Next
+Unload NeoMsgBox
+Load NeoMsgBox
+NeoMsgBox.Show , aForm
+MoveFormToOtherMonitorOnly NeoMsgBox ',  True
+Else
+On Error Resume Next
+Unload NeoMsgBox
+Load NeoMsgBox
+NeoMsgBox.Show , Form3
+MoveFormToOtherMonitorOnly NeoMsgBox, True
+End If
+ElseIf form5iamloaded Then
+MyDoEvents1 Form5
+Sleep 1
+On Error Resume Next
+Unload NeoMsgBox
+Load NeoMsgBox
+NeoMsgBox.Show , Form5
+MoveFormToOtherMonitorCenter NeoMsgBox
+Else
+On Error Resume Next
+Unload NeoMsgBox
+Load NeoMsgBox
+NeoMsgBox.Show
+MoveFormToOtherMonitorCenter NeoMsgBox
+End If
+'End If
+On Error Resume Next
+''SleepWait3 10
+Sleep 1
+If Form1.Visible Then
+Form1.Refresh
+ElseIf form5iamloaded Then
+Form5.Refresh
+Else
+MyDoEvents
+End If
+On Error GoTo recover
+If IsWine Then
+    Sleep 1
+    safety = uintnew(timeGetTime) + 30
+    While Not NeoMsgBox.Visible And safety < uintnew(timeGetTime)
+        'MyDoEvents
+        'mywait Basestack1, 1, True
+        mywait11 Basestack1, 5
+        Sleep 1
+    Wend
+    
+    If NeoMsgBox.Visible = False Then
+        MyEr "can't open msgbox", "δεν μπορώ να ανοίξω τον διάλογο"
+        GoTo conthere
+        Exit Function
+    End If
+Else
+If Forms.Count < 6 Then mywait11 Basestack1, 5 'SleepWaitEdit bstack, 30
+End If
+If AskInput Then
+NeoMsgBox.gList3.SetFocus
+End If
+  If bstack.ThreadsNumber = 0 Then
+    On Error Resume Next
+    If Not (bstack.Owner Is Form1 Or bstack.toprinter) Then If bstack.Owner.Visible Then bstack.Owner.Refresh
+    End If
+    On Error GoTo recover
+    If Not NeoMsgBox.Visible Then
+    NeoMsgBox.Visible = True
+    MyDoEvents
+    End If
+   
+    Dim mycode As Double, oldcodeid As Double, X As Form
+    mycode = Rnd * 12312314
+    oldcodeid = Modalid
+    For Each X In Forms
+        If X.Name = "GuiM2000" Then
+            Set XX = X
+            If XX.Enablecontrol Then
+                If XX.Modal = 0 Then XX.Modal = mycode
+                XX.Enablecontrol = False
+            End If
+        End If
+        Set XX = Nothing
+    Next X
+    Set X = Nothing
+On Error Resume Next
+Dim safety1 As Long
+While Not NeoMsgBox.Visible And safety1 < 2000
+    NeoMsgBox.Visible = True
+    Err.Clear
+    ProcTask2 bstack
+    safety1 = safety1 + 1
+Wend
+Modalid = mycode
+If Not NeoMsgBox.Visible Then GoTo cont11
+If INFOONLY Then
+NeoMsgBox.command1.SetFocus
+End If
+
+
+Do
+If TaskMaster Is Nothing Then
+      Sleep 1
+      Else
+    
+      If TaskMaster.QueueCount > 0 Then
+            mywait11 Basestack1, 5
+            Sleep 1
+      Else
+        
+       TaskMaster.StopProcess
+       If TaskMaster.PlayMusic Then
+       MusicMaster.TimerTick
+       Sleep 1
+       Else
+       Sleep 5
+       End If
+       DoEvents
+       TaskMaster.StartProcess
+       End If
+      End If
+      
+Loop Until NOEXECUTION Or Not ASKINUSE
+cont11:
+Unload NeoMsgBox
+ Modalid = mycode
+k1 = 0
+ BLOCKkey = True
+While KeyPressed(&H1B)
+
+ProcTask2 bstack
+NOEXECUTION = False
+Wend
+recover:
+On Error GoTo recover2
+BLOCKkey = False
+AskTitle$ = vbNullString
+Dim z As Form
+Set z = Nothing
+For Each X In Forms
+    If X.Name = "GuiM2000" Then
+        Set XX = X
+        If Not XX.Enablecontrol Then
+        XX.TestModal mycode
+        End If
+        If XX.Enablecontrol Then Set z = XX
+        'End If
+        Set XX = Nothing
+    End If
+Next X
+Set X = Nothing
+If Not zz Is Nothing Then Set z = zz
+On Error Resume Next
+If Typename(z) = "GuiM2000" Then
+    Set XX = z
+    XX.Enablecontrol = True
+    If XX.Visible Then
+    XX.ShowmeALL
+    If Not XX.Minimized Then XX.SetFocus
+    End If
+    Set z = Nothing
+    Set XX = Nothing
+ElseIf Not z Is Nothing Then
+    If z.Visible Then z.SetFocus
+End If
+Modalid = oldcodeid
+          
+If INFOONLY Then
+NeoASK = 1
+Else
+NeoASK = Abs(AskCancel$ = vbNullString) + 1
+End If
+If NeoASK = 1 Then
+If AskInput Then
+bstack.soros.PushStr AskStrInput$
+End If
+End If
+GoTo conthere
+recover2:
+' fatal error
+NERR = True: NOEXECUTION = True
+conthere:
+BLOCKkey = False
+'AskCancel$ = vbNullString
+once = False
+ASKINUSE = False
+INK$ = vbNullString
+escok = oldesc
+Exit Function
+
+
+
+End Function
+
+
+Public Function NeoAskBad(bstack As basetask) As Double
 If ASKINUSE Then Exit Function
 On Error GoTo recover
 Dim safety As Long, XX As GuiM2000
@@ -3813,11 +4047,11 @@ End If
 Modalid = oldcodeid
           
 If INFOONLY Then
-NeoASK = 1
+NeoAskBad = 1
 Else
-NeoASK = Abs(AskCancel$ = vbNullString) + 1
+NeoAskBad = Abs(AskCancel$ = vbNullString) + 1
 End If
-If NeoASK = 1 Then
+If NeoAskBad = 1 Then
 If AskInput Then
 bstack.soros.PushStr AskStrInput$
 End If
@@ -3848,7 +4082,7 @@ ask = NeoASK(bstack)
 End Function
 
 Sub mywait(bstack As basetask, pp As Double, Optional SLEEPSHORT As Boolean = False)
-Dim P As Boolean, e As Boolean
+Dim p As Boolean, e As Boolean
 On Error Resume Next
 If bstack.Process Is Nothing Then
 ''If extreme Then MyDoEvents1 Form1
@@ -3856,10 +4090,10 @@ If pp = 0 Then Exit Sub
 Else
 
 Err.Clear
-P = bstack.Process.Done
+p = bstack.Process.Done
 If Err.Number = 0 Then
 e = True
-If P <> 0 Then
+If p <> 0 Then
 Exit Sub
 End If
 End If
@@ -3881,9 +4115,9 @@ Do
         End If
 If SLEEPSHORT Then Sleep 1
 If e Then
-P = bstack.Process.Done
+p = bstack.Process.Done
 If Err.Number = 0 Then
-If P <> 0 Then
+If p <> 0 Then
 Exit Do
 End If
 End If

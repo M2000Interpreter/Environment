@@ -12,15 +12,13 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 ' FROM THE TRICK VBFORUMS
+Option Explicit
 Private Declare Function GetMem2 Lib "msvbvm60" (pSrc As Any, pDst As Any) As Long
 Private Declare Function GetMem4 Lib "msvbvm60" (pSrc As Any, pDst As Any) As Long
 Private Declare Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (arr() As Any) As Long
-'Public Type cxTest
-'    v   As Double
-'    S   As String
-'    K() As String
-'End Type
-
+Public Type ExtArray
+    baseArr As Variant
+End Type
 Public Type Complex
     r   As Double
     i   As Double
@@ -37,11 +35,56 @@ Private Const e = 2.71828182845905
 
 Private Const PI2 = Pi / 2
 
-'Public Function TstCreate(v As Double, S As String, mSize As Long) As cxTest
-'    TstCreate.v = v
-'    TstCreate.S = S
-'    ReDim TstCreate.K(mSize - 1)
-'End Function
+Friend Sub CompactVBArray(Addr_variant, Addr_variant_out)
+    Dim z, z1, z2, build As ExtArray
+    If MemInt(Addr_variant_out) = 0 Then
+    z1 = build
+    MemCopy VarPtr(z), Addr_variant, 16
+    SwapVariant z, z1.baseArr
+    MemCopy Addr_variant_out, VarPtr(z1), 16
+    MemCopy VarPtr(z1), VarPtr(z2), 16
+    z = Empty
+    MemCopy Addr_variant, VarPtr(z), 16
+    End If
+End Sub
+Friend Sub DumpVBArray(Addr_variant)
+    Dim z, z1
+    If MemInt(Addr_variant) = 36 Then
+        MemCopy VarPtr(z1), Addr_variant, 16
+        SwapVariant z, z1.baseArr
+       ' Debug.Print MemInt(VarPtr(z))
+       ' Debug.Print MemInt(MemLong(VarPtr(z) + 8)) ' dimensions
+       ' Debug.Print MemInt(MemLong(VarPtr(z) + 8) + 2) '
+       ' Debug.Print MemLong(MemLong(VarPtr(z) + 8) + 4) 'cbelements = 8 for long long
+       ' Debug.Print MemLong(MemLong(VarPtr(z) + 8) + 12) ' pointer to data
+       ' Debug.Print MemLong(MemLong(MemLong(VarPtr(z) + 8) + 12)) ' low 32 bits
+        
+        MemCopy Addr_variant, VarPtr(z), 16
+        z1 = Empty
+        MemCopy VarPtr(z), VarPtr(z1), 16
+    End If
+End Sub
+Public Function CreateArray(typeofarray As Integer, ParamArray Dimensions()) As ExtArray
+    Dim mm As mArray, i As Long
+    
+    
+    If UBound(Dimensions) - LBound(Dimensions) = -1 Then
+        CreateArray.baseArr = LibMemory.EmptyArray(1, typeofarray)
+        ReDim CreateArray.baseArr(0)
+    Else
+        Set mm = New mArray
+        mm.myarrbase = -CLng(Dimensions(0))
+        mm.MyTypeToBe = typeofarray
+        mm.RevOrder = True
+        For i = 1 To UBound(Dimensions)
+            If Dimensions(i) < 1 Then Dimensions(i) = 1
+            mm.PushDim CLng(Dimensions(i))
+        Next
+        mm.PushEnd
+        mm.ExportAndDestroy VarPtr(CreateArray.baseArr)
+    End If
+End Function
+
 
 '+=====================================================================================================================================+
 '|                                                            Real numbers                                                             |
@@ -53,8 +96,8 @@ Public Function Deg(ByVal Value As Double) As Double
 End Function
 
 ' // The logarithm to the base of a real number X
-Public Function LogX(ByVal Value As Double, ByVal Base As Double) As Double
-    LogX = Log(Value) / Log(Base)
+Public Function LogX(ByVal Value As Double, ByVal base As Double) As Double
+    LogX = Log(Value) / Log(base)
 End Function
 
 ' // The decimal logarithm of a real number
@@ -450,8 +493,15 @@ Public Function cxPowRealComp(Op1 As Double, Op2 As Complex, Optional NumDigitsA
    cxPowRealComp.i = Round(cxPowRealComp.i, NumDigitsAfterDecimal)
    End If
 End Function
-Public Function cxPowRealCompVar(ByVal Op1 As Double, Op2) As Complex
+Public Function cxPowRealCompVar2(ByVal Op1 As Double, Op2, NumDigitsAfterDecimal As Long) As Complex
     If Round(Op2.i, NumDigitsAfterDecimal) = 0 Then
+        cxPowRealCompVar2 = cxNew(Op1 ^ Op2.r, 0)
+    Else
+        cxPowRealCompVar2 = cxExp(cxMulRealVar(Op2, Log(Op1)))
+    End If
+End Function
+Public Function cxPowRealCompVar(ByVal Op1 As Double, Op2) As Complex
+    If Round(Op2.i, 0) = 0 Then
         cxPowRealCompVar = cxNew(Op1 ^ Op2.r, 0)
     Else
         cxPowRealCompVar = cxExp(cxMulRealVar(Op2, Log(Op1)))
@@ -564,17 +614,17 @@ End Function
 ' // Return true if complex number is equal
 Public Function cxEq(Op1 As Complex, Op2 As Complex, _
                 Optional NumDigitsAfterDecimal As Long = -1) As Boolean
-        Dim Z As Double
+        Dim z As Double
     If NumDigitsAfterDecimal = -1 Then
-        Z = Op1.r + Op2.r
-        If Z > 10000000000# Then
+        z = Op1.r + Op2.r
+        If z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEq = True
         Else
         If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEq = True
         End If
     Else
-        Z = Op1.r + Op2.r
-        If Z > 10000000000# Then
+        z = Op1.r + Op2.r
+        If z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEq = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
@@ -583,19 +633,19 @@ Public Function cxEq(Op1 As Complex, Op2 As Complex, _
     End If
 End Function
 Public Function cxEqVar(Op1, Op2) As Boolean
-        Dim Z As Double
-        Z = Op1.r + Op2.r
-        If Z > 10000000000# Then
+        Dim z As Double
+        z = Op1.r + Op2.r
+        If z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqVar = True
         Else
             If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqVar = True
         End If
 End Function
 Public Function cxEqVar3(Op1, Op2, ByVal NumDigitsAfterDecimal As Long) As Boolean
-        Dim Z As Double
-        Z = Op1.r + Op2.r
-        Z = Op1.r + Op2.r
-        If Z > 10000000000# Then
+        Dim z As Double
+        z = Op1.r + Op2.r
+        z = Op1.r + Op2.r
+        If z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqVar3 = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
@@ -603,10 +653,10 @@ Public Function cxEqVar3(Op1, Op2, ByVal NumDigitsAfterDecimal As Long) As Boole
         End If
 End Function
 Public Function cxEqComVar3(Op1 As Complex, Op2, ByVal NumDigitsAfterDecimal As Long) As Boolean
-        Dim Z As Double
-        Z = Op1.r + Op2.r
-        Z = Op1.r + Op2.r
-        If Z > 10000000000# Then
+        Dim z As Double
+        z = Op1.r + Op2.r
+        z = Op1.r + Op2.r
+        If z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqComVar3 = True
         Else
         If Round(Op1.r, NumDigitsAfterDecimal) = Round(Op2.r, NumDigitsAfterDecimal) And _
@@ -614,10 +664,10 @@ Public Function cxEqComVar3(Op1 As Complex, Op2, ByVal NumDigitsAfterDecimal As 
         End If
 End Function
 Public Function cxEqComVar(Op1 As Complex, Op2) As Boolean
-        Dim Z As Double
+        Dim z As Double
         On Error GoTo 1000
-        Z = Op1.r + Op2.r
-        If Z > 10000000000# Then
+        z = Op1.r + Op2.r
+        If z > 10000000000# Then
             If Abs((Op1.r - Op2.r) / (Op1.r + Op2.r)) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqComVar = True
         Else
             If Abs(Op1.r - Op2.r) < 0.00000000000001 And Abs(Op1.i - Op2.i) < 0.00000000000001 Then cxEqComVar = True
@@ -659,11 +709,11 @@ Public Function cxlogVar(Op) As Complex
     cxlogVar.r = Log(M): cxlogVar.i = a
 End Function
 ' // The logarithm of a complex number by base X
-Public Function cxLogX(Op As Complex, ByVal Base As Double) As Complex
-    Dim M As Double, a As Double, Nc As Complex
-    M = cxMod(Op): a = cxArg(Op): Nc.r = Log(Base)
+Public Function cxLogX(Op As Complex, ByVal base As Double) As Complex
+    Dim M As Double, a As Double, nc As Complex
+    M = cxMod(Op): a = cxArg(Op): nc.r = Log(base)
     cxLogX.r = Log(M): cxLogX.i = a
-    cxLogX = cxDiv(cxLogX, Nc)
+    cxLogX = cxDiv(cxLogX, nc)
 End Function
 
 ' // Sine of a complex number
@@ -676,33 +726,33 @@ Public Function cxCos(Op As Complex) As Complex
 End Function
 ' // Tangent of a complex number
 Public Function cxTan(Op As Complex) As Complex
-    Dim c2 As Double, S2 As Double
-    c2 = Cos(Op.r): c2 = c2 * c2: S2 = Sinh(Op.i): S2 = S2 * S2
-    cxTan.r = (Sin(Op.r) * Cos(Op.r)) / (c2 + S2)
-    cxTan.i = (Sinh(Op.i) * Cosh(Op.i)) / (c2 + S2)
+    Dim c2 As Double, s2 As Double
+    c2 = Cos(Op.r): c2 = c2 * c2: s2 = Sinh(Op.i): s2 = s2 * s2
+    cxTan.r = (Sin(Op.r) * Cos(Op.r)) / (c2 + s2)
+    cxTan.i = (Sinh(Op.i) * Cosh(Op.i)) / (c2 + s2)
 End Function
 ' // Cotangent of a complex number
 Public Function cxCtg(Op As Complex) As Complex
-    Dim c2 As Double, S2 As Double
-    c2 = Sin(Op.r): c2 = c2 * c2: S2 = Sinh(Op.i): S2 = S2 * S2
-    cxCtg.r = (Sin(Op.r) * Cos(Op.r)) / (c2 + S2)
-    cxCtg.i = -(Sinh(Op.i) * Cosh(Op.i)) / (c2 + S2)
+    Dim c2 As Double, s2 As Double
+    c2 = Sin(Op.r): c2 = c2 * c2: s2 = Sinh(Op.i): s2 = s2 * s2
+    cxCtg.r = (Sin(Op.r) * Cos(Op.r)) / (c2 + s2)
+    cxCtg.i = -(Sinh(Op.i) * Cosh(Op.i)) / (c2 + s2)
 End Function
 
 ' // Secant of a complex number
 Public Function cxSec(Op As Complex) As Complex
-    Dim c2 As Double, S2 As Double
-    c2 = Cos(Op.r): c2 = c2 * c2: S2 = Sinh(Op.i): S2 = S2 * S2
-    cxSec.r = (Cos(Op.r) * Cosh(Op.i)) / (c2 + S2)
-    cxSec.i = -(Sin(Op.r) * Sinh(Op.i)) / (c2 + S2)
+    Dim c2 As Double, s2 As Double
+    c2 = Cos(Op.r): c2 = c2 * c2: s2 = Sinh(Op.i): s2 = s2 * s2
+    cxSec.r = (Cos(Op.r) * Cosh(Op.i)) / (c2 + s2)
+    cxSec.i = -(Sin(Op.r) * Sinh(Op.i)) / (c2 + s2)
 End Function
 
 ' // Cosecant of a complex number
 Public Function cxCsc(Op As Complex) As Complex
-    Dim c2 As Double, S2 As Double
-    c2 = Sin(Op.r): c2 = c2 * c2: S2 = Sinh(Op.i): S2 = S2 * S2
-    cxCsc.r = (Sin(Op.r) * Cosh(Op.i)) / (c2 + S2)
-    cxCsc.i = (Cos(Op.r) * Sinh(Op.i)) / (c2 + S2)
+    Dim c2 As Double, s2 As Double
+    c2 = Sin(Op.r): c2 = c2 * c2: s2 = Sinh(Op.i): s2 = s2 * s2
+    cxCsc.r = (Sin(Op.r) * Cosh(Op.i)) / (c2 + s2)
+    cxCsc.i = (Cos(Op.r) * Sinh(Op.i)) / (c2 + s2)
 End Function
 
 ' // Arcsine of a complex number
@@ -789,16 +839,16 @@ End Function
 
 ' // Hyperbolic arcsecant of a complex number
 Public Function cxAsech(Op As Complex) As Complex
-    Dim Z As Complex
-    Z = cxRealDiv(1, Op)
-    cxAsech = cxlog(cxAdd(Z, cxSqr(cxAddReal(cxMul(Z, Z), 1))))
+    Dim z As Complex
+    z = cxRealDiv(1, Op)
+    cxAsech = cxlog(cxAdd(z, cxSqr(cxAddReal(cxMul(z, z), 1))))
 End Function
 
 ' // Hyperbolic arccosecant of a complex number
 Public Function cxAcsch(Op As Complex) As Complex
-    Dim Z As Complex
-    Z = cxRealDiv(1, Op)
-    cxAcsch = cxlog(cxAdd(Z, cxMul(cxSqr(cxAddReal(Z, 1)), cxSqr(cxSubReal(Z, 1)))))
+    Dim z As Complex
+    z = cxRealDiv(1, Op)
+    cxAcsch = cxlog(cxAdd(z, cxMul(cxSqr(cxAddReal(z, 1)), cxSqr(cxSubReal(z, 1)))))
 End Function
 ' // Print matrix to immediate window
 Public Function PrintMtrx(Op As Matrix)
@@ -814,13 +864,13 @@ End Function
 
 ' // Creating a matrix
 Public Function mxCreate(ByVal Row As Long, ByVal Col As Long, ParamArray Y()) As Matrix
-    Dim p As Variant, c As Long
+    Dim P As Variant, c As Long
     If Row <= 0 Or Col <= 0 Then Exit Function
     If Row * Col < UBound(Y) + 1 Then Exit Function
     mxCreate.Row = Row: mxCreate.Col = Col
     ReDim mxCreate.D(Row * Col - 1): c = 0
-    For Each p In Y
-        mxCreate.D(c) = p: c = c + 1
+    For Each P In Y
+        mxCreate.D(c) = P: c = c + 1
     Next
 End Function
 
@@ -840,8 +890,8 @@ End Function
 
 ' // Transpose matrix
 Public Function mxTrans(Op As Matrix) As Matrix
-    Dim i As Long, j As Long, p As Long
-    GetMem4 ByVal ArrPtr(Op.D), p: If p = 0 Then Exit Function
+    Dim i As Long, j As Long, P As Long
+    GetMem4 ByVal ArrPtr(Op.D), P: If P = 0 Then Exit Function
     mxTrans.Row = Op.Col: mxTrans.Col = Op.Row: ReDim mxTrans.D(UBound(Op.D))
     For j = 0 To mxTrans.Col - 1: For i = 0 To mxTrans.Row - 1
         mxTrans.D(i + j * mxTrans.Row) = Op.D(j + i * Op.Row)
@@ -850,17 +900,17 @@ End Function
 
 ' // Multiplication matrix on a real number
 Public Function mxMulReal(Op As Matrix, Op2 As Double) As Matrix
-    Dim p As Long, ij As Long
-    GetMem4 ByVal ArrPtr(Op.D), p: If p = 0 Then Exit Function
+    Dim P As Long, ij As Long
+    GetMem4 ByVal ArrPtr(Op.D), P: If P = 0 Then Exit Function
     ReDim mxMulReal.D(UBound(Op.D)): mxMulReal.Col = Op.Col: mxMulReal.Row = Op.Row
     For ij = 0 To UBound(Op.D): mxMulReal.D(ij) = Op.D(ij) * Op2: Next
 End Function
 
 ' // Addition of a two matrix
 Public Function mxAdd(Op1 As Matrix, Op2 As Matrix) As Matrix
-    Dim p As Long, ij As Long
-    GetMem4 ByVal ArrPtr(Op1.D), p: If p = 0 Then Exit Function
-    GetMem4 ByVal ArrPtr(Op2.D), p: If p = 0 Then Exit Function
+    Dim P As Long, ij As Long
+    GetMem4 ByVal ArrPtr(Op1.D), P: If P = 0 Then Exit Function
+    GetMem4 ByVal ArrPtr(Op2.D), P: If P = 0 Then Exit Function
     If Op1.Col <> Op2.Col Or Op1.Row <> Op2.Row Then Exit Function
     ReDim mxAdd.D(UBound(Op1.D)): mxAdd.Col = Op1.Col: mxAdd.Row = Op1.Row
     For ij = 0 To UBound(Op1.D): mxAdd.D(ij) = Op1.D(ij) + Op2.D(ij): Next
@@ -868,9 +918,9 @@ End Function
 
 ' // Subtaction of a two matrix
 Public Function mxSub(Op1 As Matrix, Op2 As Matrix) As Matrix
-    Dim p As Long, ij As Long
-    GetMem4 ByVal ArrPtr(Op1.D), p: If p = 0 Then Exit Function
-    GetMem4 ByVal ArrPtr(Op2.D), p: If p = 0 Then Exit Function
+    Dim P As Long, ij As Long
+    GetMem4 ByVal ArrPtr(Op1.D), P: If P = 0 Then Exit Function
+    GetMem4 ByVal ArrPtr(Op2.D), P: If P = 0 Then Exit Function
     If Op1.Col <> Op2.Col Or Op1.Row <> Op2.Row Then Exit Function
     ReDim mxSub.D(UBound(Op1.D)): mxSub.Col = Op1.Col: mxSub.Row = Op1.Row
     For ij = 0 To UBound(Op1.D): mxSub.D(ij) = Op1.D(ij) - Op2.D(ij): Next
@@ -878,19 +928,19 @@ End Function
 
 ' // Multiplication of a two matrix
 Public Function mxMul(Op1 As Matrix, Op2 As Matrix) As Matrix
-    Dim p As Long, i As Long, j As Long, k As Long, iM As Long, i1 As Long, i2 As Long
-    GetMem4 ByVal ArrPtr(Op1.D), p: If p = 0 Then Exit Function
-    GetMem4 ByVal ArrPtr(Op2.D), p: If p = 0 Then Exit Function
+    Dim P As Long, i As Long, j As Long, k As Long, im As Long, i1 As Long, i2 As Long
+    GetMem4 ByVal ArrPtr(Op1.D), P: If P = 0 Then Exit Function
+    GetMem4 ByVal ArrPtr(Op2.D), P: If P = 0 Then Exit Function
     If Op1.Col <> Op2.Row Then Exit Function
     ReDim mxMul.D(Op1.Row * Op2.Col - 1): mxMul.Col = Op2.Col: mxMul.Row = Op1.Row
     For i = 0 To Op1.Row - 1
         For j = 0 To Op2.Col - 1
         i2 = j
         For k = 0 To Op1.Col - 1
-            mxMul.D(iM) = mxMul.D(iM) + Op1.D(i1 + k) * Op2.D(i2)
+            mxMul.D(im) = mxMul.D(im) + Op1.D(i1 + k) * Op2.D(i2)
             i2 = i2 + Op2.Col
         Next
-        iM = iM + 1
+        im = im + 1
         Next
     i1 = i1 + Op1.Col
     Next
@@ -898,18 +948,18 @@ End Function
 
 ' // Determinant of a square matrix
 Public Function mxDtm(Op As Matrix) As Double
-    Dim p1 As Long, p2 As Long, ij1 As Long, ij2 As Long, Ct As Long, l As Long, t1 As Double, t2 As Double
-    GetMem4 ByVal ArrPtr(Op.D), p1: If p1 = 0 Then Exit Function
+    Dim P1 As Long, P2 As Long, ij1 As Long, ij2 As Long, Ct As Long, l As Long, t1 As Double, t2 As Double
+    GetMem4 ByVal ArrPtr(Op.D), P1: If P1 = 0 Then Exit Function
     If Op.Col <> Op.Row Then Exit Function
     mxDtm = Determinant(Op)
 End Function
 ' Function to compute determinant using Gaussian Elimination
-Private Function Determinant(Z As Matrix) As Double
+Private Function Determinant(z As Matrix) As Double
     Dim n As Integer, i As Integer, j As Integer, k As Integer
     Dim pivot As Integer, maxRow As Integer
     Dim factor As Double, det As Double, temp As Double
     Dim Size As Integer
-    Size = Z.Row
+    Size = z.Row
     det = 1
     
     ' Create a working copy to avoid modifying the original
@@ -918,7 +968,7 @@ Private Function Determinant(Z As Matrix) As Double
     ReDim mat(0 To Size - 1, 0 To Size - 1)
     For i = 0 To Size - 1
         For j = 0 To Size - 1
-            mat(i, j) = Z.D(q): q = q + 1
+            mat(i, j) = z.D(q): q = q + 1
         Next j
     Next i
 
@@ -957,12 +1007,12 @@ Private Function Determinant(Z As Matrix) As Double
     
     Determinant = det
 End Function
-Public Function mxInv(Z As Matrix) As Matrix
+Public Function mxInv(z As Matrix) As Matrix
     Dim i As Long, j As Long, k As Long, n As Long, q As Integer
     Dim temp As Double
     Dim pivot As Double
     Dim Aug() As Double
-    n = Z.Row
+    n = z.Row
     ' Augmented matrix: [A | I]
     ReDim Aug(1 To n, 1 To 2 * n)
     ReDim Inv(1 To n, 1 To n)
@@ -970,7 +1020,7 @@ Public Function mxInv(Z As Matrix) As Matrix
     ' Build augmented matrix
     For i = 1 To n
         For j = 1 To n
-            Aug(i, j) = Z.D(q): q = q + 1
+            Aug(i, j) = z.D(q): q = q + 1
         Next j
         For j = 1 To n
             If i = j Then
@@ -1004,7 +1054,7 @@ Public Function mxInv(Z As Matrix) As Matrix
         
         ' Still zero -> matrix is singular
         If Abs(pivot) < 0.0000000001 Then
-            MatrixInverse = Empty
+            mxInv = mxNull(n, n)
             Exit Function
         End If
         

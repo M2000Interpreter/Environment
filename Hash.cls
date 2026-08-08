@@ -28,7 +28,7 @@ Private PriveSpace() As item
 Public MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Public index As Long
 Private Hash() As Long
 Private entrance As Long

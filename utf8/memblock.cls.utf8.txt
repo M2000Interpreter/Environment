@@ -19,7 +19,7 @@ Private mBytes As Long
 Private ErrorMes As Long
 Public structref As StructCollection
 Public UseStruct As Boolean
-Private mExecBloc As Boolean, mCallBack As Boolean, oldV As Long
+Private mExecBloc As Boolean, mCallback As Boolean, oldV As Long
 Private Strings As LongHash2
 Private BasicItem As Integer
 Private mType1 As Boolean
@@ -68,7 +68,7 @@ Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpD
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
 Private Declare Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -91,7 +91,7 @@ Const CF_ENHMETAFILE = 14
 
 
 Sub Construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
-If mCallBack Then ErrorMes = 1: Exit Sub
+If mCallback Then ErrorMes = 1: Exit Sub
 If mitems <> 0 Then
 If mitems <> Times Or mBytes <> ByteLen * Times Then
     ErrorMes = 1: Exit Sub
@@ -147,7 +147,7 @@ Public Property Get status()
     status = ErrorMes
 End Property
 Public Sub ResizeItems(NewSize As Long, Optional clearme As Long = 0)
-If mCallBack Then ErrorMes = 1: Exit Sub
+If mCallback Then ErrorMes = 1: Exit Sub
 If mBytes = 0 Then Exit Sub
 Dim oPtr As Long
 
@@ -158,6 +158,7 @@ If NewSize > 0 Then
         If oPtr <> 0 Then
             mitems = NewSize
             mPtr = oPtr
+            mBytes = itemlen * NewSize
         Else
             ErrorMes = 3
         End If
@@ -180,6 +181,7 @@ If NewSize > 0 Then
             ErrorMes = 3
         End If
     End If
+    
     End If
 Else
     ErrorMes = 2
@@ -289,7 +291,7 @@ If mPtr <> 0 Then
             BlockFree mPtr
         End If
     Else
-            If callback Then callback = False
+            If Callback Then Callback = False
             BlockFreeVirtual mPtr, mBytes
             mBytes = 0
     End If
@@ -763,7 +765,7 @@ Dim a1 As SAFEARRAY1D, a() As Byte, token As Long
     
     CopyMemory ByVal VarPtrArray(a), 0&, 4
 End Sub
-Function Copy(Optional r As Long = 0, Optional P As Long = 0) As Object
+Function Copy(Optional r As Long = 0, Optional p As Long = 0) As Object
 Dim aCopy As New MemBlock, BLen As Long, hMem As Long
 If mitems > 0 Then
     If mExecBloc Then
@@ -774,12 +776,12 @@ If mitems > 0 Then
     mitems = BLen \ itemlen
     If r <> 0 Then
         If r >= 0 And r < mitems Then
-            If P >= 1 Then
-                aCopy.Construct itemlen, CLng(P), , r = 0 And Not mExecBloc, BasicItem
-                If mitems < P Then
-                    P = mitems
+            If p >= 1 Then
+                aCopy.Construct itemlen, CLng(p), , r = 0 And Not mExecBloc, BasicItem
+                If mitems < p Then
+                    p = mitems
                 End If
-                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen * P
+                CopyMemory ByVal aCopy.GetPtr(0), ByVal Me.GetPtr(r), itemlen * p
             Else
            
                 aCopy.Construct itemlen, 1&, , Not mExecBloc, BasicItem
@@ -1002,7 +1004,7 @@ If w2 <> -1 Then w2 = w2 / dv15
     
     aa.SaveDibToMeMBlock k
     Set kk = k
-    Dim P
+    Dim p
     
     If rot <> 0 Then
         aa.ClearUp
@@ -1135,13 +1137,13 @@ Friend Property Let type1(ByVal vNewValue As Variant)
     mType1 = CBool(vNewValue)
 End Property
 
-Public Property Get callback() As Boolean
-    callback = mCallBack
+Public Property Get Callback() As Boolean
+    Callback = mCallback
 End Property
 Public Property Let callback2(ByVal RHS As Boolean)
 Dim obj As Object
 If Not mExecBloc Then
-    If mCallBack <> RHS Then
+    If mCallback <> RHS Then
         If RHS Then
             Set obj = Me
             Err.Clear
@@ -1162,16 +1164,16 @@ If Not mExecBloc Then
             Err.Clear
         End If
     End If
-    mCallBack = RHS
+    mCallback = RHS
 Else
-    mCallBack = False
+    mCallback = False
 End If
 End Property
 
-Public Property Let callback(ByVal RHS As Boolean)
+Public Property Let Callback(ByVal RHS As Boolean)
 Dim obj As Object
 If Not mExecBloc Then
-    If mCallBack <> RHS Then
+    If mCallback <> RHS Then
         If RHS Then
             Set obj = Me
             Err.Clear
@@ -1192,8 +1194,8 @@ If Not mExecBloc Then
             Err.Clear
         End If
     End If
-    mCallBack = RHS
+    mCallback = RHS
 Else
-    mCallBack = False
+    mCallback = False
 End If
 End Property

@@ -11,6 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
+Option Explicit
 Public WithEvents mycontrol As VBControlExtender
 Attribute mycontrol.VB_VarHelpID = -1
 Dim another As Object
@@ -64,6 +65,7 @@ End Sub
 
 Private Sub mycontrol_ObjectEvent(Info As EventInfo)
 Dim Values(), M As Long, uk1 As Object
+Dim check As Variant
 'Debug.Print Info.Name, mycontrol.Name
 If LCase(Info.Name) = "lostfocus" Or LCase(Info.Name) = "lostfocus1" Then
 If mycontrol.enabled And mycontrol.Visible Then
@@ -91,21 +93,28 @@ If Info.EventParameters.Count > 0 Then
 ReDim Values(0 To Info.EventParameters.Count)
 Dim evinf As EventParameter
 M = 0
-'Dim check As Variant
+
 For Each evinf In Info.EventParameters
-On Error GoTo 100
-    Set check = evinf
-    If MemLong(MemLong(VarPtr(check) + 8) + 24) = 0 Then
-        Err.Clear
-        Values(M) = "Error"
+    On Error Resume Next
+    check = evinf
+    If Err.Number Then
+    Err.Clear
+    On Error GoTo 100
+    Set Values(M) = evinf
     Else
-        If MyIsObject(evinf.Value) Then
-            Set Values(M) = evinf.Value
-        Else
-            Values(M) = evinf.Value
-        End If
-        
+    Values(M) = check
     End If
+    
+    'If MemLong(MemLong(VarPtr(check) + 8) + 24) = 0 Then
+    '    Err.Clear
+    '    Values(M) = "Error"
+    'Else
+    '    If MyIsObject(evinf.Value) Then
+    '        Set Values(M) = evinf.Value
+    '    Else
+    '        Values(M) = evinf.Value
+    '    End If
+    'End If
 100
     If Err Then
         Err.Clear
@@ -119,6 +128,7 @@ If mIndex <> -1 Then
 Else
     Callback.CallbackNow myname$ + "." + Info.Name + "()", Values()
 End If
+Err.Clear
 On Error Resume Next
 With Info.EventParameters
 For M = M - 1 To 0

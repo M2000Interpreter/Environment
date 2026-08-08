@@ -1814,10 +1814,15 @@ Private Function ParseRawData() As Boolean
                     lngTemp = .ValueCount
                     
                     ReDim Preserve .Values(.ValueCount + Len(token.content) - 1) As Long
+                    If udtInstr.Data.Size = Bits8 Then
                     For i = 1 To Len(token.content)
                         .Values(lngTemp + i - 1) = Asc(Mid$(token.content, i, 1))
                     Next
-                    
+                    Else
+                    For i = 1 To Len(token.content)
+                        .Values(lngTemp + i - 1) = AscW(Mid$(token.content, i, 1))
+                    Next
+                    End If
                     .ValueCount = .ValueCount + Len(token.content)
                     Match TokenString
                     
@@ -2796,8 +2801,16 @@ cont1231:
                         Else
                             
                             If GetlocalVar(clsToken.content, i) Then
-                                clsToken.content = Trim(str$(CLng(var(i))))
-                                clsToken.TType = TokenValue
+                                'clsToken.content = Trim(str$(CLng(var(i))))
+                                If MemInt(VarPtr(var(i))) = vbString Then
+                                    clsToken.content = var(i)
+                                
+                                    clsToken.TType = TokenString
+                                Else
+                                    clsToken.content = Trim(str$(CLng(var(i))))
+                                
+                                    clsToken.TType = TokenValue
+                                End If
                             Else
                                 clsToken.TType = tokensymbol
                             End If

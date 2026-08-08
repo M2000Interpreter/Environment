@@ -1,128 +1,35 @@
 M2000 Interpreter and Environment
-Version 15 Revision 19
+Version 15 Revision 20
 
-July 31, 2026,
+August 8, 2026,
 
-1. Octal numbers: using 0o or 0q or &o
-' by default are signed long but we can use % for 16bit integer (no 64bit yet)
-? 0o77&=63, 0q77&=63, &o77&=63
-? 0o177766=65526, 0q177766=65526, &o177766=65526
-? 0o177766%=-10, 0q177766%=-10, &o177766%=-10
+1. Upgrade Assembly: Asm2 example now create exe with a form with a Unicode title. The BW directive place the Unicode string. Also now the external M2000 variables which previous used for numbers now works for string values too (see the Asm2 in new Info file).
 
-This is not so simple because I had to fix the TextViewer.cls and the GuiEditBox.cls (which they have the colouring algorithm) to display the octal values with the same color as the signed hex values for long and integers.
+2. Advance work for COM objects.
+	2.1 we can pass by value or by reference arrays with parenthesis (mArray objects).
+		this works by sending by reference the underline array, if we choose the reference pass (using & before name)
+	2.2 we can get arrays like a long() as return value, and we can use it as parameter.
+		we can convert to mArray object using Array() function:
+		2.3 using array(variant_holding_array) we get a copy of array
+		2.4 using array(&variant_holding_array) we get the array leaving empty array in variant_holding_array, without copy data.
+	2.3 Now a biginteger object treated as non object (the same as Evaluator does, except when we have a name and place the => operator - for accessing properties and methos. We cant use this for biginteger literals)
+	2.4. Now enumerations do not passed as objects (which are), but as values. Some revisions/versions they have default value the Value property but the last revisions do not have default property. So Older examples - using interpreter with Enumerations with default value works like the new one. 
+	2.5 functions/properties which we call using object=>function( ) or  object=>property( ) may use by reference and call using name of parameter. For example if object has a function function1 with Argame1 and Argname2 arguments then we can do this:
+	retvalue= object=>function1( Argname1:=ThsValueByVal, Argname2:=&ThisValueByRef)
+	And for altering property1 (lets say that have the same arguments signature)
+	object=>property1(Argname1:=ThsValueByVal, Argname2:=&ThisValueByRef)=NewValue
+	
+This works using the old way:
+	Method object, "function1",  Argname1:=ThsValueByVal, Argname2:=&ThisValueByRef as RetValue.
+	for properties there was no old way to use named arguments and by reference arguments for indexes. So the new way solve this.
+	
+	2.6 There is a lot of work for error control, so now we get feedback. Shapeex before the new error system, use a non exist property...(doing nothing but without a message...). So maybe older programs may have errors which the new interpreter may found it. For forms where an instance may delete from the user and some thread attempt to use it now we get error, so a Try { } block can recover from the error, until you master it and understand what cause it.
 
-2. Assembler x86 updated.
+3. Upgrade sructures. We can use operators ++, --, +=, -=, *=, /= for numeric types, and += for BSTR type of strings.
 
-2.1 Preprocessor now are very fast (I put a Fastcollection to use hash function for founding the EQU replacements). Also I put a document object (as a string of strings) to fast collect lines.
-Also now lines with EQU may have leading spaces (original code do not import a symbol and the equ value if the symbol not starting from position 1)
+4. Modules FUNCTOR and VBCOL2 now works as expected. Asm2 for Unicode form. Excel2 now get array from Excel, change items using the array and write back with one statement. See also struct3, struct4, jscript and mEditor (updated).
 
-2.2 Now we can use variables outside from Assembly code and Assembler use them as symbols for geting values (like Equ but the labels are variables of M2000. here the dd find alfa and alfa return value 123454321. An EQU get all characters and just replace it in every same name (no case sensitive. Fastcollection bydefault is case sensitive but we can change it if it is empty). An external varianle has value not characters as the EQU case.
-
-alfa=123454321
-E_NOINTERFACE=0x80004002&
-bb={
-Mystery_one EQU [Data]
- 	mov eax, E_NOINTERFACE
-    ret 16
-ASM_TEST_RAWDATA:
-		mov eax, Mystery_one
-		ret 16
-Data:
-		dd alfa
-}
-
-2.3 Octal numbers for the Assembler plus 0x among &H for hexadecimal numbers.
-     Now 0x works as &H (signed long), plus 0q, 0o and &o for Octal numbers.
-     Also underscore can be used as phantom characters for numbers so 0o77_7 is 0o777.
-
-2.4 Reading relative and absolute values for labels after the compiling of x86 code.
-	assembler=>labeloffset("start_code") return the offset for code buffer
-	assembler=>labelptr("start_code") for getting the absolute address.
-	*** the star_code is a label defined in assembly source text.
-
-2.5 lock a code buffer for using it for calling from other code buffer (or a callback),
-	so the first buffer may have functions for objects. 
- 
- 
-Assembler =getobject("","m2000.x86")
-function MachineCode(assembly, &mc as buffer) {
-		if Assembler=>assemble(assembly, true) then
-		' get the output size
-		local OutPutSize=Assembler=>OutputSize
-		buffer code mc as byte*OutputSize
-		' feed the base address to Assembler
-		Assembler=>BaseAddress=mc(0)
-		if Assembler=>assemble(assembly) then
-				' get a copy of final machine code
-				mc=>FillDataFromMem Assembler=>GetOutPtr
-				exit
-		end if
-	end if
-	error Assembler=>LastErrorMessage 
-}
-
-S_OK =0x00000000&
-E_NOINTERFACE = 0x80004002&
-bb={	
-start_code:	
-	mov eax, E_NOINTERFACE
-    ret 16
-start_code2:
-	mov eax, E_NOINTERFACE
-	ret
-}
-cc={	
-start_code2:	
-	mov eax, 0
-    Call start_code_ptr  
-    ret 16
-}
-buffer code mycode as byte*0x1000
-buffer code mycode2 as byte*0x1000
-
-' we use call local so the function called:
-' like a module and using this module namespace.
-call local MachineCode(bb, &mycode)
-
-start_code_offset=assembler=>labeloffset("start_code")
-' the offset used for calling by Execute Code
-' the call (using Execute Call) pass 4 parameters
-' (if we do not provide the any or all of them intepreter pass zero 32bit for each missing)
-' so we need a Ret 16 (drop 16 bytes, 4x 32bit numbers/pointers)
-
-' we can't use this function using a call from another point
-' - we have to push eax four times
-' but we may have proper Ret from another label, like start_code2
-start_code_ptr=assembler=>labelptr("start_code2")
-call local MachineCode(cc, &mycode2) 
-Hex "start_code_ptr=";start_code_ptr
-' M2000 when execute machine code from a buffer
-' set the buffer for execution 
-' also by default we can't write on the block, only read & execute
-' and at return of execution interpreter reset execution flag for buffer.
-' so the specific buffer can't execute code. Not from another another block.
-' When we call with Execution Code! (notice the !) we can read/write  the block
-' so this is good for using space for variables. But we can use another buffer
-' for reading and writting (a buffer only for data)
-
-' So the idea now is to set flag for execution and read/write before execution
-' magic begin here:
-mycode=>Callback=true
-
-Execute Code! mycode, start_code_offset;
-Print Eax
-' now we call from mycode2 a routine in mycode
-Execute Code! mycode2, 0;
-Print Eax
-' magic end here
-mycode=>Callback=false
-' If we forgot to turn to false the property callback then
-' the block didn't deleted at the exit of this module
-' We can delete it by using Clear from manual mode
-' Interpreter mark the buffer for callback ...
-' and keep it alive using a secont pointer to buffer.
-
-
+5. I did a little work for UDT with arrays.
 
 
 George Karras, Kallithea Attikis, Greece.

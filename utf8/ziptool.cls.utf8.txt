@@ -12,13 +12,14 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
+Private Delme
 Dim WithEvents Zip As cZipArchive
 Attribute Zip.VB_VarHelpID = -1
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
 
 Event Cancel(NoCancel As Boolean)
 Event Progress(ByVal FileIdx As Long, ByVal Current As Long, ByVal Total As Long, mCancel As Boolean)
-Event TotalSize(ByVal TS As Double)
+Event TotalSize(ByVal Ts As Double)
 Event Error(ByVal FileIdx As Long, Source As String, Description As String, Cancel As Boolean)
 
 Event ExtractComplete(ByVal FileIdx As Long, File As Variant)
@@ -93,11 +94,12 @@ Public Function AddFileFromFolder(sFolderAndMask As String, _
     AddFileFromFolder = Zip.AddFromFolder(sFolderAndMask, Recursive, TargetFolder, IncludeEmptyFolders, Password, EncrStrength, Level)
 End Function
 Public Property Get FileInfo(FileNum) As Object
-Dim Handler As New mHandler, touple As New mArray
+Dim Handler As New mHandler
+Dim mAr As New mArray
 Dim pp
 pp = Zip.FileInfo(FileNum)
-touple.LoadTuple pp
-Set Handler.objref = touple
+mAr.LoadArray VarPtr(pp)
+Set Handler.objref = mAr
 Handler.t1 = 3
 Set FileInfo = Handler
 End Property
@@ -180,3 +182,44 @@ End Sub
 Private Sub Zip_TotalSize(aSize As Double)
     RaiseEvent TotalSize(aSize)
 End Sub
+Public Sub GetArr(a() As Long)
+ReDim a(1 To 20)
+a(1) = 1234
+End Sub
+Public Property Get ArrOk(a() As Long) As Boolean
+ReDim a(1 To 20)
+a(1) = 12
+ArrOk = True
+End Property
+Public Property Get ArrOk2(job As Long, a() As Long) As Boolean
+ReDim a(1 To 20)
+a(1) = 12
+a(2) = job
+ArrOk2 = True
+End Property
+Public Property Let FillArray(a() As Long, RHS As Long)
+ReDim a(1 To 20)
+a(1) = RHS
+End Property
+Public Property Let FillArray2(job As Long, a() As Long, RHS As Long)
+ReDim a(1 To 20)
+a(1) = RHS
+a(2) = job
+End Property
+Public Property Let Stat(RHS)
+If MyIsObject(RHS) Then
+    Set Delme = RHS
+Else
+    Delme = RHS
+End If
+End Property
+Public Property Get Stat() As Variant
+    If MemInt(VarPtr(Delme)) = 0 Then
+        Set Delme = New Collection
+    End If
+    If MyIsObject(Delme) Then
+        Set Stat = Delme
+    Else
+        Stat = Delme
+    End If
+End Property

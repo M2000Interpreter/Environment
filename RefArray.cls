@@ -47,6 +47,16 @@ End Property
 Friend Property Let emtype(RHS As Integer)
 emptytype = RHS
 End Property
+Friend Sub CreateLastRef(ByVal a As Long)
+    Dim clr
+    If flat Then
+       ' VarByRef a, p
+        MemCopy a, VarPtr(p), 16
+    Else
+        MemCopy a, VarPtr(p(0)), 16
+    End If
+    MemCopy VarPtr(p), VarPtr(clr), 16
+End Sub
 Friend Sub CreateRef(ByVal a As Long)
     If flat Then
         VarByRef a, p
@@ -85,7 +95,7 @@ If isok Then
         If flat Then
             z.writevalue = p
             z.flat = flat
-            If VarType(p) = vbArray + vbObject Then
+            If VarType(p) = VBArray + vbObject Then
                 For i = UBound(p) To 0 Step -1
                     If Not p(i) Is Nothing Then
                         If TypeOf p(i) Is refArray Then
@@ -134,7 +144,7 @@ Dim ppp As Object
         Else
             pp = p(i)
             j = Elements(pp)
-            If VarType(pp) = vbVariant + vbArray Then
+            If myVarArrType(pp, vbVariant) Then
                 If j > 0 Then
                     For j = j - 1 To 0 Step -1
                         If IsObject(pp(j)) Then
@@ -151,7 +161,7 @@ Dim ppp As Object
                         End If
                     Next j
                 End If
-            ElseIf VarType(pp) = vbArray + vbObject Then
+            ElseIf VarType(pp) = VBArray + vbObject Then
                 If j > 0 Then
                     For j = j - 1 To 0 Step -1
                         Set M = pp(j)
@@ -184,7 +194,7 @@ Property Let writevalue(ByRef RHS)
 If IsObject(RHS) Then
     Set p = RHS
 Else
-    ihavearray = (VarType(RHS) And vbArray) <> 0
+    ihavearray = (VarType(RHS) And VBArray) <> 0
    ' flat = VarType(RHS) = vbArray + vbVariant
     p = RHS
     If ihavearray Then
@@ -193,6 +203,25 @@ Else
     
 End If
 End Property
+Sub writevalueOnce(ByRef RHS)
+If IsObject(RHS) Then
+    Set p = RHS
+Else
+    ihavearray = (VarType(RHS) And VBArray) <> 0
+   ' flat = VarType(RHS) = vbArray + vbVariant
+    SwapVariant p, RHS
+    If ihavearray Then
+    isok = Elements(p) > 0
+    End If
+    
+End If
+End Sub
+Public Sub LastUse(ByRef RHS)
+    SwapVariant p, RHS
+    p = Empty
+    ihavearray = False
+End Sub
+
 Property Let Value(Optional where, Optional what, Optional WHAT1, Optional what2, that)
 Dim mt As Integer, wt As Integer, ss$
 
@@ -293,7 +322,7 @@ entry1:
             ElseIf myVarType(that, vbObject) Then
                 Set p(where) = that
                 
-            ElseIf (MemInt(VarPtr(that)) And vbArray) <> 0 Then
+            ElseIf (MemInt(VarPtr(that)) And VBArray) <> 0 Then
             
                 SwapVariant p(where), that
             Else
@@ -456,7 +485,7 @@ If ihavearray Then
             Else
                 Select Case VarType(p(where))
                 Case vbUserDefinedType
-                
+            ' ???
                 Case vbObject, vbDataObject
                     Set Value = p(where)
                 Case vbLongLong
@@ -485,7 +514,7 @@ If ihavearray Then
         If pp > 0 Then
             If what >= 0 And what < pp Then
                 
-                Select Case VarType(p(where)) - vbArray
+                Select Case VarType(p(where)) - VBArray
                 Case vbObject, vbDataObject
                     Set Value = p(where)(what)
                 Case 20
@@ -702,7 +731,7 @@ isok = True
 If where > 0 Then OneDimension = False
 End Sub
 Property Get ItemType(item) As Long
-On Error GoTo ALFA
+On Error GoTo alfa
     If ihavearray And isok Then
         If Not IsMissing(item) Then
         
@@ -712,7 +741,7 @@ On Error GoTo ALFA
         End If
     End If
     Exit Property
-ALFA:
+alfa:
     ItemType = -1
 End Property
 Public Function IsInnerRefArray(item, r As refArray) As Boolean
@@ -974,7 +1003,7 @@ If ihavearray Then
     If isok Then
         If IsMissing(where) Or flat Then
             If Not IsMissing(where) Then
-                If VarType(p) = vbArray + vbVariant Then
+                If VarType(p) = VBArray + vbVariant Then
                     vtType = MemInt(VarPtr(p(where)))
                 Else
                     vtType = VarType(p(where))
@@ -995,7 +1024,7 @@ If ihavearray Then
             End If
             If IsMissing(index) Then
             If pp > 0 Then
-                vtType = MemInt(VarPtr(p(where))) - vbArray
+                vtType = MemInt(VarPtr(p(where))) - VBArray
             Else
                 vtType = MemInt(VarPtr(p(where))) ' not an array ??
             End If

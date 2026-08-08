@@ -13,6 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 Dim ObjectRef As Long
+Dim lastpropname As String
 Dim vtref As Long
 Dim mIndex As Variant
 Public UseIndex As Boolean
@@ -20,7 +21,7 @@ Dim Init As Boolean
 'Dim IamMethod  As Boolean  ' not used
 Dim hardlink As Object, useobj As Boolean, isobjret As Boolean
 Private mLastObj As Object
-Public Arr As Boolean
+Public arr As Boolean
 Private UseExtControl As Boolean
 'Dim oEnum As IUnknown
 Private IndexList As mIndexes
@@ -61,11 +62,15 @@ Else
     End If
 End If
 End Property
-Sub Construct(ref As Long, vtrefnumber As Long, Optional indirect As Boolean = False, Optional UseExtCtrl As Boolean = False)
+Property Get ZeroRef() As Boolean
+    ZeroRef = vtref = 0
+End Property
+
+Sub Construct(ref As Long, vtrefnumber As Long, indirect As Boolean, UseExtCtrl As Boolean, PropName$)
 If useobj Then Exit Sub
 UseExtControl = UseExtCtrl
 Init = True
-
+lastpropname = PropName$
 ObjectRef = ref
 If indirect Then
 vtref = -vtrefnumber
@@ -73,8 +78,17 @@ Else
 vtref = vtrefnumber
 End If
 End Sub
-Sub ConstructObj(obj As Object, vtrefnumber As Long, Optional UseExtCtrl As Boolean = False)
+Property Get IHaveFname() As Boolean
+    IHaveFname = Len(lastpropname) > 0
+End Property
+Property Get FN() As String
+    FN = lastpropname
+End Property
+
+Sub ConstructObj(obj As Object, vtrefnumber As Long, UseExtCtrl, PropName$)
 Init = True
+
+lastpropname = PropName$
 UseIndex = False
 isobjret = False
 mIndex = Empty
@@ -196,6 +210,7 @@ If Init Then
                     isobjret = True
                     'ValueObj = 0
                     Set mLastObj = RETVAR
+                    
                 Else
                     If TypeOf RETVAR Is IUnknown Then
                         isobjret = True
@@ -320,6 +335,7 @@ If Init Then
         ElseIf useobj Then
             IndexNew = False
             Value = ReadPropIndexObj(hardlink, vtref, mIndex, UseExtControl)
+            
         Else
             IndexNew = False
             Value = ReadPropIndex(ObjectRef, vtref, mIndex, UseExtControl, check, RETVAR)
@@ -373,6 +389,26 @@ End If
 End Property
 
 Public Property Let Value(vNewValue As Variant)
+Dim usehandler As mHandler
+If MemInt(VarPtr(vNewValue)) = 36 Then
+    If TypeOf vNewValue Is ExtArray Then
+        nMath2.DumpVBArray VarPtr(vNewValue)
+    End If
+ElseIf MyIsObject(vNewValue) Then
+If Not vNewValue Is Nothing Then
+If TypeOf vNewValue Is mHandler Then
+Set usehandler = vNewValue
+If usehandler.t1 = 3 Then
+ 'vNewValue = usehandler.objref.VariantArray()
+ usehandler.objref.ExportVariant vNewValue
+End If
+ElseIf TypeOf vNewValue Is mArray Then
+ 'vNewValue = vNewValue.VariantArray()
+vNewValue.ExportVariant vNewValue
+
+End If
+End If
+End If
 If Init Then
 If Not UseIndex Then
 If useobj Then
@@ -469,9 +505,9 @@ End Property
 Function Copy() As PropReference
 Set Copy = New PropReference
 If useobj Then
-    Copy.ConstructObj hardlink, vtref, UseExtControl
+    Copy.ConstructObj hardlink, vtref, UseExtControl, FN
 Else
-    Copy.Construct ObjectRef, Abs(vtref), Sgn(vtref) < 0, UseExtControl
+    Copy.Construct ObjectRef, Abs(vtref), Sgn(vtref) < 0, UseExtControl, FN
 End If
 Copy.UseIndex = False
 End Function

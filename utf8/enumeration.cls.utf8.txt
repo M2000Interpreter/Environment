@@ -25,7 +25,7 @@ Private Type item
     Pad As String
 End Type
 Public Done As Boolean, HasErrorIndex As Boolean
-Public Index As Long, ErrorIndex As Long
+Public index As Long, ErrorIndex As Long
 Private PriveSpace() As item, mInterface As Boolean
 Dim MaxSpace As Long
 Dim toplim As Long
@@ -36,19 +36,19 @@ Private Sub Class_Initialize()
 End Sub
 Property Get Value() As Variant
 Done = False
-If Index = -1 Then
+If index = -1 Then
 Else
     Done = True
-    Value = PriveSpace(Index).iValue
+    Value = PriveSpace(index).iValue
     
 End If
 End Property
 Property Get PadValue() As String
 Done = False
-If Index = -1 Then
+If index = -1 Then
 Else
     Done = True
-    PadValue = PriveSpace(Index).Pad
+    PadValue = PriveSpace(index).Pad
 End If
 End Property
 
@@ -118,7 +118,7 @@ End Function
 Function ExistFromOther2(usehandler As mHandler) As Boolean
 Dim other As Enumeration
 Set other = usehandler.objref
-other.Index = usehandler.index_start
+other.index = usehandler.index_start
 Dim s$, i As Long
 s$ = other.KeyToString
 For i = 0 To toplim
@@ -130,12 +130,12 @@ Function SearchSimple(what As String, ByRef ok As Boolean) As Variant
 Dim i As Long, ii As Long
 If HasErrorIndex Then ii = -1
 For i = 0 To toplim + ii
-If what = PriveSpace(i).KeyUCase Then ok = True: SearchSimple = PriveSpace(i).iValue: Index = i: Exit Function
+If what = PriveSpace(i).KeyUCase Then ok = True: SearchSimple = PriveSpace(i).iValue: index = i: Exit Function
 Next i
 If HasErrorIndex Then
-    Index = ErrorIndex
+    index = ErrorIndex
     ok = True
-    SearchSimple = PriveSpace(Index).iValue
+    SearchSimple = PriveSpace(index).iValue
 End If
 End Function
 Function SearchValue(v As Variant, ByRef ok As Boolean) As Variant
@@ -193,7 +193,7 @@ End If
 Set SearchValue = New mHandler
 End Function
 Public Property Get KeyToString() As Variant
-    If Index <> -1 Then KeyToString = PriveSpace(Index).Key
+    If index <> -1 Then KeyToString = PriveSpace(index).Key
 End Property
 
 Private Sub Class_Terminate()

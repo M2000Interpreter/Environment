@@ -2120,7 +2120,8 @@ If Error or not ok Then Print Error$ ' Wrong type in module A.CHECKTHIS
 \\ we can pass group not value of HttpStatus
 CheckThis Group(HttpStatus)
 Print acchigh=2
-Select Case HttpStatus
+\\ Select Enum HttpStatus  ' works also
+Select Case  HttpStatus
 Case HttpStatus.NotFound
       Print "Not Found"
 Case HttpStatus.MethodNotAllowed
@@ -3069,11 +3070,12 @@ IF LEN(mm)>1 THEN {
 end sub
 sub Show_Folders(obj)
 With obj, -4& as new Folder
-
-	With Folder, "Name" as FolderName$
+ 
+	'With Folder, "Name" as FolderName$
 	
 	While Folder {
-	      Print FolderName$
+	      'Print FolderName$
+	      Print folder=>Name
 	}
 
 end sub
@@ -3088,10 +3090,20 @@ IF LEN(mm)>1 THEN {
             Report 3, mm$(i!) ' use index, not key
       Next i
 }
-Print "Press a key ": Print Key$
+Print "Press a key ": Push Key$: Drop
 With files, "count" as count
 if count>0 then
-      With files, "item" set myfile ("llist1.gsb")
+       try {
+//	           With files, "item" set myfile ("llist1.gsb")
+           myfile=files=>item("llist1.gsb")
+       }
+       What$=Error$:if what$<>"" Then
+           Print what$
+           Print "This happen because there is no llist1.gsb file"
+           Print "Press a key ": Push Key$: Drop
+       End if
+      \\ myfile=files=>item("llist1.gsb")
+      \\myfile=files("llist1.gsb")
       \\ this is a property -4 which return a IEnumVariant
       With files, -4& as EnumFile
       Print Type$(EnumFile)
@@ -3102,7 +3114,7 @@ if count>0 then
                   Report 3, m$(i!) ' use index, not key
             Next i
       End If
-      Print "Press a key ": Print Key$
+      Print "Press a key ": Push Key$: Drop
       With EnumFile, "Name" as aName$
       While EnumFile
             Print aName$
@@ -5814,7 +5826,7 @@ If Module(Info) Then
 	Title "Info"
 end if
 }
-MODULE INFOBASIC { Italic 0
+MODULE INFOBASIC {Italic 0
 Bold 1
 if val(piece$(os$+" 1"," ")(1))>9 then
 	Font "Segoe UI"
@@ -5871,7 +5883,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 64 for M2000 Interpreter version 15, revision 17 and above"
+	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 20 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -5907,7 +5919,7 @@ Report {
 Pen 11 {Stack}
 title("Useful Statements")
 Report {
-	Help All, Help Print, Help  |   Monitor  (to see switches), shitches  (some staments can be used from a module using the Set statement)
+	Help All, Help Print, Help  |   Monitor  (to see switches), shitches  (some statements can be used from a module using the Set statement)
 	(Set Monitor - because Monitor is known to Console Interpreter)
 	Edit info  (press esc to exit editor) | Edit "disk_file.gsb"  (to edit from disk - saved at exit)
 	Edit  (no argument) open command editor (we pick in console line using up/down arrows)
@@ -6396,7 +6408,7 @@ Layer Simple {
 \\ now put a ListBox
 Declare Listbox1 Listbox Form Simple
 tooltip$={This is the title
-- This is the text for tooltio
+- This is the text for tooltip   
 - Another paragraph
 }
 with listbox1, "tooltip", tooltip$
@@ -11189,19 +11201,21 @@ Group {
 
 Module CheckFirst {
       RAD = lambda -> number/180*pi
-      ASIN = lambda RAD -> {
-          Read x : x=Round(x,10)
-            If x>=0 and X<1 Then {
+      ASIN = lambda RAD (x)-> {
+            x=Round(x,10)
+            If x>=0 and X<1 Then
                   =RAD(abs(2*Round(ATN(x/(1+SQRT(1-x**2))))))
-            } Else.if x==1 Then {
+            Else.if x==1 Then
                   =RAD(90)
-            } Else error "asin exit limit"
+            Else
+                error "asin exit limit"
+           End if
       }
       ACOS=lambda ASIN (x) -> PI/2 - ASIN(x)
       POW3 = Lambda ->number**3
       POW3INV =Lambda ->number**(1/3)
-      COSRAD =lambda ->Cos(number*180/pi)
-      SINRAD=lambda ->Sin(number*180/pi)
+      COSRAD =lambda->rCos(number)  'lambda ->Cos(number*180/pi)
+      SINRAD=lambda ->rSin(number)'Sin(number*180/pi)
       Composed=lambda (f1, f2) -> {
             =lambda f1, f2 (x)->{
                   =f1(f2(x))
@@ -27807,10 +27821,10 @@ MODULE HANDLER {escape off
 Form 100, 60
 Pen 15 {
 	Print "Demo: Using a console program from M2000, using WScript.Shell "
-	Print "Press Esc to exit, or write Exit and press enter"
+	Print "Press Esc to exit, or write Exit and press enter - Wait"
+	cls, 2
+
 }
-title "M2000", 0
-cls, 2
 Declare GetForegroundWindow Lib "user32.GetForegroundWindow"
 Declare ShowWindow Lib "user32.ShowWindow" {long hwnd, long nCmdShow}
 cl$=chr$(12)
@@ -27818,23 +27832,37 @@ al$=">"+chr$(13)
 const SW_MINIMIZE = 6&
 Declare objShell "WScript.Shell"
 Method objShell, "Exec", "%comspec% /d /k"  as  objExecObject
+
 With objExecObject, "StdOut" set StdOut
 With objExecObject, "Stdin" set StdIn
 With objExecObject, "Status" as Status
 With StdOut, "AtEndOfStream" as AtEndOfStream
-' no chcp 6500
-' this  (utf8) not work
-Method StdIn, "WriteLine" , "chcp 1253"
-Method StdIn, "WriteLine" , "cd c:\"
-Method StdIn, "WriteLine" , "dir"
-Method StdIn, "WriteLine" ," "
-wait 1000
-' we have to minimize the window
+ title "M2000", 0
 t=GetForegroundWindow()
 t1=ShowWindow(t, SW_MINIMIZE)
+WAIT 200
+title "M2000"
+
+' no chcp 6500
+' this  (utf8) not work
+
+Method StdIn, "WriteLine" ,{
+chcp 1253
+cd c:\"
+dir
+ 
+}
+
+
+//	Method StdIn, "WriteLine" , "chcp 1253"
+//	Method StdIn, "WriteLine" , "cd c:\"
+//	Method StdIn, "WriteLine" , "dir"
+//	Method StdIn, "WriteLine" ," "
+//	
+' we have to minimize the window
 a$=""
 p$=""
-title "M2000"
+try {
 Every 10 {
 	Method StdOut, "ReadLine" as strText$
 	p$=filter$(strText$, cl$)
@@ -27856,7 +27884,9 @@ Every 10 {
 	end if
 	if keypress(27) then exit
 	if status=1 then exit
-} 
+	wait 0
+}
+}
 print "End"
 Declare objExecObject nothing
 Declare objShell nothing
@@ -27870,7 +27900,7 @@ Escape Off
 Form 80, 50
 Pen 15 {
 	Print "Demo: Using a console program from M2000, using ShellPipe internal object"
-	Print "Press Esc to exit, or write Exit and press enter"
+	Print "Press Esc to exit, or write Exit and press enter - New Key Clik...function"
 }
 cls, 2
 Declare withevents SP SHELLPIPE
@@ -27882,6 +27912,8 @@ Method SP, "Run","cmd.exe  /d  /k" as ok
 Wait 200
 Show
 Rem Print ok
+timeout=10 
+
 If ok=0 then
 ' With SP, "chcp", -1  ' for /u 
 '  utf-8 work input - not work output (only for english letters)    	
@@ -27903,8 +27935,7 @@ If ok=0 then
 ' set codepage from locale 1032  - work Input/Outpu
 //	    With Sp, "ChCpFromLCID", 1032, "ChCp" as Cp    
 //	    Method SP, "SendLine", "chcp "+ cp
-    
-    Method SP, "SendLine", "Cd c:\"
+       Method SP, "SendLine", "Cd c:\"
     Method SP, "SendLine", "Dir"
     idle=timecount
     lastcomm$=""
@@ -27929,18 +27960,26 @@ If ok=0 then
     	           end if
               End While
     }
-    Every 20 {
+    
+    thread {
+        if inkey(1)<>-1  then idle=timecount:tone 10, 1000        
+        if (timecount-idle)>15000  then input end: timeout=-1
+    } as mytimeout interval 100
+    
+    task.main 20 {
     	Method Sp, "ProcessLoop"
     	if not IsActive then exit
     	if keypress(27) then exit
     	if (timecount-idle)>100 then
     		Print "(child)>";
+    		idle=timecount
     		Pen 15 {Line Input comm$}
     		Print    		
     		Method SP, "SendLine", comm$
     		refresh
     		lastcomm$=comm$
     	end if
+    	if timeout<0 then thread mytimeout erase
     }
 end if
 Declare SP nothing
@@ -33489,7 +33528,7 @@ MODULE LIBEPIG {Τμήμα ΦέρεΑπόΔεξιά(Α, Β,  βήμα_ολίσθ
 		Αναφορά 2, "https://github.com/M2000Interpreter"
 	} ως Α
 	Σχέδιο 14000, 14000{
-		Θέση 6500,7000
+		Θέση 7000,7000
 		Εικόνα Α, 12000,,0
 	} ως Α1
 	=Α1
@@ -33526,9 +33565,9 @@ MODULE LIBEPIG {Τμήμα ΦέρεΑπόΔεξιά(Α, Β,  βήμα_ολίσθ
 		Τύπωσε @(0), "○  ";
 		Αναφορά 3, {Παράλληλος (Concurrent) Προγραμματισμός. (Νήματα σε έναν επεξεργαστή)}
 	} ως Α1
-	Σχέδιο 10000,10000{
-		Θέση 5000, 4500
-		Εικόνα Α1, 8000,,0
+	Σχέδιο 10000,8000{
+		Θέση 5000, 3500
+		Εικόνα Α1, 9000,,30
 	} ως Α
 	=Α
 }
@@ -33560,9 +33599,9 @@ MODULE LIBEPIG {Τμήμα ΦέρεΑπόΔεξιά(Α, Β,  βήμα_ολίσθ
 		}
 		
 	} ως Α1
-	Σχέδιο 14000, 14000{
-		Θέση 6500,7000
-		Εικόνα Α1, 12000,,0
+	Σχέδιο 12000, 12000{
+		Θέση 6000,6000
+		Εικόνα Α1, 10000,,0
 	} ως Α
 	// Σχέδιο 6000, 4000{
 	//	θέση 3000,2000
@@ -33579,7 +33618,7 @@ MODULE DEMOEPIG {window 10, 18000, 14000;
 		Επάνω δεξιά φαίνεται και το ρολόι λεπτών για να συτονίζει κανείς το χρόνο της παρουσίασης.
 		Το ρολόι δουλεύει σε δικό του νήμα και χρησιμοποιεί δικό του sprite, το 32 το οποίο είναι πάντα πάνω από όλα τα άλλα!
 }
-// Τα πραγματικά νούμερα των παικτών (sprites) δεν γίνονται ποτέ φανερά, αυτά που χειριζόμαστε είναι οι προτεραιότητές τους, έτσι πάντα το 32 θα είναι πάνω από τα άλλα, όσα και αν υπάρχουν, γιατί στην αρχή δεν υπάρχουν φορτωμένοι παίκτης. Μπορεί να αλλάξει νούμερο ένας παίκτης με έναν άλλο, αλλάζοντας προτεραιότητες (θα μπει ο μπροστινός παίκτης πίσω από τον άλλο, και όσοι είναι ενδιάμεσα θα παραμείνουν ως έχει), έτσι αν έχουμε δυο μεταβλητές με τις προτεραιότητες απλά τις αλλάζουμε μεταξύ τους τιμές. Η μπορεί να αλλάξει ένας παίκτης προτεραιόττηα κατά απόλυτη τιμή  αλλάζοντας τις προτεραιότητες των αλλων. Στη τελευταία περίπτωση πρέπει να κρατάμε λογαριασμό σε ένα πίνακα, δείτε στο τμήμα sprites, τη ρουτίνα RotateValues() που περιστρέφει τις τιμές σε ένα πίνακα (με γρήγορη εντολή).
+// Τα πραγματικά νούμερα των παικτών (sprites) δεν γίνονται ποτέ φανερά, αυτά που χειριζόμαστε είναι οι προτεραιότητές τους, έτσι πάντα το 32 θα είναι πάνω από τα άλλα, όσα και αν υπάρχουν, γιατί στην αρχή δεν υπάρχουν φορτωμένοι παίκτης. Μπορεί να αλλάξει νούμερο ένας παίκτης με έναν άλλο, αλλάζοντας προτεραιότητες (θα μπει ο μπροστινός παίκτης πίσω από τον άλλο, και όσοι είναι ενδιάμεσα θα παραμείνουν ως έχει), έτσι αν έχουμε δυο μεταβλητές με τις προτεραιότητες απλά αλλάζουμε μεταξύ τους τις τιμές. Εναλλακτικά μπορεί να αλλάξει ένας παίκτης προτεραιόττηα κατά απόλυτη τιμή  αλλάζοντας τις προτεραιότητες των αλλων. Στη τελευταία περίπτωση πρέπει να κρατάμε λογαριασμό σε ένα πίνακα, δείτε στο τμήμα sprites, τη ρουτίνα RotateValues() που περιστρέφει τις τιμές σε ένα πίνακα (με γρήγορη εντολή).
 // Οι προτεραιότητες χρησιμεύουν και για τον έλεγχο σύγκρουσης, ο οποίος γίνεται για νούμερα κάτω από το νούμερο προτεραιότητας του παίκτη. Συνήθως μας ενδιαφέρει ένας παίκτης να ελέγχεται για σύγκρουση με άλλους παίκτες.
 Βάλε Κομ$: Πέτα
 
@@ -33587,7 +33626,7 @@ MODULE DEMOEPIG {window 10, 18000, 14000;
 Ένθεση Κώδικα LibTimer
 Οθόνη 5, 0
 Γραμματοσειρά "Verdana"
-Φόρμα ! 60, 32
+Φόρμα 60, 32
 Αδειασε
 Ένθεση Κώδικα LibEpig
 Πένα 14, 255
@@ -34606,6 +34645,7 @@ for i=0 to Zip.Count-1
 		Report Buf$(i)
 		end if
 	else.if M(i)#val$(0)="mydraw.emf" then
+		beep	
 		move 6000,6000
 		Image buf, 12000,,45
 	end if
@@ -36120,7 +36160,7 @@ Class Observer {
                         .subject=>notify .name$
                         Print "Raise from ";.name$
                         call .func$
-                        break
+                       // break   ' use this to serve the first one only
                   End If
             End While
       }
@@ -36408,11 +36448,16 @@ MODULE VBCOLLECTION {Module GetC {
       Push c
       \\ normaly we can use this line
       \\ but if we omit this, Interpreter do this for us
+     list      
       Declare c Nothing
 }
 GetC
 Read a
 Print type$(a)="Collection"
+Print type((a("zero")))
+? a("zero")=3000032131231231312312@
+Print type(a=>item("zero"))="Decimal"
+list
 }
 MODULE XML4 {Module CheckIt {
 	Flush
@@ -36429,8 +36474,8 @@ MODULE XML4 {Module CheckIt {
 		xml=>PlaceAttributeToNode Node1, "name", name$
 		xml=>AppendChild Node1
 	end while
-	xml=>beautify=-4	
-	Report 3, xml=>xml  ' beautify return to 0
+	xml=>beautify=-4
+	Report 3, xml=>xml 
 	xml=>beautify=-4	
 	clipboard xml=>xml
 	Result=xml=>GetListByTag("Character", -1)^ ' look ^ for getting object
@@ -36791,7 +36836,7 @@ if menu>0 then
 end if
 dir user
 volume 50
-if resp="" then if module(InfoBasic) then InfoBasic
+if resp="" then if module(InfoBasic) then  keyboard "InfoBasic", 13
 }
 MODULE PRIORITY {Module OrdrerQueue (filename$, emptysecndqueue as Boolean)  {
       // f=-2  or use empty filename for screen
@@ -37855,7 +37900,7 @@ NL={
 }
 FOR I=0 TO 27
 	METHOD BUTTON(I), "MOVE",X(I),Y(I), 900, 1200
-	WITH BUTTON(I), "STYLE", I+1, "CLICKABLE",TRUE, "SHAPE", I, "QUALITY",SEQUALITYHIGH
+	WITH BUTTON(I),  "CLICKABLE",TRUE, "SHAPE", I, "QUALITY",SEQUALITYHIGH
 	WITH BUTTON(I),  "STYLE3DEFFECT", SESTYLE3EFFECTDIFFUSE,"STYLE3D",SESTYLE3DBOTH
 	WITH BUTTON(I),"BORDERCOLOR", 15,  "BORDERWIDTH", 4, "FILLSTYLE", SEFSSOLID, "FILLCOLOR", RC()
 //	TOOLTIP$="TITLE"+NL+"CHECK THIS "+I
@@ -37973,8 +38018,8 @@ Module TestMenu {
 }
 TestMenu
 }
-MODULE HASHLIST {if linespace=0 then linespace 30:mode mode
-Report {
+MODULE HASHLIST {if linespace=0 then linespace 30:mode mode  else cls,0
+Report {HASHLIST EXAMPLE 
 	This example use the M2000.hashlist object
 	Hashlist object can be used for lists of specific type
 	A hashlist for long values, need 4 byte per item - plus some extra for hash table
@@ -38030,6 +38075,8 @@ for i=0 to hash.count-1
 	print format$("{0:-60} - {1}",hash(i), KeyNum(i))
 next i
 }
+print "Press any key":Push key$:Drop
+cls
 double
 Report "Second Example: Assign a new HashList (old one deleted - automatic), of type Decimal"
 normal
@@ -41453,9 +41500,9 @@ sub main()
 				exit
 			else
 				if yourNumber > myNumber then
-					printf("Your guess is to high\n")
+					printf("Your guess "+yourNumber+" is to high\n")
 				else
-					printf("Your guess is to low\n")
+					printf("Your guess "+yourNumber+" is to low\n")
 				end if
 			end if
 		end while
@@ -41553,66 +41600,69 @@ Sub CleanQuery(holdbuffer as Boolean=false)
 	lastchar=""
 end sub
 }
-MODULE ROSETTA {linespace 0
-form 80
- ' just make the dummy event place, because event functions clear the "event hidden variable"
-declare withevents alfa
-declare Form1 form
-with form1, "Title" as Form1.Title$
-declare wb type "shell.explorer.2" form Form1
-
-print type$(wb)
-
-method Form1,"move", 1000, 1000, 14000, 12000
-Layer Form1 {Gradient 11, #7777aa}
-method wb, "move", 1000, 1000, 12000, 10000
-with wb, "silent", false, "object" set wb1, "visible" as visible
-
-'with wb,"RegisterAsBrowser", true
-method wb,"Navigate2", "https://en.wikipedia.org/wiki/Hello"
-with wb1, "readystate" as readystate
-
-function wb.TitleChange {
-	read new &a$
-	Pen 15 {Print "Title:"; a$}
-	Form1.Title$=a$
+MODULE ROSETTA {try {
+	linespace 0
+	form 80
+	 ' just make the dummy event place, because event functions clear the "event hidden variable"
+	declare withevents alfa
+	declare Form1 form
+	with form1, "Title" as Form1.Title$
+	declare wb type "shell.explorer.2" form Form1
+	
+	print type$(wb)
+	
+	method Form1,"move", 1000, 1000, 14000, 12000
+	Layer Form1 {Gradient 11, #7777aa}
+	method wb, "move", 1000, 1000, 12000, 10000
+	with wb, "silent", false, "object" set wb1, "visible" as visible
+	
+	'with wb,"RegisterAsBrowser", true
+	method wb,"Navigate2", "https://en.wikipedia.org/wiki/Hello"
+	with wb1, "readystate" as readystate
+	
+	function wb.TitleChange {
+		read new &a$
+		Pen 15 {Print "Title:"; a$}
+		Form1.Title$=a$
+	}
+	function alfa_onmousewheel {
+		Print "You rotate the mouse wheel"
+		refresh
+	}
+	function alfa_ondblclick {
+		Print "Double Click, wow"
+		refresh
+	}
+	function alfa_onkeydown (new a, b){
+		if not readystate then exit
+		print "this is the key:", b=>parentWindow=>event=>keycode
+		refresh
+	}
+	function wb.BeforeNavigate2 {
+		Pen 15 {? "_BeforeNavigate2"}
+	//	stack
+		refresh
+	}
+	// we get the document each time a Document Complete
+	// and we make a new event sink object
+	function wb.DocumentComplete {
+		clear alfa
+		with wb, "document" get withevents alfa
+		Pen 11 {print "DocumentComplete"}
+		refresh
+	}
+	function form1.click {
+		visible=not visible
+		print readystate
+		print type$(alfa)
+		refresh
+	}
+	try {
+		method Form1 "show", 1
+	}
+	declare wb Nothing
+	declare Form1 nothing	
 }
-function alfa_onmousewheel {
-	Print "You rotate the mouse wheel"
-	refresh
-}
-function alfa_ondblclick {
-	Print "Double Click, wow"
-	refresh
-}
-function alfa_onkeydown (new a, b){
-	if not readystate then exit
-	print "this is the key:", b=>parentWindow=>event=>keycode
-	refresh
-}
-function wb.BeforeNavigate2 {
-	Pen 15 {? "_BeforeNavigate2"}
-//	stack
-	refresh
-}
-// we get the document each time a Document Complete
-// and we make a new event sink object
-function wb.DocumentComplete {
-	clear alfa
-	with wb, "document" get withevents alfa
-	Pen 11 {print "DocumentComplete"}
-	refresh
-}
-function form1.click {
-	visible=not visible
-	print readystate
-	print type$(alfa)
-	refresh
-}
-method Form1 "show", 1
-declare wb Nothing
-declare Form1 nothing
-
 }
 MODULE MACHINECODE2 {linespace 0
 font "Courier New"
@@ -42279,9 +42329,23 @@ Report "Varptr for items of arrays"
 
 module check1 {
 	pen 11 {Report "dim a(2, 3) as Long Long (8 bytes per item)"}
-	dim a(2, 3) as Long Long=12345678901234&&
+	' using OLE we arange the items using dimensions in reverse order (this is the OLE type)
+	fillme=lambda c=12345678901234&&
+			->{
+			=c:c++
+			}
+	pen 15 {
+		if random(1, 10)<6 then
+			dim ole  a(2, 3) as Long Long<<fillme()
+			Print "OLE type"
+		else
+			dim a(2, 3) as Long Long<<fillme()
+			Print "M2000 type"	
+		end if
+	}
 	Long Long z
-	a(1,2)++
+	Print "a(1,2)="+a(1,2)
+	a(1,2)+=100
 	m=getmem8(varptr(a(1,2)),varptr(z))
 	Print "z="+z
 	Print "a(1,2)="+a(1,2)
@@ -42289,6 +42353,12 @@ module check1 {
 	m=PutMem8(varptr(a(1,1)), z)
 	Print "a(1,1)="+a(1,1)
 	Print
+	Print "varptr(a(0,0)):";varptr(a(0,0))
+	Print "varptr(a(1,0)):";varptr(a(1,0)),
+	Pen 15 {Print "dif:";varptr(a(1,0))-varptr(a(0,0))}
+	z=a()
+	Print "Array Data Ptr:";z=>ArrPtr
+	
 }
 check1
 module check2 {
@@ -47390,15 +47460,14 @@ module check_this_too {
 	m->(alfa(40, -10))
 	Print eval(m, 4) ' this execute the value part
 	Print m=>x
-	for m {
+		for m {
 		Print "inside a for object Block"
 		Print .x, .y,"", eval(this, 5)
-//		Print .x, .y, eval$(this, 5)		
 		.x++
 		Print m=>x=this.x
 		this.x++
 		Print m=>x=this.x
-	}
+		}
 	Print "delete old object here"
 	m->epsilon  ' we change pointer - then old one call remove part
 	Print "new object is a weak reference of epsilon:";eval(m, 6)
@@ -48333,59 +48402,101 @@ TRY {
 	END IF
 }
 }
-MODULE EXCEL2 {IF NOT  EXIST("MyTest.xlsx") THEN
-	PRINT "Execute EXCEL1 first"
-	BREAK
-END IF
-BOOLEAN CANOPEN=FALSE
-TRY {
-	OPEN DIR$+"MyTest.xlsx" FOR APPEND AS #F
-	CANOPEN=NOT ERROR
-	CLOSE#F
+MODULE EXCEL2 {if not  exist("mytest.xlsx") then
+	print "execute excel1 first"
+	break
+end if
+boolean canopen=false
+try {
+	open dir$+"mytest.xlsx" for append as #f
+	canopen=not error
+	close#f
 }
-IF NOT CANOPEN THEN PRINT "CLOSE FILE MyTest.xlsx": EXIT
+if not canopen then print "close file mytest.xlsx": exit
 // Declare can arranged with WithEvents
 //DECLARE ExcelSheet.Application "Excel.Application"
 ExcelSheet.Application=GetObject("", "Excel.Application")
 WorkBooks=ExcelSheet.Application=>Workbooks
-ActiveWorkbook=ExcelSheet.Application=>ActiveWorkbook
 WorkBooks=>Open dir$+"MyTest.xlsx"
+ActiveWorkbook=ExcelSheet.Application=>ActiveWorkbook
 cells=ExcelSheet.Application=>cells
 ActiveSheet=ExcelSheet.Application=>ActiveSheet
 Columns=ActiveSheet=>Columns("A:E")^  ' return the object Range
 Range=ActiveSheet=>Range("D1:D4")^  ' return the object Range
-PRINT  ActiveSheet=>name
+
+PRINT ActiveSheet=>name
+
 Range=>value="Approved"
 ActiveSheet=>Range("E1:E4")=TODAY
 cells(4,3)=NOW
 Columns=>AutoFit
+Range=ActiveSheet=>Range("A1:E4")^ ' WE GET THE RANGE OBJECT FOR SPECIFIC RANGE.
+RangeArray=ActiveSheet=>Range("A1:E4")=>VALUE  ' USING ^ return the object Range
+print "New revision 20, version 15 handle arrays:", TYPE(RangeArray)
+mArray=ARRAY(RangeArray)
+print len(RangeArray)
+mArray1=ARRAY(&RangeArray) ' NOW ARRAY RETURN EMPTY ARRAY TO RangeArray
+//mArray3=ARRAY(RangeArray)
+//print len(MArray3), " length of Array3"
+' look here we use VALUE2 property
+mArray2=ARRAY(ActiveSheet=>Range("A1:E4")=>VALUE2)
 
-' TO NOT OPEN THE "OVERWRITE ALERT"
-' FIRST WE SAVE USING NEW NEAME ...001
-//	METHOD ActiveSheet, "SaveAs", dir$+"MyTest001.xlsx", 51, CreateBackup:=TRUE ' 51 with no macro
-//	METHOD ActiveWorkbook, "Close", SaveChanges:=FALSE
-//	METHOD ExcelSheet.Application, "Quit"
-ActiveSheet=>SaveAs dir$+"MyTest001.xlsx", 51, CreateBackup:=TRUE ' 51 with no macro
+Print mArray#str$(",")
+Print
+Print "Using Value2 property - look Date type value now came as Double type"
+Print
+Print mArray2#str$(",")
+link mArray to A()
+//	list
+print $("",16)
+Print "items of A()= ";Len(A())
+Display()
+for i=2 to 4:a(i,1)+=10:next
+print "**************************"
+Display()
+ActiveSheet=>Range("A1:E4")=mArray=>VariantArray()
+ActiveSheet=>SaveAs dir$+"MyTest001.xlsx", 51&, CreateBackup:=TRUE ' 51 with no macro
+wait 100
 ActiveWorkbook=>Close  SaveChanges:=FALSE
 ExcelSheet.Application=>Quit
+declare ExcelSheet.Application nothing
+wait 300
+if exist("mytest.xlsx") then {
+	dos "del "+dir$+"mytest.xlsx", 500;
+}
+try {
+	name "mytest001.xlsx" as "mytest.xlsx"
+}
+print exist("mytest.xlsx")
+wait 100  ' give 100ms time to system to finish.
+try {
+	if file.app$("xlsx")="" then
+		win  "excel", dir$+"mytest.xlsx"
+	else
+		win  dir$+"mytest.xlsx"
+	end if
+}
 
-DECLARE ExcelSheet.Application NOTHING
-WAIT 300
-' THEN AFTER CLOSSING THE WORKBOOK USING SAVECHANGES=FALESE
-IF EXIST("MyTest.xlsx") THEN {
-	// GIVE 500ms to do it
-	DOS "DEL "+dir$+"MyTest.xlsx", 500;
-}
-' so now we rename the files (on current directory DIR$)
-NAME "MyTest001.xlsx" AS "MyTest.xlsx"
-WAIT 100  ' give 100ms time to system to finish.
-TRY {
-	IF FILE.APP$("xlsx")="" THEN
-		WIN  "EXCEL", DIR$+"MyTest.xlsx"
-	ELSE
-		WIN  DIR$+"MyTest.xlsx"
-	END IF
-}
+sub display()
+local i, j
+for i=1 to dimension(a(),1,1)
+	print "    ("+i+")", 
+	for j=1 to dimension(a(),2,1)
+		if type(a(i,j))="Double"  then
+			if a(i,j)>=0 and a(i,j)<1 then
+				date thistime=a(i,j)
+				print time$(thistime,1033, "hh:mm:ss tt" ),
+			else
+				print a(i,j),
+			end if
+		else
+			print a(i, j),
+		end if
+	next
+	print
+next
+end sub
+`
 }
 MODULE INTER {GLOBAL ENUM HRESULT {
 	S_OK						= 0&  ' long type
@@ -48398,13 +48509,13 @@ MODULE INTER {GLOBAL ENUM HRESULT {
 	E_ACCESSDENIED				= &H80070005&
 	E_HANDLE					= &H80070006&
 	E_OUTOFMEMORY				= &H8007000E&
-	E_INVALIDARG					= &H80070057&
+	E_INVALIDARG				= &H80070057&
 	E_UNEXPECTED				= &H8000FFFF&
 	
-	DISP_E_MEMBERNOTFOUND		= &H80020003&
+	DISP_E_MEMBERNOTFOUND	= &H80020003&
 	DISP_E_UNKNOWNNAME		= &H80020006&
-	DISP_E_NONAMEDARGS			= &H80020007&
-	DISP_E_EXCEPTION				= &H80020009&
+	DISP_E_NONAMEDARGS		= &H80020007&
+	DISP_E_EXCEPTION			= &H80020009&
 	DISP_E_BADINDEX				= &H8002000B&
 }
 STRUCTURE IID {
@@ -48575,13 +48686,13 @@ MODULE INTER1 {GLOBAL ENUM HRESULT {
 	E_ACCESSDENIED				= &H80070005&
 	E_HANDLE					= &H80070006&
 	E_OUTOFMEMORY				= &H8007000E&
-	E_INVALIDARG					= &H80070057&
+	E_INVALIDARG				= &H80070057&
 	E_UNEXPECTED				= &H8000FFFF&
 	
-	DISP_E_MEMBERNOTFOUND		= &H80020003&
+	DISP_E_MEMBERNOTFOUND	= &H80020003&
 	DISP_E_UNKNOWNNAME		= &H80020006&
-	DISP_E_NONAMEDARGS			= &H80020007&
-	DISP_E_EXCEPTION				= &H80020009&
+	DISP_E_NONAMEDARGS		= &H80020007&
+	DISP_E_EXCEPTION			= &H80020009&
 	DISP_E_BADINDEX				= &H8002000B&
 }
 class ALFA {
@@ -48600,12 +48711,12 @@ private:
 			memidConstructor	AS LONG
 			memidDestructor	AS LONG
 			pstrSchema		AS LONG
-			cbSizeInstance		AS LONG
+			cbSizeInstance	AS LONG
 			typekind			AS LONG
 			cFuncs			AS INTEGER
 			CVars			AS INTEGER
 			cImplTypes		AS INTEGER
-			cbSizeVft			AS INTEGER
+			cbSizeVft		AS INTEGER
 			cbAlignment		AS INTEGER
 			wTypeFlags		AS INTEGER
 			wMajorVerNum	AS INTEGER
@@ -48633,7 +48744,12 @@ public:
 		GetTypeComp
 		GetFuncDesc
 		GetVarDesc
-		GetNames : {LONG memid, LONG PTRrgBstrNames, LONG cMaxNames, LONG &pcNames}
+		GetNames : {
+			LONG memid,
+			LONG PTRrgBstrNames,
+			LONG cMaxNames,
+			LONG &pcNames
+		 }
 		GetRefTypeOfImplType
 		GetImplTypeFlags
 		GetIDsOfNames
@@ -49876,10 +49992,12 @@ Refresh
 For i=1 to Speech {
       Print "Voice "+i+": "+Speech$(i)
 }
-if instr(Speech$(1),"Zina")=0 then
-	Const male=2, female=1
-else
+if instr(Speech$(2),"Zira")>0 then
 	Const male=1, female=2
+else.if instr(Speech$(1),"Zina")>0 then
+	Const male=1, female=2
+else
+	Const male=2, female=1
 end if
 Const on=1, off=0
 Flush
@@ -52021,7 +52139,7 @@ Declare Simple Nothing
 }
 MODULE TSTJOY2 {//	GOTO 1000
 MODULE SPEEDTST {
-	PRINT "SPEED TEST 2nd USING WIAT 0 IN EVERY LOOP"
+	PRINT "Speed test 2nd using wait 0 in every loop"
 	PRINT "You can use Ctrl+C or Esc (not in Fast !)"
 	MODULE TESTA {
 		PROFILER:Z=100
@@ -52502,7 +52620,6 @@ call tool add name "MONDY" tag "EAT A LOT" date "2022.10.10.12:00"
 call tool add name "MARY" tag "PIZZA FRIENDLY" date "2022.10.10.12:00"
 call tool add name "DONALD" tag "PIZZA FRIENDLY" date "2022.10.10.02:00"
 call tool add name "ΓΙΩΡΓΟΣ" date "2022.11.29.16:55"
-call tool all-entries
 };
 Close #F
 locale o
@@ -52522,7 +52639,7 @@ while not exist("tool.bat")
 end while
 ? "ok"
 declare info information
-dos "cd "+shortdir$(dir$)+" &&  tool"
+dos "cd "+shortdir$(dir$)+" &&  tool all-entries && tool"
 Print "Waitiing to close the cmd.exe window..."; dos
 Escape off
 Pen 15 {Print "If you return focus to this M2000 console you can press Esc and kill the DOS window"}
@@ -52998,6 +53115,7 @@ Function _NewEnum as IUnknown*
 
 }
 declare c collection
+with c, "item" as item()
 Print type$(c)
 c=>add "this is a string item", "zero"
 ? c=>count
@@ -53014,7 +53132,7 @@ c=>add 34324324,"mm"
 ? c=>count
 m=(1,2i)
 c=>add m, "alfa"
-? c("alfa")|r=1, c("alfa")|i=1, c("alfa") 
+? c("alfa")|r=1, c("alfa")|i=2, c("alfa") 
 Method c, "_NewEnum" as Item
 while item
 	print eval(item),
@@ -53022,8 +53140,10 @@ end while
 biginteger b=123123123121213123123123u
 c=>add  b, "big1"
 ? c("big1")=>tostring
-? c("big1")^  ' object
-k=c("big1")^
+' change here twio lines
+? c("big1") , c("big1")^2u ''''''''''^  ' object
+exit
+k=c("big1")''''''''''''''''^
 ? k
 Method c, "_NewEnum" as Item
 while item
@@ -53035,16 +53155,24 @@ c=>add  mm, "list"
 dd=(1,2,3,4,5,6)
 c=>add dd, "array"
 print
-? c("array")^
-mm0=c("array")^
+? c("array")
+mm0=c("array")
 ? type$(mm0), mm0#sum()
 mm1=list
 ? type$(mm1)
-mm1=c("list")^
+mm1=c("list")  ' no need ^ but it isn't fault if we have object.
 m0=each(mm1)
 while m0
-	? eval(m0)
+	? eval(m0),
 end while
+?
+?"********************"
+mm1=item("list")
+m0=each(mm1)
+while m0
+	? eval(m0),
+end while
+?
 
 ?type$(getAnyValue("Not Exist Key"))
 ?type$(getAnyValue("array"))="tuple"
@@ -53062,17 +53190,7 @@ function getAnyValue(key)
 	Try {
 		let z=c(key)
 	}
-	if Type$(z)="Empty" then
-	Try {
-		z=c(key)^
-		if type$(z)="FastCollection" then
-			local z1=list
-			z1=c(key)^
-			z=z1
-		end if
-	}	
-	end if
-	= z
+	=z
 end function
 }
 MODULE LEGATO {tempo = 1000
@@ -53433,7 +53551,7 @@ Module AmbFunction {
         z=array(k)
         Print z#str$()
     end while
-    Print "Solutions for a+a+c+c+c=9 when a (1 to 6) and c (0 to 6) (wait some seconds):"
+    Print "Solutions for a+a+c+c+c=9 when a (1 to 5) and c (0 to 5) (wait some seconds):"
     Refresh       
     a=range(1,6)
     c=range(0,6)
@@ -53513,7 +53631,7 @@ MODULE VBSCRIPT {Module Checkit {
 		for k=1 to 9:M(k)=10:next
 		ExecuteStatement "Print {George}"
 		
-		CallGlobal "CallFromVbGlobal", M
+		CallGlobal "CallFromVbGlobal",  M
 		ExecuteStatement "Print a(0)"
 		k=me.Eval("a(0)")
 		CallModule "CallFromVb", "a(0)", k
@@ -53607,9 +53725,9 @@ MODULE PYTHON1 {module variation2 {
 variation2
 }
 MODULE PYTHON2 {module variation3 {
-	Declare SP SHELLPIPE
+	Declare sp SHELLPIPE
 	Print $(4), ' switch to proportional length text rendering
-	with SP, "Active" as IsActive, "Hasline" as Sp.HasLine
+//		with sp, "Active" as IsActive, "Hasline" as sp.HasLine
 	text UTF-8 code.py {#!/usr/bin/env python3
       import logging
       import threading
@@ -53642,18 +53760,21 @@ MODULE PYTHON2 {module variation3 {
         except KeyboardInterrupt:
           pass
       }
-        Method SP, "Run","python "+quote$(temporary$+"code.py") as ok
+//	        Method sp, "Run","python "+quote$(temporary$+"code.py") as ok
+        ok= sp=>Run("python "+quote$(temporary$+"code.py"))
         after 400 {
             win file.app$("html"), "http:\\127.0.0.1"
         }
 	if ok==0 else 500
 	escape off
-	while isActive
-		Method SP, "ProcessLoop"
+	while sp=>Active 'isActive
+//			Method sp, "ProcessLoop"
+		sp=>ProcessLoop
 		if keypress(27) then ? "Esc": Refresh:  exit
-		if keypress(67) and keypress(0x11) then Print "^space": exit
-		while sp.Hasline
-			method SP, "GetLine" as aLine$
+		if keypress(32) and keypress(0x11) then Print "^space": exit
+		while sp=>Hasline
+//				method sp, "GetLine" as aLine$
+			aLine$=sp=>Getline
 			print aLine$
 			refresh
 		end while
@@ -53661,7 +53782,7 @@ MODULE PYTHON2 {module variation3 {
 	end while
 	print
 	print "done"
-	Declare SP nothing
+	Declare sp nothing
 500 	text code.py ' delete temporary$+"code.py"
 	Print $(0), ' normal text rendering (monospaced)
 	escape on
@@ -53786,7 +53907,7 @@ print
 
 }
 MODULE ASM2 {Static Function MachineCode
-SplitHor(4/5)
+SplitHor(7/10)
 Enum PESubsystem {
     Subsystem_GUI = 2
     Subsystem_CUI = 3
@@ -53794,22 +53915,27 @@ Enum PESubsystem {
 Assembler =getobject("","m2000.x86")
 Assembler=>Subsystem=Subsystem_GUI
 Assembler=>PEHeader=true
+long WM_SETTEXT = &HC
+// use DW to place the unicode string
+WindowTitleCaption="成长汉 - Γιώργος - M2000 Asm: "+today+" "+now
+AppNameL="ASM Window"
 Buffer2export=MachineCode({
 extern "kernel32", GetModuleHandleA
 extern "user32",   LoadCursorA
-extern "user32",   RegisterClassA
-extern "user32",   UnregisterClassA
-extern "user32",   CreateWindowExA
+extern "user32",   RegisterClassW
+extern "user32",   UnregisterClassW
+extern "user32",   CreateWindowExW
+
 extern "user32",   DestroyWindow
 extern "user32",   ShowWindow
-extern "user32",   GetMessageA
+extern "user32",   GetMessageW
 extern "user32",   TranslateMessage
-extern "user32",   DispatchMessageA
-extern "user32",   DefWindowProcA
+extern "user32",    DispatchMessageW
+extern "user32",   DefWindowProcW
 extern "user32",   PostQuitMessage
 
-AppName:           db "ASM Window", 0
-WindowTitle:       db "My first ASM window", 0
+AppName:           dW AppNameL, 0   ;  use dw for unicode strings
+WindowTitle:       dW WindowTitleCaption, 0
 hInstance:         dd 0
 hCursor:           dd 0
 hWnd:              dd 0
@@ -53857,7 +53983,7 @@ main:
    mov dword [esp+36], AppName             ; lpszClassName = AppName
 
    push dword esp                          ; register the window class
-   call RegisterClassA
+   call RegisterClassW
 
 
    ;;;;;; CREATEWINDOW ;;;;;;;;
@@ -53867,14 +53993,14 @@ main:
    push dword 0                            ; hMenu
    push dword 0                            ; hWndParent
    push dword 250                          ; Height
-   push dword 300                          ; Width
+   push dword 480                          ; Width
    push dword 0                            ; y
    push dword 0                            ; x
    push dword &HCF0000                     ; WS_OVERLAPPEDWND or WS_BORDER or WS_CAPTION
    push dword WindowTitle                  ; lpWindowName
    push dword AppName                      ; ClassName
    push dword &H40000                      ; dwExStyle
-   call CreateWindowExA
+   call CreateWindowExW
 
    mov [hWnd], eax
 
@@ -53893,7 +54019,7 @@ main:
        push dword 0
        push dword 0
        push dword [wMsg]
-       call GetMessageA
+       call GetMessageW
 
        test eax, eax
        jz   ExitMessageLoop
@@ -53901,7 +54027,7 @@ main:
        push dword [wMsg]                   ; process the message
        call TranslateMessage
        push dword [wMsg]
-       call DispatchMessageA
+       call DispatchMessageW
 
        jmp  MessageLoop
 
@@ -53913,7 +54039,7 @@ main:
 
    push dword [hInstance]                  ; unregister the window class
    push dword AppName
-   call UnregisterClassA
+   call UnregisterClassW
 
    add  esp, SIZEOF_WNDCLASS               ; cleanup WNDCLASS Struct
    pop  ebp
@@ -53934,7 +54060,7 @@ WndProc:
        push dword [esp+16]
        push dword [esp+16]
        push dword [esp+16]
-       call DefWindowProcA
+       call DefWindowProcW
 
 ret 16
 })
@@ -53973,7 +54099,7 @@ Function MachineCode(assembly as string)
 		local mc
 		buffer code mc as byte*OutputSize
 		' feed the base address to Assembler
-		Assembler=>BaseAddress=&H400000
+		Assembler=>BaseAddress=&H400000		
 		if Assembler=>assemble(assembly) then
 			' get a copy of final machine code
 			mc=>FillDataFromMem Assembler=>GetOutPtr
@@ -54337,6 +54463,10 @@ Module Knuth`s_power_tree {
 	print 1.1^81
 	Compute(3u, 191)
 	print modpow( 3u,191u, biginteger("1"+string$("0", 100)))
+	pen 12 {
+	 	m=3u
+		print m=>intpower(191u)
+	 } 
 	mm=(0,1,2,17)	
 	zz=each(mm)
 	while zz
@@ -54345,6 +54475,7 @@ Module Knuth`s_power_tree {
 		print 2^n
 	end while
 	Clipboard final$
+	Print "Clipboard Set: ";len(clipboard$);"characters"
 	
 	Sub Compute(X, Exp as long)
 		local zz=paths(Exp): if Exp>1 then local z=each(zz, 2)
@@ -54409,5 +54540,293 @@ Module Knuth`s_power_tree {
 	end function
 }
 Knuth`s_power_tree
+}
+MODULE JSCRIPT {clear
+declare vs "MSScriptControl.ScriptControl"
+declare Alfa Module
+Print Type$(Alfa)
+vs=>Language="Jscript"
+vs=>AllowUI=true
+vs=>Reset
+Print Type$(Alfa)
+vs=>AddObject "M2000", Alfa
+vs=>ExecuteStatement {
+    M2000.AddExecCode("Function BB {=1234**number} : k=2");
+    M=M2000.ExecuteStatement("Print 1234, BB(k)");
+    M2000.AddExecCode("Print {press any key, better non space, to see it}:aa$=key$");
+}
+Print vs=>eval({"hello there"})
+Print vs=>eval({"hello there too"})
+list
+Print "You press "; if(aa$<>" "->aa$, "SPACE")
+declare vs nothing
+}
+MODULE STRUCT3 {' we can call subs without ( )
+' If we want the module to exist with others modules:
+' it is better to use STATIC SUB display, inc
+' because global modules display/inc if exist have priority for calling mechanism
+
+' structures use Integer, Long and Long Long as unsigned numbers
+' byte is unsinged anywhere in M2000.
+structure testthis {
+	a as long
+	b as long long
+	c as integer
+	d as byte
+	txt as integer*60
+	txt2 as byte*15
+	txt3 as byte*40
+}
+
+testthis TestMe[10], helper, helper2
+
+' TestMe is an array of objects, each object is type of buffer
+
+Testme[0]|a=0xFFFF_FFFF
+Testme[0]|b=0xFFFF_FFFF_0000_0001
+Testme[0]|c=0xFFFF
+Testme[0]|d=0xFF
+' copy 
+helper=Testme[0]
+print helper[0]|d=255
+helper[0]|d=100
+Testme[2]=helper
+print Testme[2]|d=100, Testme[0]|d=255
+helper|txt[0]=field$("George the Best", 60)
+helper|txt2[0]=Str$("AnsiBytes")
+helper|txt3[0]=Str$(field$("Secoond fild using AnsiBytes", 40))
+
+open "backup.dat" for output as #f:put #f, helper:close #f
+' helper2=buffer("backup.dat") raise error because the data are not "alfa"
+' but here we place date as is 
+helper2[0]=buffer("backup.dat")
+print helper2|d=100, helper2|txt[0, 60], len(helper2|txt[0, 60])*2=60
+NullAnsi=chr$(0)
+print "Ansi text1:";filter$(chr$(helper2|txt2[0,15]), NullAnsi)
+print "Ansi text2:";Rtrim(chr$(helper2|txt3[0,40]))
+
+
+
+
+
+print Testme[0]|a=4294967295
+' for unsinged long long literal we use Decimal type
+print Testme[0]|b=18446744069414584321@
+print Testme[0]|c=65535
+
+' we can use Uint() for negative => Uint long with same bits
+Testme[1]|a=Uint(-1)
+' -4294967299 need more bits than 32bits
+Testme[1]|b=Uint64(-4294967299&&) ' for long long
+' works for integer because m2000 keep the lower bits only
+Testme[1]|c=Uint(-12323)
+Testme[1]|d=Uint(-123)
+Testme[1]|txt2[0]=Str$("AnsiBytes2")
+
+
+print Testme[1]|a=4294967295
+' we can use sint() for reverse uint()
+' by default sint works for 4 bytes (1,2,4,8)
+print sint(Testme[1]|a)=-1
+print sint(Testme[1]|b, 8)=-4294967299&&
+print sint(Testme[1]|c, 2)=-12323
+print sint(Testme[1]|d, 1)=-123
+
+
+buffer bigone as testthis*100
+' now bigone is one buffer with 100 testthis fields in sequence
+print "bytes for each testthis=";len(testthis)
+print "bytes of bigone=";len(bigone)
+for i=0 to 9:bigone[i]=TestMe[i]:next
+print sint(bigone[1]|b, 8)=-4294967299&&
+print "Ansi text1:";filter$(chr$(bigone[1]|txt2[0,15]), NullAnsi)
+
+open "backup2.dat" for output as #f:put #f, bigone:close #f
+' we want to read then second Testme only
+' file cursor is One based, file length can be bigger than 4GB
+
+open "backup2.dat" for input as #f
+//	get #f, helper, len(testthis)+1  ' one line
+seek #f, len(testthis)+1:get #f, helper
+
+close #f
+print sint(helper|a)'=-4294967299&&
+print sint(helper|b, 8)'=-4294967299&&
+print sint(helper|c,2)
+print sint(helper|d,1)
+print "Ansi text1:";filter$(chr$(helper|txt2[0,15]), NullAnsi)
+
+
+Print "part 2"
+
+
+structure alfa {
+	a as double
+	b as double
+}
+new_alfa=lambda alfa (x=0,y=0)->{
+	var z as alfa
+	z|a=x
+	z|b=y
+	=z
+}
+var z as alfa
+z|a=1223.13
+z|a+=10
+z|b=123123.213
+display z
+z=new_alfa(100, 300)
+// use 4 bytes ... as object
+// without use 16 bytes ... as variant
+dim a(10) as object<<new_alfa(12,45)
+display z
+inc z
+display z
+
+display a(1)
+inc a(2)
+display a(2)
+
+
+' buffers are objects so we pass the pointer here
+sub display(p as alfa)
+	print p|a, p|b
+end sub
+sub inc(p as alfa)
+	p|a++  ' new operators
+end sub
+}
+MODULE STRUCT4 {structure beta {
+	z as long *100
+}
+structure alfa {
+	x as long
+	y as beta	
+	name as string	
+}
+
+alfa zz[10]
+zz[1]|x=1000
+zz[1]|name="ok"
+print "Run again to choose another type"
+if random(1, 2)=1 then
+	pen 12 {print "using tuple object"}
+	tuple=(1,2,zz=>copy(), zz[1]) 
+	link tuple to a()
+	? type$(a())="tuple"
+else
+	pen 13 {print "using mArray object"}
+	dim a(10)
+	a(2)=zz=>copy() ' a copy of zz buffer
+	a(3)=zz[1] ' is a copy of one only ALFA
+	? type$(a())="mArray"
+end if
+print type(a(2)), a(2)=>structref=>tag '="ALFA"
+print len(a(2))=4080, a(2)=>items=10
+' new..
+print a(2)[1]|x=1000, a(2)[1]|name="ok"
+a(2)[1]|name+="...."
+a(2)[1]|x*=3
+print a(2)[1]|x=3000
+print type(a(3)), a(3)=>structref=>tag '="ALFA"
+print len(a(3))=408, a(3)=>items=1
+print a(3)|x=1000, a(3)|name="ok"
+
+a(2)[1]|y|z[4]=100
+a(2)[1]|y|z[4]+=100
+try {
+	print {a(2)[1]|y|z[4] << operator?}
+	a(2)[1]|y|z[4]	
+}
+Print "Error Message: ";Error$
+print a(2)[1]|y|z[4]=200
+a(3)|name="George"
+print zz[1]|name="ok"
+print a(2)[1]|x=3000, a(2)[1]|name="ok...."
+a(2)[1]|name="George"
+print zz[1]|name="ok"
+print a(2)[1]|name="George"
+}
+MODULE STRUCT5 {// CreateArray() is a function for test purposes.
+Module Part.1{
+	declare m math2
+	const vbInteger=2
+	kkk=m=>createarray(vbInteger,1,25, 2)
+	print type(kkk)="Integer()"
+	zzz=array(&kkk) ' this leave empty kkk
+	print len(zzz)=50
+	link zzz to z()
+	print dimension(zzz, 1, 0)=1
+	print dimension(zzz, 1, 1)=25
+	print dimension(zzz, 2, 0)=1
+	print dimension(zzz, 2, 1)=2
+	print type(kkk)
+	' redim
+	z(10,2)=1000
+	Dim z(1 to 25, 1 to 10)
+	print len(zzz)=250
+	// copy back the Integer()
+	kkk=zzz=>variantArray()
+	zzz=array(&kkk) ' this leave empty kkk
+	print dimension(zzz, 1, 0)=1
+	print dimension(zzz, 1, 1)=25
+	print dimension(zzz, 2, 0)=1
+	print dimension(zzz, 2, 1)=10
+	print z(10, 2)=1000
+//		list
+}
+Part.1
+
+// wait next revision for using
+// VB arrays with more than one index
+// Now we can feed mArray (here with a copy) 
+Module Part.2 {
+	declare m math2
+	kkk=m=>createarray(2,1,25)
+	for i=1 to 25
+		kkk|basearr(i)=random(1, 100)
+		print kkk|basearr(i);
+		if i<25 then print ","; else print
+	next
+	ret=array(kkk)#sort()
+	print type(ret)="mArray"
+	// variantArray() is a function of mArray only
+	kkk=ret=>variantArray()
+	print type$(kkk)="Integer()"
+	print array(kkk)#Str$(",")
+}
+Part.2
+
+Module Part.3 {
+	' for makung an OLE type array:
+	Dim OLE  A(-5 to 5, 2 to 4, 1) as long long=123456789123456789&&
+	A(-4,2,0)++
+	pointer2array=A()
+	' so now we can use => for the object mArray
+	' this return a variant of type LongLong()
+	' VB6 never use this type, but M200 does.
+	vbArray=pointer2array=>VariantArray()
+	' Actually M2000 put this array in a UDT called ExtArray
+	rem {
+		Public Type ExtArray
+			baseArr As Variant
+		End Type
+	}
+	' so every time  assing it to something else we copy it
+	' keep in mind tha we can use by reference pass in M2000
+	vbAnotherArray=vbArray
+	print type$(vbArray)="Long Long()"
+	print type$(vbAnotherArray)="Long Long()"
+	checkit &vbArray
+	checkit &vbAnotherArray
+	
+	sub checkit(&that)
+		dim dest()
+		dest()=array(that) ' a copy now
+		print dest(-5, 2, 0)=123456789123456789&&
+		print dest(-4, 2, 0)=123456789123456790&&
+	end sub
+}
+Part.3
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

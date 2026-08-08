@@ -147,7 +147,7 @@ Private Declare Function Ellipse Lib "gdi32" (ByVal hDC As Long, ByVal x1 As Lon
 Private Declare Function CreatePen Lib "gdi32" (ByVal nPenStyle As Long, ByVal nWidth As Long, ByVal crColor As Long) As Long
 Private Declare Function SelectObject Lib "gdi32" (ByVal hDC As Long, ByVal hObject As Long) As Long
 
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 
 Private Const PS_NULL = 5
 Private Const PS_SOLID = 0
@@ -879,6 +879,9 @@ GetTextMetrics UserControl.hDC, TM
 AveCharWith = TM.tmAveCharWidth
 End Property
 Public Property Get Font() As Font
+If m_font Is Nothing Then
+    Set m_font = UserControl.Font
+End If
     Set Font = m_font
 End Property
 
@@ -1407,10 +1410,15 @@ tParam.cbSize = LenB(tParam)
 tParam.iTabLength = 4
 mTabStop = True
 Buffer = 100
-Set m_font = UserControl.Font
+'On Error Resume Next
+'Set m_font = UserControl.Font
+'If Err Then
+'If Err.Number = 7 Then MyEr "SYSTEM PROBLEM", "пяобкгла сустглатос"
+'Exit Sub
+'End If
 ReDim mList(0 To Buffer)
 Dim i As Long
-scrTwips = 1440# / GetDeviceCaps(UserControl.hDC, LOGPIXELSX)
+scrTwips = Screen.TwipsPerPixelX ' 1440# / GetDeviceCaps(UserControl.hDC, LOGPIXELSX)
 dragslow = 1
 DrawWidth = 1
 DrawStyle = 0

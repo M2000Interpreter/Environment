@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, retval As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, retval As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -332,49 +332,471 @@ Public Const KL_NAMELENGTH = 9
 Declare Function LoadKeyboardLayout Lib "user32" Alias "LoadKeyboardLayoutA" (ByVal pwszKLID As String, ByVal flags As Long) As Long
 Declare Function UnloadKeyboardLayout Lib "user32" (ByVal HKL As Long) As Long
 Declare Function ActivateKeyboardLayout Lib "user32" (ByVal HKL As Long, ByVal flags As Long) As Long
-Public Function HighLong(ByVal P) As Long
-    If MemInt(VarPtr(P)) <> 20 Then P = cInt64(P)
-    HighLong = MemLong(VarPtr(P) + 12)
+
+Const DISP_E_PARAMNOTFOUND = &H80020004
+Const DISP_E_MEMBERNOTFOUND = &H80020003
+Const DISP_E_BADPARAMCOUNT = &H8002000E
+Const DISP_E_TYPEMISMATCH = &H80020005
+Const DISP_E_OVERFLOW = &H8002000A
+Const DISP_E_BADVARTYPE = &H80020008
+Const DISP_E_EXCEPTION = &H80020009
+Const DISP_E_NONAMEDARGS = &H80020007
+Const DISP_E_UNKNOWNNAME = &H80020006
+Const DISP_E_UNKNOWNLCID = &H8002000C
+Const DISP_E_PARAMNOTOPTIONAL = &H8002000F
+Const E_UNEXPECTED = &H8000FFFF
+Const E_NOTIMPL = &H80004001
+Const E_OUTOFMEMORY = &H8007000E
+Const E_INVALIDARG = &H80070057
+Const E_NOINTERFACE = &H80004002
+Const E_POINTER = &H80004003
+Const E_HANDLE = &H80070006
+Const E_ABORT = &H80004004
+Const E_FAIL = &H80004005
+Const E_ACCESSDENIED = &H80070005
+Const E_PENDING = &H8000000A
+Const E_BOUNDS = &H8000000B
+Const E_CHANGED_STATE = &H8000000C
+Const E_ILLEGAL_STATE_CHANGE = &H8000000D
+Const E_ILLEGAL_METHOD_CALL = &H8000000E
+Const RO_E_METADATA_NAME_NOT_FOUND = &H8000000F
+Const RO_E_METADATA_NAME_IS_NAMESPACE = &H80000010
+Const RO_E_METADATA_INVALID_TYPE_FORMAT = &H80000011
+Const RO_E_INVALID_METADATA_FILE = &H80000012
+Const RO_E_CLOSED = &H80000013
+Const RO_E_EXCLUSIVE_WRITE = &H80000014
+Const RO_E_CHANGE_NOTIFICATION_IN_PROGRESS = &H80000015
+Const RO_E_ERROR_STRING_NOT_FOUND = &H80000016
+Const E_STRING_NOT_NULL_TERMINATED = &H80000017
+Const E_ILLEGAL_DELEGATE_ASSIGNMENT = &H80000018
+Const E_ASYNC_OPERATION_NOT_STARTED = &H80000019
+Const E_APPLICATION_EXITING = &H8000001A
+Const E_APPLICATION_VIEW_EXITING = &H8000001B
+Const RO_E_MUST_BE_AGILE = &H8000001C
+Const RO_E_UNSUPPORTED_FROM_MTA = &H8000001D
+Const RO_E_COMMITTED = &H8000001E
+Const CO_E_INIT_TLS = &H80004006
+Const CO_E_INIT_SHARED_ALLOCATOR = &H80004007
+Const CO_E_INIT_MEMORY_ALLOCATOR = &H80004008
+Const CO_E_INIT_CLASS_CACHE = &H80004009
+Const CO_E_INIT_RPC_CHANNEL = &H8000400A
+Const CO_E_INIT_TLS_SET_CHANNEL_CONTROL = &H8000400B
+Const CO_E_INIT_TLS_CHANNEL_CONTROL = &H8000400C
+Const CO_E_INIT_UNACCEPTED_USER_ALLOCATOR = &H8000400D
+Const CO_E_INIT_SCM_MUTEX_EXISTS = &H8000400E
+Const CO_E_INIT_SCM_FILE_MAPPING_EXISTS = &H8000400F
+Const CO_E_INIT_SCM_MAP_VIEW_OF_FILE = &H80004010
+Const CO_E_INIT_SCM_EXEC_FAILURE = &H80004011
+Const CO_E_INIT_ONLY_SINGLE_THREADED = &H80004012
+Const CO_E_CANT_REMOTE = &H80004013
+Const CO_E_BAD_SERVER_NAME = &H80004014
+Const CO_E_WRONG_SERVER_IDENTITY = &H80004015
+Const CO_E_OLE1DDE_DISABLED = &H80004016
+Const CO_E_RUNAS_SYNTAX = &H80004017
+Const CO_E_CREATEPROCESS_FAILURE = &H80004018
+Const CO_E_RUNAS_CREATEPROCESS_FAILURE = &H80004019
+Const CO_E_RUNAS_LOGON_FAILURE = &H8000401A
+Const CO_E_LAUNCH_PERMSSION_DENIED = &H8000401B
+Const CO_E_START_SERVICE_FAILURE = &H8000401C
+Const CO_E_REMOTE_COMMUNICATION_FAILURE = &H8000401D
+Const CO_E_SERVER_START_TIMEOUT = &H8000401E
+Const CO_E_CLSREG_INCONSISTENT = &H8000401F
+Const CO_E_IIDREG_INCONSISTENT = &H80004020
+Const CO_E_NOT_SUPPORTED = &H80004021
+Const CO_E_RELOAD_DLL = &H80004022
+Const CO_E_MSI_ERROR = &H80004023
+Const CO_E_ATTEMPT_TO_CREATE_OUTSIDE_CLIENT_CONTEXT = &H80004024
+Const CO_E_SERVER_PAUSED = &H80004025
+Const CO_E_SERVER_NOT_PAUSED = &H80004026
+Const CO_E_CLASS_DISABLED = &H80004027
+Const CO_E_CLRNOTAVAILABLE = &H80004028
+Const CO_E_ASYNC_WORK_REJECTED = &H80004029
+Const CO_E_SERVER_INIT_TIMEOUT = &H8000402A
+Const CO_E_NO_SECCTX_IN_ACTIVATE = &H8000402B
+Const CO_E_TRACKER_CONFIG = &H80004030
+Const CO_E_THREADPOOL_CONFIG = &H80004031
+Const CO_E_SXS_CONFIG = &H80004032
+Const CO_E_MALFORMED_SPN = &H80004033
+Const OLE_E_OLEVERB = &H80040000
+Const OLE_E_ADVF = &H80040001
+Const OLE_E_ENUM_NOMORE = &H80040002
+Const OLE_E_ADVISENOTSUPPORTED = &H80040003
+Const OLE_E_NOCONNECTION = &H80040004
+Const OLE_E_NOTRUNNING = &H80040005
+Const OLE_E_NOCACHE = &H80040006
+Const OLE_E_BLANK = &H80040007
+Const OLE_E_CLASSDIFF = &H80040008
+Const OLE_E_CANT_GETMONIKER = &H80040009
+Const OLE_E_CANT_BINDTOSOURCE = &H8004000A
+Const OLE_E_STATIC = &H8004000B
+Const OLE_E_PROMPTSAVECANCELLED = &H8004000C
+Const OLE_E_INVALIDRECT = &H8004000D
+Const OLE_E_WRONGCOMPOBJ = &H8004000E
+Const OLE_E_INVALIDHWND = &H8004000F
+Const OLE_E_NOT_INPLACEACTIVE = &H80040010
+Const OLE_E_CANTCONVERT = &H80040011
+Const OLE_E_NOSTORAGE = &H80040012
+Const DV_E_FORMATETC = &H80040064
+Const DV_E_DVTARGETDEVICE = &H80040065
+Const DV_E_STGMEDIUM = &H80040066
+Const DV_E_STATDATA = &H80040067
+Const DV_E_LINDEX = &H80040068
+Const DV_E_TYMED = &H80040069
+Const DV_E_CLIPFORMAT = &H8004006A
+Const DV_E_DVASPECT = &H8004006B
+Const DV_E_DVTARGETDEVICE_SIZE = &H8004006C
+Const DV_E_NOIVIEWOBJECT = &H8004006D
+Const DRAGDROP_E_NOTREGISTERED = &H80040100
+Const DRAGDROP_E_ALREADYREGISTERED = &H80040101
+Const DRAGDROP_E_INVALIDHWND = &H80040102
+Const CLASS_E_NOAGGREGATION = &H80040110
+Const CLASS_E_CLASSNOTAVAILABLE = &H80040111
+Const CLASS_E_NOTLICENSED = &H80040112
+Const VIEW_E_DRAW = &H80040140
+Const REGDB_E_READREGDB = &H80040150
+Const REGDB_E_WRITEREGDB = &H80040151
+Const REGDB_E_KEYMISSING = &H80040152
+Const REGDB_E_INVALIDVALUE = &H80040153
+Const REGDB_E_CLASSNOTREG = &H80040154
+Const REGDB_E_IIDNOTREG = &H80040155
+Const REGDB_E_BADTHREADINGMODEL = &H80040156
+Const CAT_E_CATIDNOEXIST = &H80040160
+Const CAT_E_NODESCRIPTION = &H80040161
+Const CS_E_PACKAGE_NOTFOUND = &H80040164
+Const CS_E_NOT_DELETABLE = &H80040165
+Const CS_E_CLASS_NOTFOUND = &H80040166
+Const CS_E_INVALID_VERSION = &H80040167
+Const CS_E_NO_CLASSSTORE = &H80040168
+Const CS_E_OBJECT_NOTFOUND = &H80040169
+Const CS_E_OBJECT_ALREADY_EXISTS = &H8004016A
+Const CS_E_INVALID_PATH = &H8004016B
+Const CS_E_NETWORK_ERROR = &H8004016C
+Const CS_E_ADMIN_LIMIT_EXCEEDED = &H8004016D
+Const CS_E_SCHEMA_MISMATCH = &H8004016E
+Const CS_E_INTERNAL_ERROR = &H8004016F
+Const CACHE_E_NOCACHE_UPDATED = &H80040170
+Const OLEOBJ_E_NOVERBS = &H80040180
+Const OLEOBJ_E_INVALIDVERB = &H80040181
+Const INPLACE_E_NOTUNDOABLE = &H800401A0
+Const INPLACE_E_NOTOOLSPACE = &H800401A1
+Const CONVERT10_E_OLESTREAM_GET = &H800401C0
+Const CONVERT10_E_OLESTREAM_PUT = &H800401C1
+Const CONVERT10_E_OLESTREAM_FMT = &H800401C2
+Const CONVERT10_E_OLESTREAM_BITMAP_TO_DIB = &H800401C3
+Const CONVERT10_E_STG_FMT = &H800401C4
+Const CONVERT10_E_STG_NO_STD_STREAM = &H800401C5
+Const CONVERT10_E_STG_DIB_TO_BITMAP = &H800401C6
+Const CLIPBRD_E_CANT_OPEN = &H800401D0
+Const CLIPBRD_E_CANT_EMPTY = &H800401D1
+Const CLIPBRD_E_CANT_SET = &H800401D2
+Const CLIPBRD_E_BAD_DATA = &H800401D3
+Const CLIPBRD_E_CANT_CLOSE = &H800401D4
+Const MK_E_CONNECTMANUALLY = &H800401E0
+Const MK_E_EXCEEDEDDEADLINE = &H800401E1
+Const MK_E_NEEDGENERIC = &H800401E2
+Const MK_E_UNAVAILABLE = &H800401E3
+Const MK_E_SYNTAX = &H800401E4
+Const MK_E_NOOBJECT = &H800401E5
+Const MK_E_INVALIDEXTENSION = &H800401E6
+Const MK_E_INTERMEDIATEINTERFACENOTSUPPORTED = &H800401E7
+Const MK_E_NOTBINDABLE = &H800401E8
+Const MK_E_NOTBOUND = &H800401E9
+Const MK_E_CANTOPENFILE = &H800401EA
+Const MK_E_MUSTBOTHERUSER = &H800401EB
+Const MK_E_NOINVERSE = &H800401EC
+Const MK_E_NOSTORAGE = &H800401ED
+Const MK_E_NOPREFIX = &H800401EE
+Const MK_E_ENUMERATION_FAILED = &H800401EF
+Const CO_E_NOTINITIALIZED = &H800401F0
+Const CO_E_ALREADYINITIALIZED = &H800401F1
+Const CO_E_CANTDETERMINECLASS = &H800401F2
+Const CO_E_CLASSSTRING = &H800401F3
+Const CO_E_IIDSTRING = &H800401F4
+Const CO_E_APPNOTFOUND = &H800401F5
+Const CO_E_APPSINGLEUSE = &H800401F6
+Const CO_E_ERRORINAPP = &H800401F7
+Const CO_E_DLLNOTFOUND = &H800401F8
+Const CO_E_ERRORINDLL = &H800401F9
+Const CO_E_WRONGOSFORAPP = &H800401FA
+Const CO_E_OBJNOTREG = &H800401FB
+Const CO_E_OBJISREG = &H800401FC
+Const CO_E_OBJNOTCONNECTED = &H800401FD
+Const CO_E_APPDIDNTREG = &H800401FE
+Const CO_E_RELEASED = &H800401FF
+Const EVENT_S_SOME_SUBSCRIBERS_FAILED = &H40200
+Const EVENT_E_ALL_SUBSCRIBERS_FAILED = &H80040201
+Const EVENT_S_NOSUBSCRIBERS = &H40202
+Const EVENT_E_QUERYSYNTAX = &H80040203
+Const EVENT_E_QUERYFIELD = &H80040204
+Const EVENT_E_INTERNALEXCEPTION = &H80040205
+Const EVENT_E_INTERNALERROR = &H80040206
+Const EVENT_E_INVALID_PER_USER_SID = &H80040207
+Const EVENT_E_USER_EXCEPTION = &H80040208
+Const EVENT_E_TOO_MANY_METHODS = &H80040209
+Const EVENT_E_MISSING_EVENTCLASS = &H8004020A
+Const EVENT_E_NOT_ALL_REMOVED = &H8004020B
+Const EVENT_E_COMPLUS_NOT_INSTALLED = &H8004020C
+Const EVENT_E_CANT_MODIFY_OR_DELETE_UNCONFIGURED_OBJECT = &H8004020D
+Const EVENT_E_CANT_MODIFY_OR_DELETE_CONFIGURED_OBJECT = &H8004020E
+Const EVENT_E_INVALID_EVENT_CLASS_PARTITION = &H8004020F
+Const EVENT_E_PER_USER_SID_NOT_LOGGED_ON = &H80040210
+Public ComErrorDesc As New FastCollection
+Public Sub makeComErrorDescList()
+If ComErrorDesc.Count > 0 Then Exit Sub
+ComErrorDesc.AddKey DISP_E_PARAMNOTFOUND, "A passed parameter DISPID does not match any parameter on the target method."
+ComErrorDesc.AddKey DISP_E_MEMBERNOTFOUND, "The requested member or property does not exist, or an attempt was made to write to a read-only property."
+ComErrorDesc.AddKey DISP_E_BADPARAMCOUNT, "The number of parameters supplied does not match the number accepted by the method or property."
+ComErrorDesc.AddKey DISP_E_TYPEMISMATCH, "One or more arguments could not be coerced to the expected formal parameter type."
+ComErrorDesc.AddKey DISP_E_OVERFLOW, "A value could not be converted or coerced into its expected representation because it exceeded range limits."
+ComErrorDesc.AddKey DISP_E_BADVARTYPE, "One of the arguments in the parameter array is not a valid variant type."
+ComErrorDesc.AddKey DISP_E_EXCEPTION, "The application needs to raise a runtime exception and populate the exception info structure."
+ComErrorDesc.AddKey DISP_E_NONAMEDARGS, "Named arguments were passed to a function implementation that does not support them."
+ComErrorDesc.AddKey DISP_E_UNKNOWNNAME, "The name corresponding to the dispatch identifier could not be general-mapped or found."
+ComErrorDesc.AddKey DISP_E_UNKNOWNLCID, "The locale identifier (LCID) used to interpret string arguments is not recognized."
+ComErrorDesc.AddKey DISP_E_PARAMNOTOPTIONAL, "A required, non-optional parameter was omitted by the caller"
+
+ComErrorDesc.AddKey E_UNEXPECTED, "Catastrophic failure"
+ComErrorDesc.AddKey E_NOTIMPL, "Not implemented"
+ComErrorDesc.AddKey E_OUTOFMEMORY, "Ran out of memory"
+ComErrorDesc.AddKey E_INVALIDARG, "One or more arguments are invalid"
+ComErrorDesc.AddKey E_NOINTERFACE, "No such interface supported"
+ComErrorDesc.AddKey E_POINTER, "Invalid pointer"
+ComErrorDesc.AddKey E_HANDLE, "Invalid handle"
+ComErrorDesc.AddKey E_ABORT, "Operation aborted"
+ComErrorDesc.AddKey E_FAIL, "Unspecified error"
+ComErrorDesc.AddKey E_ACCESSDENIED, "General access denied error"
+ComErrorDesc.AddKey E_PENDING, "The data necessary to complete this operation is not yet available."
+ComErrorDesc.AddKey E_BOUNDS, "The operation attempted to access data outside the valid range"
+ComErrorDesc.AddKey E_CHANGED_STATE, "A concurrent or interleaved operation changed the state of the object, invalidating this operation."
+ComErrorDesc.AddKey E_ILLEGAL_STATE_CHANGE, "An illegal state change was requested."
+ComErrorDesc.AddKey E_ILLEGAL_METHOD_CALL, "A method was called at an unexpected time."
+ComErrorDesc.AddKey RO_E_METADATA_NAME_NOT_FOUND, "Typename or Namespace was not found in metadata file."
+ComErrorDesc.AddKey RO_E_METADATA_NAME_IS_NAMESPACE, "Name is an existing namespace rather than a typename."
+ComErrorDesc.AddKey RO_E_METADATA_INVALID_TYPE_FORMAT, "Typename has an invalid format."
+ComErrorDesc.AddKey RO_E_INVALID_METADATA_FILE, "Metadata file is invalid or corrupted."
+ComErrorDesc.AddKey RO_E_CLOSED, "The object has been closed."
+ComErrorDesc.AddKey RO_E_EXCLUSIVE_WRITE, "Only one thread may access the object during a write operation."
+ComErrorDesc.AddKey RO_E_CHANGE_NOTIFICATION_IN_PROGRESS, "Operation is prohibited during change notification."
+ComErrorDesc.AddKey RO_E_ERROR_STRING_NOT_FOUND, "The text associated with this error code could not be found."
+ComErrorDesc.AddKey E_STRING_NOT_NULL_TERMINATED, "String not null terminated."
+ComErrorDesc.AddKey E_ILLEGAL_DELEGATE_ASSIGNMENT, "A delegate was assigned when not allowed."
+ComErrorDesc.AddKey E_ASYNC_OPERATION_NOT_STARTED, "An async operation was not properly started."
+ComErrorDesc.AddKey E_APPLICATION_EXITING, "The application is exiting and cannot service this request."
+ComErrorDesc.AddKey E_APPLICATION_VIEW_EXITING, "The application view is exiting and cannot service this request."
+ComErrorDesc.AddKey RO_E_MUST_BE_AGILE, "The object must support the IAgileObject interface."
+ComErrorDesc.AddKey RO_E_UNSUPPORTED_FROM_MTA, "Activating a single-threaded class from MTA is not supported."
+ComErrorDesc.AddKey RO_E_COMMITTED, "The object has been committed."
+ComErrorDesc.AddKey CO_E_INIT_TLS, "Thread local storage failure"
+ComErrorDesc.AddKey CO_E_INIT_SHARED_ALLOCATOR, "Get shared memory allocator failure"
+ComErrorDesc.AddKey CO_E_INIT_MEMORY_ALLOCATOR, "Get memory allocator failure"
+ComErrorDesc.AddKey CO_E_INIT_CLASS_CACHE, "Unable to initialize class cache"
+ComErrorDesc.AddKey CO_E_INIT_RPC_CHANNEL, "Unable to initialize RPC services"
+ComErrorDesc.AddKey CO_E_INIT_TLS_SET_CHANNEL_CONTROL, "Cannot set thread local storage channel control"
+ComErrorDesc.AddKey CO_E_INIT_TLS_CHANNEL_CONTROL, "Could not allocate thread local storage channel control"
+ComErrorDesc.AddKey CO_E_INIT_UNACCEPTED_USER_ALLOCATOR, "The user supplied memory allocator is unacceptable"
+ComErrorDesc.AddKey CO_E_INIT_SCM_MUTEX_EXISTS, "The OLE service mutex already exists"
+ComErrorDesc.AddKey CO_E_INIT_SCM_FILE_MAPPING_EXISTS, "The OLE service file mapping already exists"
+ComErrorDesc.AddKey CO_E_INIT_SCM_MAP_VIEW_OF_FILE, "Unable to map view of file for OLE service"
+ComErrorDesc.AddKey CO_E_INIT_SCM_EXEC_FAILURE, "Failure attempting to launch OLE service"
+ComErrorDesc.AddKey CO_E_INIT_ONLY_SINGLE_THREADED, "There was an attempt to call CoInitialize a second time while single threaded"
+ComErrorDesc.AddKey CO_E_CANT_REMOTE, "A Remote activation was necessary but was not allowed"
+ComErrorDesc.AddKey CO_E_BAD_SERVER_NAME, "A Remote activation was necessary but the server name provided was invalid"
+ComErrorDesc.AddKey CO_E_WRONG_SERVER_IDENTITY, "The class is configured to run as a security id different from the caller"
+ComErrorDesc.AddKey CO_E_OLE1DDE_DISABLED, "Use of Ole1 services requiring DDE windows is disabled"
+ComErrorDesc.AddKey CO_E_RUNAS_SYNTAX, "A RunAs specification must be <domain name>\<user name> or simply <user name>."
+ComErrorDesc.AddKey CO_E_CREATEPROCESS_FAILURE, "The server process could not be started. The pathname may be incorrect."
+ComErrorDesc.AddKey CO_E_RUNAS_CREATEPROCESS_FAILURE, "The server process could not be started as the configured identity. The pathname may be incorrect or unavailable."
+ComErrorDesc.AddKey CO_E_RUNAS_LOGON_FAILURE, "The server process could not be started because the configured identity is incorrect. Check the user name and password."
+ComErrorDesc.AddKey CO_E_LAUNCH_PERMSSION_DENIED, "The client is not allowed to launch this server."
+ComErrorDesc.AddKey CO_E_START_SERVICE_FAILURE, "The service providing this server could not be started."
+ComErrorDesc.AddKey CO_E_REMOTE_COMMUNICATION_FAILURE, "This computer was unable to communicate with the computer providing the server."
+ComErrorDesc.AddKey CO_E_SERVER_START_TIMEOUT, "The server did not respond after being launched."
+ComErrorDesc.AddKey CO_E_CLSREG_INCONSISTENT, "The registration information for this server is inconsistent or incomplete."
+ComErrorDesc.AddKey CO_E_IIDREG_INCONSISTENT, "The registration information for this interface is inconsistent or incomplete."
+ComErrorDesc.AddKey CO_E_NOT_SUPPORTED, "The operation attempted is not supported."
+ComErrorDesc.AddKey CO_E_RELOAD_DLL, "A dll must be loaded."
+ComErrorDesc.AddKey CO_E_MSI_ERROR, "A Microsoft Software Installer error was encountered."
+ComErrorDesc.AddKey CO_E_ATTEMPT_TO_CREATE_OUTSIDE_CLIENT_CONTEXT, "The specified activation could not occur in the client context as specified."
+ComErrorDesc.AddKey CO_E_SERVER_PAUSED, "Activations on the server are paused."
+ComErrorDesc.AddKey CO_E_SERVER_NOT_PAUSED, "Activations on the server are not paused."
+ComErrorDesc.AddKey CO_E_CLASS_DISABLED, "The component or application containing the component has been disabled."
+ComErrorDesc.AddKey CO_E_CLRNOTAVAILABLE, "The common language runtime is not available"
+ComErrorDesc.AddKey CO_E_ASYNC_WORK_REJECTED, "The thread-pool rejected the submitted asynchronous work."
+ComErrorDesc.AddKey CO_E_SERVER_INIT_TIMEOUT, "The server started, but did not finish initializing in a timely fashion."
+ComErrorDesc.AddKey CO_E_NO_SECCTX_IN_ACTIVATE, "Unable to complete the call since there is no COM+ security context inside IObjectControl.Activate."
+ComErrorDesc.AddKey CO_E_TRACKER_CONFIG, "The provided tracker configuration is invalid"
+ComErrorDesc.AddKey CO_E_THREADPOOL_CONFIG, "The provided thread pool configuration is invalid"
+ComErrorDesc.AddKey CO_E_SXS_CONFIG, "The provided side-by-side configuration is invalid"
+ComErrorDesc.AddKey CO_E_MALFORMED_SPN, "The server principal name (SPN) obtained during security negotiation is malformed."
+ComErrorDesc.AddKey OLE_E_OLEVERB, "Invalid OLEVERB structure"
+ComErrorDesc.AddKey OLE_E_ADVF, "Invalid advise flags"
+ComErrorDesc.AddKey OLE_E_ENUM_NOMORE, "Can't enumerate any more, because the associated data is missing"
+ComErrorDesc.AddKey OLE_E_ADVISENOTSUPPORTED, "This implementation doesn't take advises"
+ComErrorDesc.AddKey OLE_E_NOCONNECTION, "There is no connection for this connection ID"
+ComErrorDesc.AddKey OLE_E_NOTRUNNING, "Need to run the object to perform this operation"
+ComErrorDesc.AddKey OLE_E_NOCACHE, "There is no cache to operate on"
+ComErrorDesc.AddKey OLE_E_BLANK, "Uninitialized object"
+ComErrorDesc.AddKey OLE_E_CLASSDIFF, "Linked object's source class has changed"
+ComErrorDesc.AddKey OLE_E_CANT_GETMONIKER, "Not able to get the moniker of the object"
+ComErrorDesc.AddKey OLE_E_CANT_BINDTOSOURCE, "Not able to bind to the source"
+ComErrorDesc.AddKey OLE_E_STATIC, "Object is static; operation not allowed"
+ComErrorDesc.AddKey OLE_E_PROMPTSAVECANCELLED, "User canceled out of save dialog"
+ComErrorDesc.AddKey OLE_E_INVALIDRECT, "Invalid rectangle"
+ComErrorDesc.AddKey OLE_E_WRONGCOMPOBJ, "compobj.dll is too old for the ole2.dll initialized"
+ComErrorDesc.AddKey OLE_E_INVALIDHWND, "Invalid window handle"
+ComErrorDesc.AddKey OLE_E_NOT_INPLACEACTIVE, "Object is not in any of the inplace active states"
+ComErrorDesc.AddKey OLE_E_CANTCONVERT, "Not able to convert object"
+ComErrorDesc.AddKey OLE_E_NOSTORAGE, "Not able to perform the operation because object is not given storage yet"
+ComErrorDesc.AddKey DV_E_FORMATETC, "Invalid FORMATETC structure"
+ComErrorDesc.AddKey DV_E_DVTARGETDEVICE, "Invalid DVTARGETDEVICE structure"
+ComErrorDesc.AddKey DV_E_STGMEDIUM, "Invalid STDGMEDIUM structure"
+ComErrorDesc.AddKey DV_E_STATDATA, "Invalid STATDATA structure"
+ComErrorDesc.AddKey DV_E_LINDEX, "Invalid lindex"
+ComErrorDesc.AddKey DV_E_TYMED, "Invalid tymed"
+ComErrorDesc.AddKey DV_E_CLIPFORMAT, "Invalid clipboard format"
+ComErrorDesc.AddKey DV_E_DVASPECT, "Invalid aspect(s)"
+ComErrorDesc.AddKey DV_E_DVTARGETDEVICE_SIZE, "tdSize parameter of the DVTARGETDEVICE structure is invalid"
+ComErrorDesc.AddKey DV_E_NOIVIEWOBJECT, "Object doesn't support IViewObject interface"
+ComErrorDesc.AddKey DRAGDROP_E_NOTREGISTERED, "Trying to revoke a drop target that has not been registered"
+ComErrorDesc.AddKey DRAGDROP_E_ALREADYREGISTERED, "This window has already been registered as a drop target"
+ComErrorDesc.AddKey DRAGDROP_E_INVALIDHWND, "Invalid window handle"
+ComErrorDesc.AddKey CLASS_E_NOAGGREGATION, "Class does not support aggregation (or class object is remote)"
+ComErrorDesc.AddKey CLASS_E_CLASSNOTAVAILABLE, "ClassFactory cannot supply requested class"
+ComErrorDesc.AddKey CLASS_E_NOTLICENSED, "Class is not licensed for use"
+ComErrorDesc.AddKey VIEW_E_DRAW, "Error drawing view"
+ComErrorDesc.AddKey REGDB_E_READREGDB, "Could not read key from registry"
+ComErrorDesc.AddKey REGDB_E_WRITEREGDB, "Could not write key to registry"
+ComErrorDesc.AddKey REGDB_E_KEYMISSING, "Could not find the key in the registry"
+ComErrorDesc.AddKey REGDB_E_INVALIDVALUE, "Invalid value for registry"
+ComErrorDesc.AddKey REGDB_E_CLASSNOTREG, "Class not registered"
+ComErrorDesc.AddKey REGDB_E_IIDNOTREG, "Interface not registered"
+ComErrorDesc.AddKey REGDB_E_BADTHREADINGMODEL, "Threading model entry is not valid"
+ComErrorDesc.AddKey CAT_E_CATIDNOEXIST, "CATID does not exist"
+ComErrorDesc.AddKey CAT_E_NODESCRIPTION, "Description not found"
+ComErrorDesc.AddKey CS_E_PACKAGE_NOTFOUND, "No package in the software installation data in the Active Directory meets this criteria."
+ComErrorDesc.AddKey CS_E_NOT_DELETABLE, "Deleting this will break the referential integrity of the software installation data in the Active Directory."
+ComErrorDesc.AddKey CS_E_CLASS_NOTFOUND, "The CLSID was not found in the software installation data in the Active Directory."
+ComErrorDesc.AddKey CS_E_INVALID_VERSION, "The software installation data in the Active Directory is corrupt."
+ComErrorDesc.AddKey CS_E_NO_CLASSSTORE, "There is no software installation data in the Active Directory."
+ComErrorDesc.AddKey CS_E_OBJECT_NOTFOUND, "There is no software installation data object in the Active Directory."
+ComErrorDesc.AddKey CS_E_OBJECT_ALREADY_EXISTS, "The software installation data object in the Active Directory already exists."
+ComErrorDesc.AddKey CS_E_INVALID_PATH, "The path to the software installation data in the Active Directory is not correct."
+ComErrorDesc.AddKey CS_E_NETWORK_ERROR, "A network error interrupted the operation."
+ComErrorDesc.AddKey CS_E_ADMIN_LIMIT_EXCEEDED, "The size of this object exceeds the maximum size set by the Administrator."
+ComErrorDesc.AddKey CS_E_SCHEMA_MISMATCH, "The schema for the software installation data in the Active Directory does not match the required schema."
+ComErrorDesc.AddKey CS_E_INTERNAL_ERROR, "An error occurred in the software installation data in the Active Directory."
+ComErrorDesc.AddKey CACHE_E_NOCACHE_UPDATED, "Cache not updated"
+ComErrorDesc.AddKey OLEOBJ_E_NOVERBS, "No verbs for OLE object"
+ComErrorDesc.AddKey OLEOBJ_E_INVALIDVERB, "Invalid verb for OLE object"
+ComErrorDesc.AddKey INPLACE_E_NOTUNDOABLE, "Undo is not available"
+ComErrorDesc.AddKey INPLACE_E_NOTOOLSPACE, "Space for tools is not available"
+ComErrorDesc.AddKey CONVERT10_E_OLESTREAM_GET, "OLESTREAM Get method failed"
+ComErrorDesc.AddKey CONVERT10_E_OLESTREAM_PUT, "OLESTREAM Put method failed"
+ComErrorDesc.AddKey CONVERT10_E_OLESTREAM_FMT, "Contents of the OLESTREAM not in correct format"
+ComErrorDesc.AddKey CONVERT10_E_OLESTREAM_BITMAP_TO_DIB, "There was an error in a Windows GDI call while converting the bitmap to a DIB"
+ComErrorDesc.AddKey CONVERT10_E_STG_FMT, "Contents of the IStorage not in correct format"
+ComErrorDesc.AddKey CONVERT10_E_STG_NO_STD_STREAM, "Contents of IStorage is missing one of the standard streams"
+ComErrorDesc.AddKey CONVERT10_E_STG_DIB_TO_BITMAP, "There was an error in a Windows GDI call while converting the DIB to a bitmap."
+ComErrorDesc.AddKey CLIPBRD_E_CANT_OPEN, "OpenClipboard Failed"
+ComErrorDesc.AddKey CLIPBRD_E_CANT_EMPTY, "EmptyClipboard Failed"
+ComErrorDesc.AddKey CLIPBRD_E_CANT_SET, "SetClipboard Failed"
+ComErrorDesc.AddKey CLIPBRD_E_BAD_DATA, "Data on clipboard is invalid"
+ComErrorDesc.AddKey CLIPBRD_E_CANT_CLOSE, "CloseClipboard Failed"
+ComErrorDesc.AddKey MK_E_CONNECTMANUALLY, "Moniker needs to be connected manually"
+ComErrorDesc.AddKey MK_E_EXCEEDEDDEADLINE, "Operation exceeded deadline"
+ComErrorDesc.AddKey MK_E_NEEDGENERIC, "Moniker needs to be generic"
+ComErrorDesc.AddKey MK_E_UNAVAILABLE, "Operation unavailable"
+ComErrorDesc.AddKey MK_E_SYNTAX, "Invalid syntax"
+ComErrorDesc.AddKey MK_E_NOOBJECT, "No object for moniker"
+ComErrorDesc.AddKey MK_E_INVALIDEXTENSION, "Bad extension for file"
+ComErrorDesc.AddKey MK_E_INTERMEDIATEINTERFACENOTSUPPORTED, "Intermediate operation failed"
+ComErrorDesc.AddKey MK_E_NOTBINDABLE, "Moniker is not bindable"
+ComErrorDesc.AddKey MK_E_NOTBOUND, "Moniker is not bound"
+ComErrorDesc.AddKey MK_E_CANTOPENFILE, "Moniker cannot open file"
+ComErrorDesc.AddKey MK_E_MUSTBOTHERUSER, "User input required for operation to succeed"
+ComErrorDesc.AddKey MK_E_NOINVERSE, "Moniker class has no inverse"
+ComErrorDesc.AddKey MK_E_NOSTORAGE, "Moniker does not refer to storage"
+ComErrorDesc.AddKey MK_E_NOPREFIX, "No common prefix"
+ComErrorDesc.AddKey MK_E_ENUMERATION_FAILED, "Moniker could not be enumerated"
+ComErrorDesc.AddKey CO_E_NOTINITIALIZED, "CoInitialize has not been called."
+ComErrorDesc.AddKey CO_E_ALREADYINITIALIZED, "CoInitialize has already been called."
+ComErrorDesc.AddKey CO_E_CANTDETERMINECLASS, "Class of object cannot be determined"
+ComErrorDesc.AddKey CO_E_CLASSSTRING, "Invalid class string"
+ComErrorDesc.AddKey CO_E_IIDSTRING, "Invalid interface string"
+ComErrorDesc.AddKey CO_E_APPNOTFOUND, "Application not found"
+ComErrorDesc.AddKey CO_E_APPSINGLEUSE, "Application cannot be run more than once"
+ComErrorDesc.AddKey CO_E_ERRORINAPP, "Some error in application program"
+ComErrorDesc.AddKey CO_E_DLLNOTFOUND, "DLL for class not found"
+ComErrorDesc.AddKey CO_E_ERRORINDLL, "Error in the DLL"
+ComErrorDesc.AddKey CO_E_WRONGOSFORAPP, "Wrong operating system or operating system version for the application"
+ComErrorDesc.AddKey CO_E_OBJNOTREG, "Object is not registered"
+ComErrorDesc.AddKey CO_E_OBJISREG, "Object is already registered"
+ComErrorDesc.AddKey CO_E_OBJNOTCONNECTED, "Object is not connected to server"
+ComErrorDesc.AddKey CO_E_APPDIDNTREG, "Application was launched but it didn't register a class factory"
+ComErrorDesc.AddKey CO_E_RELEASED, "Object has been released"
+ComErrorDesc.AddKey EVENT_S_SOME_SUBSCRIBERS_FAILED, "An event was able to invoke some but not all of the subscribers"
+ComErrorDesc.AddKey EVENT_E_ALL_SUBSCRIBERS_FAILED, "An event was unable to invoke any of the subscribers"
+ComErrorDesc.AddKey EVENT_S_NOSUBSCRIBERS, "An event was delivered but there were no subscribers"
+ComErrorDesc.AddKey EVENT_E_QUERYSYNTAX, "A syntax error occurred trying to evaluate a query string"
+ComErrorDesc.AddKey EVENT_E_QUERYFIELD, "An invalid field name was used in a query string"
+ComErrorDesc.AddKey EVENT_E_INTERNALEXCEPTION, "An unexpected exception was raised"
+ComErrorDesc.AddKey EVENT_E_INTERNALERROR, "An unexpected internal error was detected"
+ComErrorDesc.AddKey EVENT_E_INVALID_PER_USER_SID, "The owner SID on a per-user subscription doesn't exist"
+ComErrorDesc.AddKey EVENT_E_USER_EXCEPTION, "A user-supplied component or subscriber raised an exception"
+ComErrorDesc.AddKey EVENT_E_TOO_MANY_METHODS, "An interface has too many methods to fire events from"
+ComErrorDesc.AddKey EVENT_E_MISSING_EVENTCLASS, "A subscription cannot be stored unless its event class already exists"
+ComErrorDesc.AddKey EVENT_E_NOT_ALL_REMOVED, "Not all the objects requested could be removed"
+ComErrorDesc.AddKey EVENT_E_COMPLUS_NOT_INSTALLED, "COM+ is required for this operation, but is not installed"
+ComErrorDesc.AddKey EVENT_E_CANT_MODIFY_OR_DELETE_UNCONFIGURED_OBJECT, "Cannot modify or delete an object that was not added using the COM+ Admin SDK"
+ComErrorDesc.AddKey EVENT_E_CANT_MODIFY_OR_DELETE_CONFIGURED_OBJECT, "Cannot modify or delete an object that was added using the COM+ Admin SDK"
+ComErrorDesc.AddKey EVENT_E_INVALID_EVENT_CLASS_PARTITION, "The event class for this subscription is in an invalid partition"
+ComErrorDesc.AddKey EVENT_E_PER_USER_SID_NOT_LOGGED_ON, "The owner of the PerUser subscription is not logged on to the system specified"
+End Sub
+
+
+Public Function HighLong(ByVal p) As Long
+    If MemInt(VarPtr(p)) <> 20 Then p = cInt64(p)
+    HighLong = MemLong(VarPtr(p) + 12)
 End Function
-Public Function LowLong(ByVal P) As Long
-    If Not myVarType(P, 20) Then P = cInt64(P)
-    LowLong = MemLong(VarPtr(P) + 8)
+Public Function LowLong(ByVal p) As Long
+    If Not myVarType(p, 20) Then p = cInt64(p)
+    LowLong = MemLong(VarPtr(p) + 8)
 End Function
 Function Hex64$(a, Optional bytes = 8)
-    Dim P, P1, z
+    Dim p, P1, z
     z = cInt64(a)
-    P = MemLong(VarPtr(z) + 8)
+    p = MemLong(VarPtr(z) + 8)
     P1 = MemLong(VarPtr(z) + 12)
-    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(P), 8), bytes * 2)
+    Hex64$ = Right$(Right$("0000000" + Hex$(P1), 8) + Right$("0000000" + Hex$(p), 8), bytes * 2)
 End Function
 Public Function OneLongLong() As Variant
-    Static P
-    If P = Empty Then
-        PutMem2 VarPtr(P), 20
-        PutMem1 VarPtr(P) + 8, 1
+    Static p
+    If p = Empty Then
+        PutMem2 VarPtr(p), 20
+        PutMem1 VarPtr(p) + 8, 1
     End If
-    OneLongLong = P
+    OneLongLong = p
 End Function
 Public Function OneBigLongLong() As Variant
-    Static P
-    If P = Empty Then
-        PutMem2 VarPtr(P), 20
-        PutMem1 VarPtr(P) + 12, 1
+    Static p
+    If p = Empty Then
+        PutMem2 VarPtr(p), 20
+        PutMem1 VarPtr(p) + 12, 1
     End If
-    OneBigLongLong = P
+    OneBigLongLong = p
 End Function
 Public Function MaskLowLongLong() As Variant
-    Static P
-    If P = Empty Then
-    MemInt(VarPtr(P)) = 20
-    MemLong(VarPtr(P) + 8) = -1&
+    Static p
+    If p = Empty Then
+    MemInt(VarPtr(p)) = 20
+    MemLong(VarPtr(p) + 8) = -1&
     End If
-    MaskLowLongLong = P
+    MaskLowLongLong = p
 End Function
 Public Function Signed(a) As Long
-    Dim P
-    P = Fix(CDec(a))
-    Signed = MemLong(VarPtr(P) + 8)
+    Dim p
+    p = Fix(CDec(a))
+    Signed = MemLong(VarPtr(p) + 8)
 End Function
 Public Function UnsignedSub(a As Long, b As Long)
     Static ua, UB
@@ -388,7 +810,7 @@ Public Function UnsignedSub(a As Long, b As Long)
     UnsignedSub = MemLong(VarPtr(ua) + 8)
 End Function
 
-Public Function cInt64(P)
+Public Function cInt64(p)
     Static maxlonglong, limitlonglong, OneLongLong, OneBigLongLong
     Dim a, i As Integer
     If MemInt(VarPtr(maxlonglong)) = 0 Then
@@ -399,10 +821,10 @@ Public Function cInt64(P)
         MemInt(VarPtr(OneBigLongLong)) = 20
         MemByte(VarPtr(OneBigLongLong) + 12) = 1
     End If
-    i = MemInt(VarPtr(P))
+    i = MemInt(VarPtr(p))
     Select Case i
     Case vbDecimal
-        a = Fix(P)
+        a = Fix(p)
         a = a - Int(a / maxlonglong) * maxlonglong
         If a < -limitlonglong - 1 Then
             While a <= -limitlonglong - 1: a = a + maxlonglong: Wend
@@ -410,13 +832,13 @@ Public Function cInt64(P)
         While a >= limitlonglong: a = a - maxlonglong: Wend
         cInt64 = -OneLongLong And a
     Case 20
-        cInt64 = P
+        cInt64 = p
     Case vbLong, vbInteger
-        cInt64 = -OneLongLong And P
+        cInt64 = -OneLongLong And p
     Case Else
         On Error GoTo er1
         
-        a = Fix(CDec(P))
+        a = Fix(CDec(p))
         If a > limitlonglong Or a <= -limitlonglong Then
         a = a - Int(a / (maxlonglong)) * (maxlonglong)
         If a <= -limitlonglong - 1 Then
@@ -426,14 +848,14 @@ Public Function cInt64(P)
         End If
         cInt64 = -OneLongLong And a
         If i = vbString Then
-            If Left$(P, 1) = "&" And a < 0 Then
-            Select Case Len(P)
+            If Left$(p, 1) = "&" And a < 0 Then
+            Select Case Len(p)
             Case 10
-                If InStr("89ABCDEF", UCase(Mid$(P, 3, 1))) > 0 Then
+                If InStr("89ABCDEF", UCase(Mid$(p, 3, 1))) > 0 Then
                 cInt64 = OneBigLongLong + cInt64
                 End If
             Case 18
-                If Mid$(P, 3, 8) = "00000000" Then
+                If Mid$(p, 3, 8) = "00000000" Then
                     cInt64 = OneBigLongLong + cInt64
                 End If
             Case 11 To 17
@@ -1937,15 +2359,15 @@ End Function
 Function CollideArea(Priority As Long, Percent As Long, basestack As basetask, rest$) As Boolean
 ' nx2 isn't width but absolute line at nx2
 ' means not inside
-Dim nx1 As Long, ny1 As Long, nx2 As Long, ny2 As Long, P
-If IsExp(basestack, rest$, P, , True, , True) Then
-nx1 = CLng(P): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, P, , True, , True) Then
-ny1 = CLng(P): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, P, , True, , True) Then
-nx2 = CLng(P): If Not FastSymbol(rest$, ",") Then Exit Function
-If IsExp(basestack, rest$, P, , True, , True) Then
-ny2 = CLng(P)
+Dim nx1 As Long, ny1 As Long, nx2 As Long, ny2 As Long, p
+If IsExp(basestack, rest$, p, , True, , True) Then
+nx1 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
+If IsExp(basestack, rest$, p, , True, , True) Then
+ny1 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
+If IsExp(basestack, rest$, p, , True, , True) Then
+nx2 = CLng(p): If Not FastSymbol(rest$, ",") Then Exit Function
+If IsExp(basestack, rest$, p, , True, , True) Then
+ny2 = CLng(p)
 End If
 End If
 End If
@@ -2419,7 +2841,7 @@ End Sub
 Public Function PlayTuneMIDI(ch As Long, octave2play As Integer, note2play As Integer, subbeat As Long, doted As Long, volume2play As Long, skipgate As Long, zoom As Double, zoostat As Long, rightvol As Integer, leftvol As Integer) As Boolean
 
 Dim i As Long, v$, probe2play As Long, j As Long, park$, multiplier As Long, tupletBeat As Long, tupletDot As Long, divider As Double, BE As Double
-Dim P
+Dim p
 If Len(voices(ch)) = 0 Then Exit Function
 note2play = 0
 i = 1
@@ -2441,10 +2863,10 @@ Case "R", "r"
             v$ = v$ & Mid$(voices(ch), i + 1, 1)
             i = i + 1
         Loop
-        P = val("0" + v$)
-        If P > 0 Then
-        If P > 1000 Then P = 1000
-            rightvol = cUint(&HFF00 * P / 1000 + 255)
+        p = val("0" + v$)
+        If p > 0 Then
+        If p > 1000 Then p = 1000
+            rightvol = cUint(&HFF00 * p / 1000 + 255)
         Else
             rightvol = 0
         End If
@@ -2456,10 +2878,10 @@ Case "L", "l"
             v$ = v$ & Mid$(voices(ch), i + 1, 1)
             i = i + 1
         Loop
-        P = val("0" + v$)
-        If P > 0 Then
-        If P > 1000 Then P = 1000
-            leftvol = cUint(&HFF00 * P / 1000 + 255)
+        p = val("0" + v$)
+        If p > 0 Then
+        If p > 1000 Then p = 1000
+            leftvol = cUint(&HFF00 * p / 1000 + 255)
         Else
             leftvol = 0
         End If
@@ -3518,9 +3940,9 @@ t(0) = 1 ' VT_NULL
    CopyMemory ByVal VarPtr(VarNull), t(0), 16
 End Sub
 Function myIsNull(VarNull As Variant) As Boolean
-Dim P As Integer
-GetMem2 VarPtr(VarNull), P
-myIsNull = P = 1
+Dim p As Integer
+GetMem2 VarPtr(VarNull), p
+myIsNull = p = 1
 End Function
 
 ' VarByRef VarPtr(var2(items)), var(i)
@@ -3975,7 +4397,7 @@ End Function
 
 
 
-Static Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
+Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
@@ -3988,7 +4410,7 @@ r1 = 1
     End If
 
 Dim v As Double, b$
-If final Then
+If Final Then
 If checktype > 0 Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
 Else
@@ -4827,6 +5249,7 @@ End Function
 
 Public Function allcommands(aHash As coHash) As Boolean
 Dim mycommands(), i As Long
+makeComErrorDescList
 mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK", "BACKGROUND", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BINARY", "BITMAPS", "BOOLEAN", "BOLD", "BREAK", "BROWSER", "BUFFER", "BYTE", "CALL", "CASE", "CAT", "CHANGE", "CHARSET", "CHOOSE.COLOR", "CHOOSE.FONT", "CHOOSE.OBJECT", "CHOOSE.ORGAN", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLOSE", "CLS", "CODEPAGE", "COLOR", "COMPLEX", "COMMIT", "COMPRESS", "CONST", "CONTINUE", "COPY", "CURRENCY", "CURSOR", "CURVE", "DATA", "DATE", "DB.PROVIDER", "DB.USER", "DECIMAL" _
 , "DECLARE", "DEF", "DELETE", "DESKTOP", "DIM", "DIR", "DIV", "DO", "DOCUMENT", "DOS", "DOUBLE", "DRAW", "DRAWING", "DRAWINGS", "DROP", "DURATION", "EDIT", "EDIT.DOC", "ELSE", "ELSE.IF", "EMPTY", "END", "ENGLISH", "ENUM", "ENUMERATION", "ERASE", "ERROR", "ESCAPE", "EVENT", "EVERY", "EXECUTE", "EXIT", "EXPORT", "FAST", "FIELD", "FILES", "FILL", "FIND", "FKEY", "FLOODFILL", "FLUSH", "FONT", "FOR", "FORM", "FORMLABEL", "FRAME", "FUNCTION", "GET", "GLOBAL" _
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INTEGER", "INVENTORY", "ITALIC", "ITALICS", "INTERFACE", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
