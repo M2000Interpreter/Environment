@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 21
+Global Const Revision = 22
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -14772,10 +14772,16 @@ enter2:
             End If
 enterthis:
             If NeoGetArrayItem(ppppl, bstackstr, q$, W, a$, , , True, True) Then
+                If ppppl.arr = False Then
                 If MaybeIsSymbol(a$, "#") Then
-                  
-                    GoTo final
-                ElseIf Not ppppl.arr And FastSymbol(a$, ")") Then
+                If Not bstackstr.lastobj Is Nothing Then
+                Stop
+                GoTo final
+                End If
+                End If
+                End If
+                
+                If Not ppppl.arr And FastSymbol(a$, ")") Then
                     ' need an object
                     If IsNumber(bstackstr, q$ + ")", p) Then
                         If Not bstackstr.lastobj Is Nothing Then
@@ -26520,20 +26526,20 @@ contprop2:
 againObj:
             ProcMethodAsap bstack, myobject, v$, rst$, NeoGetArrayItem, status
             If status = 1 Then
-            If IsLabelObj(rst$, v$) Then
-            If IsSymbolNoSpace(rst$, "(") Then
-                status = 1
+                If IsLabelObj(rst$, v$) Then
+                    If IsSymbolNoSpace(rst$, "(") Then
+                        status = 1
+                    Else
+                        status = 0
+                    End If
+                    GoTo againObj
+                End If
             Else
-                status = 0
-            End If
-            GoTo againObj
-            End If
-            Else
-            If fromstr And rightexpr Then
-                Set bstack.lastobj = myobject
-                Exit Function
-             End If
-            End If
+                If fromstr And rightexpr Then
+                    Set bstack.lastobj = myobject
+                    Exit Function
+                 End If
+                End If
             
             Set pp = Nothing
             Exit Function

@@ -4694,7 +4694,9 @@ Dim isglobal As Boolean, usehandler As mHandler
                         If GetlocalVar(W$, v) Then GoTo assignvaluestr1
                     ElseIf GetlocalVar(W$, v) Then
 assignvaluestr1:
-                        If IsStrExp(bstack, b$, ss$) Then
+                        If IsExp(bstack, b$, p) Then
+                            Assign ss$, p
+                            
 str99399:
                             If IsProp(var(v)) Then
                                 If FastSymbol(b$, "@") Then
