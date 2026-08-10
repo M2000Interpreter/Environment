@@ -85,7 +85,7 @@ Public Function CallByNameLetValue _
     ByVal CallType As cbnCallTypes, _
      pArgs(), pargs2() As String, _
      items As Long, fixnamearg As Long, shiftarray As Boolean) As Boolean
-Debug.Print Typename(pobjTarget), pstrProcName, CallType
+'Debug.Print Typename(pobjTarget), pstrProcName, CallType
 
 
     ' pobjTarget    :   Class or form object that contains the procedure/property
@@ -390,12 +390,19 @@ Public Function CallByNameFixParamArray _
     Dim myptr() As Long
     Dim mm As GuiM2000
     Dim mmm As mArray
+    Dim useExtender As Boolean
     ' Get IDispatch from object
     If pobjTarget Is Nothing Then Exit Function
     If Not UseExtControl Then
         If TypeOf pobjTarget Is ExtControl Then
+            
             Set pobjTarget = pobjTarget.Value
+        Else
+        If TypeOf pobjTarget Is Control Then
+        useExtender = True
         End If
+        End If
+        
     End If
     Set IDsp = pobjTarget
     If fixnamearg = 0 Then
@@ -406,6 +413,7 @@ Public Function CallByNameFixParamArray _
         Else
             lngRet = IDsp.GetIDsOfNames(riid, StrPtr(pstrProcName), 1&, Clid, dispid)
             If lngRet <> 0 Then dispid = -1
+            
         End If
     Else
         ReDim myptr(0 To fixnamearg)
@@ -489,6 +497,7 @@ passhere:
             If dispid = -2147414014 Then
                 GoTo jumpe1
             End If
+            
         Else
             With params
                 .cArgs = 0
@@ -496,9 +505,16 @@ passhere:
             End With
         End If
         ' Invoke method/property
+        If useExtender Then
+        If dispid = &H80011001 Then
+        GoTo jumpe1
+        End If
+        End If
         If LastErNum = 0 Then
             lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
-            If lngRet = -2147352562 Then
+            If lngRet = -2147352573 And useExtender Then
+            GoTo jumpe1
+            ElseIf lngRet = -2147352562 Then
                 lngRet = IDsp.Invoke(dispid, riid, 0, 2, params, VarRet, Excep, lngArgErr)
             End If
         End If
@@ -677,6 +693,7 @@ conthere:
                 Else
                 '   CallByName pobjTarget, pstrProcName, VbMethod, varArr()
 jumpe1:
+                    If fixnamearg > 0 Then MyEr "no named arguments for this call", "όχι ορίσματα με ονόματα για αυτή τη κλήση"
                     Select Case items
                     Case 0
                         CallByName pobjTarget, pstrProcName, VbMethod
@@ -710,7 +727,9 @@ jumpe1:
                 End If
             
             Else
-                If lngRet = &H80020005 Then
+                If lngRet = -2147352573 Then
+                GoTo jumpe1
+                ElseIf lngRet = &H80020005 Then
                     FixError "800A000D"
                 Else
                     FixError Hex$(Excep.sCode)

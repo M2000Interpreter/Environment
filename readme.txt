@@ -1,35 +1,90 @@
 M2000 Interpreter and Environment
-Version 15 Revision 20
+Version 15 Revision 21
 
-August 8, 2026,
+August 10, 2026,
 
-1. Upgrade Assembly: Asm2 example now create exe with a form with a Unicode title. The BW directive place the Unicode string. Also now the external M2000 variables which previous used for numbers now works for string values too (see the Asm2 in new Info file).
+1. Restore compatibility  for the array() function.
 
-2. Advance work for COM objects.
-	2.1 we can pass by value or by reference arrays with parenthesis (mArray objects).
-		this works by sending by reference the underline array, if we choose the reference pass (using & before name)
-	2.2 we can get arrays like a long() as return value, and we can use it as parameter.
-		we can convert to mArray object using Array() function:
-		2.3 using array(variant_holding_array) we get a copy of array
-		2.4 using array(&variant_holding_array) we get the array leaving empty array in variant_holding_array, without copy data.
-	2.3 Now a biginteger object treated as non object (the same as Evaluator does, except when we have a name and place the => operator - for accessing properties and methos. We cant use this for biginteger literals)
-	2.4. Now enumerations do not passed as objects (which are), but as values. Some revisions/versions they have default value the Value property but the last revisions do not have default property. So Older examples - using interpreter with Enumerations with default value works like the new one. 
-	2.5 functions/properties which we call using object=>function( ) or  object=>property( ) may use by reference and call using name of parameter. For example if object has a function function1 with Argame1 and Argname2 arguments then we can do this:
-	retvalue= object=>function1( Argname1:=ThsValueByVal, Argname2:=&ThisValueByRef)
-	And for altering property1 (lets say that have the same arguments signature)
-	object=>property1(Argname1:=ThsValueByVal, Argname2:=&ThisValueByRef)=NewValue
-	
-This works using the old way:
-	Method object, "function1",  Argname1:=ThsValueByVal, Argname2:=&ThisValueByRef as RetValue.
-	for properties there was no old way to use named arguments and by reference arguments for indexes. So the new way solve this.
-	
-	2.6 There is a lot of work for error control, so now we get feedback. Shapeex before the new error system, use a non exist property...(doing nothing but without a message...). So maybe older programs may have errors which the new interpreter may found it. For forms where an instance may delete from the user and some thread attempt to use it now we get error, so a Try { } block can recover from the error, until you master it and understand what cause it.
+The issue start from revision 52 version 14, on Array() funtion.
+So an new function born, the Copy.Arr() for copies of array types including lists (which now have a secondary interface common to secondary interface of mArray and tuple). Array([]) return array from a current stack object, placing an empty one, and Array(s)  when s is a stack object works. 
 
-3. Upgrade sructures. We can use operators ++, --, +=, -=, *=, /= for numeric types, and += for BSTR type of strings.
 
-4. Modules FUNCTOR and VBCOL2 now works as expected. Asm2 for Unicode form. Excel2 now get array from Excel, change items using the array and write back with one statement. See also struct3, struct4, jscript and mEditor (updated).
 
-5. I did a little work for UDT with arrays.
+this was the test code:
+A=(1,2,3,4)  
+B=ARRAY(A)  ' this now is the same as Array(A, 0) return the first item or raise error if no item exist
+PRINT B IS A  ' false
+PRINT A ' 1,2,3,4
+PRINT B ' 1,2,3,4
+
+now change to:
+A=(1,2,3,4)
+B=COPY.ARR(A)
+PRINT B IS A  ' false
+PRINT A ' 1,2,3,4
+PRINT B ' 1,2,3,4
+
+2. I found a way to make M2000 to play without lag the KB module (keyboard for music), on my laptop. My desktop has no noticable lag, because has a real synth inside. My laptop is another story. So I found VirtualMIDISynth #1 (Google Gemini told me about it), which we can set buffer to 0ms. (has 250ms preset). So now you play music with zero lang on a cheep laptop...by setting the default midi out
+
+So I defined the midi.out() (code to enumerate midi output from Gemini) to return either an array of zero or more strings, and when we place an numeric argument then return the string (the name of the midi output)
+
+So to change output we use "Play to" as variant of "Play". Remember there is Play 0 to stop all scores... The play statement set an instrument on a score (and optional the stacatto per sent. by default we play legato, ewual to 100 for the paremeter of stacatto).  
+
+m=midi.out()
+if len(m)>0 then
+	menu
+	for i=0 to len(m)-1
+		menu + midi.out(i)
+	next
+	print "select:";
+	menu !
+	if menu=0 then
+		midi_number=0
+		print menu$(1)
+	else
+		print menu$(menu)
+		midi_number=menu-1	
+	end if
+else
+	print "no midi found"
+	break
+end if
+
+Play to midi_number  ' disable midi (erase all music threads), set the midi number, enable midi
+
+or 
+Play to midi_number, ... mormal parameters (also disable/ser/enable midi).
+
+
+
+Form M2000 console load Info and do this:
+
+Play to 0  ' VirtualMIDISynth get the 0
+music_notes ' now you hear all the notes instantly.
+then do again:
+Play to 1
+music_notes ' now you use the Microsoft synth with a lag, so you beleave that you hear the D#9 and above...notes.
+
+
+
+3. Modules on Info: DD6, HU, RADIAL now works fine. We can get a copy of a list (copy properly the Group type of objects) using the Copy() new function directly (shallow copy, not shown here):
+A=list:=1:=1000,2,3:=500,4
+B=A=>Copy()
+Print A, B
+
+C=Array(A) 'same as Array(A,0)
+? C=1000
+D=Copy.Arr(A)
+Print Type(D)="tuple"
+Print D#Str$(",")="1000,2,500,4"
+Keys=Copy.Arr(A!)
+Print Keys#Str$(",")="1,2,3,4"
+' A is a list but for Version 15 can be used like an array too
+' using #functions
+Print A#Str$(",")="1000,2,500,4"
+Higher100=lambda (x)->x>100
+' no need to copy A first...
+Print A#Filter(Higher100)#sort()#str$(",")="500,1000"
 
 
 George Karras, Kallithea Attikis, Greece.

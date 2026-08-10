@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -4158,7 +4158,7 @@ Case "CDATE(", "CDR(", "CEIL(", "CENTER", "CHANGE", "CHARSET", "CHOOSE.COLOR", "
 Case "CHR$(", "CHR(", "CHRCODE$(", "CHRCODE(", "CIRCLE", "CLASS", "CLEAR", "CLIPBOARD", "CLIPBOARD$", "CLIPBOARD.DRAWING", "CLIPBOARD.IMAGE", "CLIPBOARD.IMAGE$"
 Case "CLOSE", "CLS", "CODE", "CODEPAGE", "COLLIDE(", "COLOR", "COLOR(", "COLORS"
 Case "COLOUR(", "COM", "COMMAND", "COMMAND$", "COMMIT", "COMMON", "COMPARE(", "COMPRESS", "COMPUTER", "COMPUTER$", "CONCURRENT", "CONJUGATE(", "CONST", "CONS("
-Case "CONTINUE", "CONTROL$", "COPY", "COS(", "CTIME(", "CURRENCY", "CURRENCY[", "CURSOR", "CURVE", "COMPLEX", "COMPLEX["
+Case "CONTINUE", "CONTROL$", "COPY", "COPY.ARR(", "COS(", "CTIME(", "CURRENCY", "CURRENCY[", "CURSOR", "CURVE", "COMPLEX", "COMPLEX["
 Case "DATA", "DATE", "DATE[", "DATE$(", "DATE(", "DATEFIELD", "DB.PROVIDER", "DB.USER", "DECIMAL", "DECIMAL[", "DECLARE", "DEF", "DELETE"
 Case "DESCENDING", "DESKTOP", "DIM", "DIMENSION(", "DIR", "DIR$", "DIV", "DO"
 Case "DOC.LEN(", "DOC.PAR(", "DOC.UNIQUE.WORDS(", "DOC.WORDS(", "DOCUMENT", "DOS", "DOUBLE", "DOUBLE[", "DOWN", "DRAW", "DRAWING"
@@ -4180,7 +4180,7 @@ Case "LEN(", "LEN.DISP(", "LET", "LETTER$", "LIB", "LICENSE", "LINE", "LINESPACE
 Case "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LOCALE$(", "LOCALE(", "LOG(", "LONG", "LONG[", "LOOP"
 Case "LOWORD(", "LOWWORD(", "LOWLONG(", "LOLONG(", "LTRIM$(", "LTRIM(", "MAIN.TASK", "MAGNITUDE(", "MAP(", "MARK", "MASTER", "MAT(", "MATCH(", "MAX(", "MAX.DATA$("
 Case "MAX.DATA(", "MDB(", "MEDIA", "MEDIA.COUNTER", "MEMBER$(", "MEMBER.TYPE$(", "MEMO", "MEMORY", "MENU"
-Case "MENU$(", "MENU.VISIBLE", "MENUITEMS", "MERGE.DOC", "METHOD", "MID$(", "MID(", "MIN(", "MIN.DATA$(", "MIN.DATA("
+Case "MENU$(", "MENU.VISIBLE", "MENUITEMS", "MERGE.DOC", "METHOD", "MID$(", "MID(", "MIDI.OUT(", "MIN(", "MIN.DATA$(", "MIN.DATA("
 Case "MOD", "MOD(", "MODE", "MODPOW(", "MODULE", "MODULE$", "MODULE(", "MODULES", "MODULE.NAME$", "MONITOR", "MONITORS", "MONITOR.STACK", "MONITOR.STACK.SIZE", "MOTION", "MOTION.W", "MOTION.WX"
 Case "MOTION.WY", "MOTION.X", "MOTION.XW", "MOTION.Y", "MOTION.YW", "MOUSE", "MOUSE.ICON", "MOUSE.KEY", "MOUSE.X"
 Case "MOUSE.Y", "MOUSEA.X", "MOUSEA.Y", "MOVE", "MOVIE", "MOVIE.COUNTER", "MOVIE.DEVICE$", "MOVIE.ERROR$", "MOVIE.HEIGHT", "MOVIE.STATUS$", "MOVIE.WIDTH"
@@ -4229,7 +4229,7 @@ Case "ΕΑΧ", "ΕΓΓΡΑΦΕΣ(", "ΕΓΓΡΑΦΟ", "ΕΓΓΡΑΦΟΥ.ΛΕΞΕ
 Case "ΕΙΚΟΝΑ", "ΕΙΚΟΝΑ(", "ΕΙΚΟΝΑ.Ψ(", "ΕΙΚΟΝΑ.Ψ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΑ.Υ(", "ΕΙΚΟΝΑ.Υ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΑ.Χ(", "ΕΙΚΟΝΑ.Χ.ΣΗΜΕΙΑ(", "ΕΙΚΟΝΕΣ", "ΕΙΚΟΝΙΔΙΟ", "ΕΙΝΑΡ", "ΕΙΝΑΙ", "ΕΙΝΓΡ"
 Case "ΕΙΣΑΓΩΓΗ", "ΕΙΣΑΓΩΓΗ$(", "ΕΙΣΑΓΩΓΗΣ", "ΕΚΘ(", "ΕΚΔΟΣΗ", "ΕΚΤΕΛΕΣΗ", "ΕΚΤΥΠΩΣΗ", "ΕΚΤΥΠΩΣΗΣ", "ΕΚΤΥΠΩΤΗΣ", "ΕΚΤΥΠΩΤΗΣ$", "ΕΚΦΡ(", "ΕΚΦΡ$("
 Case "ΕΚΦΡΑΣΗ(", "ΕΚΦΡΑΣΗ$(", "ΕΛΕΓΧΟΣ", "ΕΛΕΓΧΟΣ.ΣΩΡΟΥ", "ΕΛΕΓΧΟΣ.ΜΕΓΕΘΟΣ.ΣΩΡΟΥ", "ΕΛΛΗΝΙΚΑ", "ΕΝΑΟΝΟΜΑ$", "ΕΝΘΕΣΗ", "ΕΝΚΟΜ$", "ΕΝΚΟΜ(", "ΕΝΤΑΣΗ", "ΕΝΤΟΛΗ$"
-Case "ΕΝΩ", "ΕΝΩΣΕ", "CONS(", "ΕΝΩΣΗ.ΣΕΙΡΑΣ$(", "ΕΝΩΣΗ(", "ΕΞΑΓΩΓΗ", "ΕΞΟΔΟΣ", "ΕΞΩΤΕΡΙΚΗ", "ΕΠΑΝ$(", "ΕΠΑΝΑΛΑΒΕ", "ΕΠΑΝΑΦΟΡΑ", "ΕΠΑΝΕΛΑΒΕ"
+Case "ΕΝΩ", "ΕΝΩΣΕ", "CONS(", "ΕΝΩΣΗ.ΣΕΙΡΑΣ$(", "ΕΝΩΣΗ(", "ΕΞΑΓΩΓΗ", "ΕΞΟΔΟΣ", "ΕΞΟΔΟΣ.MIDI(", "ΕΞΩΤΕΡΙΚΗ", "ΕΠΑΝ$(", "ΕΠΑΝΑΛΑΒΕ", "ΕΠΑΝΑΦΟΡΑ", "ΕΠΑΝΕΛΑΒΕ"
 Case "ΕΠΑΝΩ", "ΕΠΕΛΕΞΕ", "ΕΠΕΛΕΞΕ.ΑΝΤΙΚΕΙΜΕΝΟ", "ΕΠΕΛΕΞΕ.ΓΡΑΜΜΑΤΟΣΕΙΡΑ", "ΕΠΕΛΕΞΕ.ΟΡΓΑΝΟ", "ΕΠΕΛΕΞΕ.ΧΡΩΜΑ", "ΕΠΙΓΡΑΦΗ", "ΕΠΙΚΑΙΡΟ", "ΕΠΙΛΕΞΕ", "ΕΠΙΛΕΞΕ.ΑΝΤΙΚΕΙΜΕΝΟ", "ΕΠΙΛΕΞΕ.ΓΡΑΜΜΑΤΟΣΕΙΡΑ"
 Case "ΕΠΙΛΕΞΕ.ΟΡΓΑΝΟ", "ΕΠΙΛΕΞΕ.ΧΡΩΜΑ", "ΕΠΙΛΟΓΕΣ", "ΕΠΙΛΟΓΕΣ$(", "ΕΠΙΛΟΓΕΣ.ΦΑΝΕΡΕΣ", "ΕΠΙΛΟΓΗ", "ΕΠΙΛΟΓΗ$(", "ΕΠΙΛΟΓΗΣ", "ΕΠΙΠΕΔΟ"
 Case "ΕΠΙΣΤΡΟΦΗ", "ΕΠΙΦΑΝΕΙΑ", "ΕΠΟΜΕΝΟ", "ΕΠΟΜΕΝΑ(", "ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ", "ΕΤΟΙΜΟ(", "ΕΥΡΕΙΑ", "ΕΥΡΕΣΗ", "ΕΥΡΙΑ", "ΕΦΑΠ(", "ΕΦΑΡΜΟΓΗ.ΑΡΧΕΙΟΥ$(", "ΕΦΑΡΜΟΓΗ.ΚΑΤ$", "ΕΦΑΡΜΟΓΗ"
@@ -4252,7 +4252,7 @@ Case "ΟΝΟΜΑ.ΑΡΧΕΙΟΥ.ΜΟΝΟ$(", "ΟΝΟΜΑ.ΤΜΗΜΑΤΟΣ$", "Ο
 Case "ΠΑΙΖΕΙΑΞΙΑ(", "ΠΑΙΖΕΙΕΝΤΑΣΗ(", "ΠΑΙΖΕΙΝΟΤΑ(", "ΠΑΙΖΕΙΠΟΡΤΑ(", "ΠΑΙΖΕΙΣΧΗΜΑ(", "ΠΑΙΖΕΙΤΕΛΕΙΕΣ(", "ΠΑΙΖΕΙΤΩΡΑ(", "ΠΑΙΞΕ", "ΠΑΚ(", "ΠΑΚ$(", "ΠΑΝΤΑ"
 Case "ΠΑΝΩ", "ΠΑΝΩΜΙΣΟ(", "ΠΑΝΩΜΙΣΟ64(", "ΠΑΡΑΓΡΑΦΟΣ$(", "ΠΑΡΑΓΡΑΦΟΣ(", "ΠΑΡΑΜ(", "ΠΑΡΑΜ$(", "ΠΑΡΑΘΕΣΗ$(", "ΠΑΡΑΘΥΡΟ", "ΠΑΡΑΜΕΤΡΟΙ$", "ΠΑΡΕ", "ΠΑΡΕΚΑΡΕ$"
 Case "ΠΑΡΕΜΒΟΛΗ", "ΠΑΤΗΜΕΝΟ(", "ΠΑΧΟΣ", "ΠΕΔΙΑ", "ΠΕΔΙΟ", "ΠΕΔΙΟ$(", "ΠΕΖ$(", "ΠΕΖ(", "ΠΕΝΑ", "ΠΕΡΙ"
-Case "ΠΕΡΙ$", "ΠΕΡΙΘΩΡΙΟ", "ΠΕΤΑ", "ΠΙ", "ΠΙΝΑΚΑΣ", "ΠΙΝΑΚΑΣ$(", "ΠΙΝΑΚΑΣ(", "ΠΙΝΑΚΕΣ", "ΠΙΣΩ("
+Case "ΠΕΡΙ$", "ΠΕΡΙΘΩΡΙΟ", "ΠΕΤΑ", "ΠΙ", "ΠΙΝΑΚΑΣ", "ΠΙΝΑΚΑΣ$(", "ΠΙΝΑΚΑΣ(", "ΑΝΤΙΓΡΑΦΟ.ΠΙΝ(", "ΠΙΝΑΚΕΣ", "ΠΙΣΩ("
 Case "ΠΛΑΓΙΑ", "ΠΛΑΙΣΙΟ", "ΠΛΑΤΟΣ", "ΠΛΑΤΟΣ.ΣΕΛΙΔΑΣ", "ΠΛΑΤΟΣ.ΣΗΜΕΙΟΥ", "ΠΛΑΤΟΣ.ΤΑΙΝΙΑΣ", "ΠΛΑΤΦΟΡΜΑ$", "ΠΛΕΙΑΔΑ", "ΠΛΗΚΤΡΟΛΟΓΙΟ", "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", "ΠΟΛΙΚΟΣ(", "ΠΟΛΥΓΩΝΟ"
 Case "ΠΡΟΣ", "ΠΡΟΣΑΡΜΟΓΗΣ", "ΠΡΟΣΘΕΣΕ.ΕΓΓΡΑΦΟ", "ΠΡΟΣΘΗΚΗ", "ΠΡΩΤΟΤΥΠΟ", "ΠΡΩΤΟ(", "ΠΡΟΣΩΡΙΝΟ$", "ΠΡΟΧΕΙΡΟ", "ΠΡΟΧΕΙΡΟ$", "ΠΡΟΧΕΙΡΟ.ΕΙΚΟΝΑ", "ΠΡΟΧΕΙΡΟ.ΕΙΚΟΝΑ$", "ΠΡΟΧΕΙΡΟ.ΣΧΕΔΙΟ", "ΡΕΥΜΑ", "ΡΙΖΑ("
 Case "ΡΟΥΤΙΝΑ", "ΡΟΥΤΙΝΑΣ", "ΡΥΘΜΙΣΕΙΣ", "ΡΩΤΑ$(", "ΡΩΤΑ(", "ΣΑΡΩΣΕ", "ΣΒΗΣΕ", "ΣΕ"
@@ -4397,7 +4397,7 @@ End Function
 
 
 
-Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
+Static Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
@@ -4410,7 +4410,7 @@ r1 = 1
     End If
 
 Dim v As Double, b$
-If Final Then
+If final Then
 If checktype > 0 Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
 Else
@@ -5232,7 +5232,7 @@ myfun() = Array("PARAM(", 1, "ΠΑΡΑΜ(", 1, "STACKITEM(", 2, "ΤΙΜΗΣΩΡ�
 , "HEX(", 144, "ΔΕΚΑΕΞ(", 144, "REPLACE(", 145, "ΑΛΛΑΓΗ(", 145, "FILTER(", 146, "ΦΙΛΤΡΟ(", 146, "UCASE(", 147, "ΚΕΦ(", 147, "LCASE(", 148, "ΠΕΖ(", 148, "TYPE(", 149, "ΤΥΠΟΣ(", 149, "TITLE(", 150, "ΤΙΤΛΟΣ(", 150, "BIT64.XOR(", 151, "ΔΥΑΔ64.ΑΠΟ(", 151, "BIT64.AND(", 152, "ΔΥΑΔ64.ΚΑΙ(", 152, "BIT64.OR(", 153, "ΔΥΑΔ64.Η(", 153 _
 , "BIT64.ADD(", 154, "ΔΥΑΔ64.ΠΡΟ(", 154, "ΔΥΑΔ64.ΠΡΟΣΘΕΣΗ(", 154, "BIT64.SHIFT(", 155, "ΔΥΑΔ64.ΟΛΙΣΘΗΣΗ(", 155, "BIT64.ROTATE(", 156, "ΔΥΑΔ64.ΠΕΡΙΣΤΡΟΦΗ(", 156, "BIT64.NOT(", 157, "ΔΥΑΔ64.ΟΧΙ(", 157, "BIT64.NEG(", 158, "ΔΥΑΔ64.ΑΝΤΙ(", 158, "ΔΥΑΔ64.ΑΝΤΙΣΤΡΟΦΟ(", 158 _
 , "HILOWLONG(", 159, "ΔΥΟΜΙΣΑ64(", 159, "HILONG(", 160, "ΠΑΝΩΜΙΣΟ64(", 160, "HIGHLONG(", 160, "LOLONG(", 161, "LOWLONG(", 161, "ΚΑΤΩΜΙΣΟ64(", 161, "BINARY.TEST(", 162, "ΔΥΑΔΙΚΟ.ΕΧΕΙ(", 162, "BINARY.SET(", 163, "ΔΥΑΔΙΚΟ.ΒΑΛΕ(", 163, "BINARY.RESET(", 164, "ΔΥΑΔΙΚΟ.ΒΓΑΛΕ(", 164, "BIT64.TEST(", 165, "ΔΥΑΔ64.ΕΧΕΙ(", 165, "BIT64.SET(", 166, "ΔΥΑΔ64.ΒΑΛΕ(", 166, "BIT64.RESET(", 167, "ΔΥΑΔ64.ΒΓΑΛΕ(", 167 _
-, "BINARY.SUB(", 168, "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", 168, "ΔΥΑΔΙΚΟ.ΑΦ(", 168, "ΔΥΑΔ64.ΑΦ(", 169, "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", 169, "BIT64.SUB(", 169, "ΔΥΑΔ64(", 170, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", 170, "UINT64(", 170)
+, "BINARY.SUB(", 168, "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", 168, "ΔΥΑΔΙΚΟ.ΑΦ(", 168, "ΔΥΑΔ64.ΑΦ(", 169, "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", 169, "BIT64.SUB(", 169, "ΔΥΑΔ64(", 170, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "ΑΝΤΙΓΡΑΦΟ.ΠΙΝ(", 171, "MIDI.OUT(", 172, "ΕΞΟΔΟΣ.MIDI(", 172)
 
 
 

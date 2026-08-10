@@ -9462,7 +9462,29 @@ Click me to display Date and Time.</button>
 browser "alfa.html",motion.xw+motion.x,motion.yw+motion.y, scale.x,6000
 Print {click, and pres Esc, or use statement Browser ""}
 }
-MODULE KB {Function CallMe {
+MODULE KB {' use VirtualMIDISynth #1 setting buffers to 0
+m=midi.out()
+if len(m)>0 then
+	menu
+	for i=0 to len(m)-1
+		menu + midi.out(i)
+	next
+	print "select:";
+	menu !
+	if menu=0 then
+		midi=0
+		print menu$(1)
+	else
+		print menu$(menu)
+		midi=menu-1	
+	end if
+else
+	print "no midi found"
+	break
+end if
+
+play to midi  ' choose the midi device
+Function CallMe {
      \\  Fkey Clear  - not used
       \\ Keyboard - can play two or more notes at once
       \\ some keybards can play max 6 notes, some other max 4
@@ -9483,7 +9505,7 @@ MODULE KB {Function CallMe {
       Gradient 5,5
       Cursor 0,0
       Double
-      Report 2, "Keyboard 006 - Fast Response"   
+      Report 2, "Keyboard 006 - Fast Response - "+midi.out(midi)   
       Normal
       Report 2,{Menu
       1-Exit  3-Xylophone 4-Piano 5-Saxophone  8-Show Keys/Notes 9-Rythm Yes 0-Rythm No
@@ -9531,19 +9553,20 @@ MODULE KB {Function CallMe {
       Module ClKey {
             Read a$, press, sel
             If press Then {
-            If Instr(kb$,a$+"-")>0 Then Exit
-            Next()
-            voi(sel)=f
-            Print a$, f
-            Refr<=true
-            Score f, dur, a$+vol$ : kb$<=kb$+a$+"-": Play f, org
+                If Instr(kb$,a$+"-")>0 Then Exit
+                
+                Next()
+                voi(sel)=f
+                Score f, dur, a$+vol$ : kb$<=kb$+a$+"-": Play f, org
+                Print a$, f
+                Refr<=true
             } else {
                   kb$<=Replace$(a$+"-","", kb$)
                   If voi(sel)>0 Then {
-                  Refr<=true
-                   Play voi(sel), 0 
-                   use(voi(sel))~
-                   voi(sel)=0
+			Refr<=true
+			Play voi(sel), 0 
+			use(voi(sel))~
+			voi(sel)=0
                    }
             }
             Sub Next()
@@ -12918,7 +12941,7 @@ Print IbanCheck$("MK11 2222 3333 4444 555")
 }
 MODULE HTTP {Module CheckIt  {
       Declare  xml "Microsoft.XMLHTTP"
-      const testUrl$ = "https://news.google.com/"
+      const testUrl$ = "https://rosettacode.org/wiki/Rosetta_Code"
       With  xml, "readyState" as ReadyState
       Method xml "Open", "Get", testUrl$, True  ' True means Async
       Method xml "send"
@@ -53193,7 +53216,26 @@ function getAnyValue(key)
 	=z
 end function
 }
-MODULE LEGATO {tempo = 1000
+MODULE LEGATO {m=midi.out()
+if len(m)>0 then
+	menu
+	for i=0 to len(m)-1
+		menu + midi.out(i)
+	next
+	print "select:";
+	menu !
+	if menu=0 then
+		midi=0
+		print menu$(1)
+	else
+		print menu$(menu)
+		midi=menu-1	
+	end if
+else
+	print "no midi found"
+	break
+end if
+tempo = 1000
 a$="e@3e@3e@2e@3e@3e@2e@3g@3c@3d@3e"
 a$+="f@3f@3f@3f@3f@3e@3e@3e@4e@4e@3d@3d@3e@3d@2g@2"
 a$+="e@3e@3e@2e@3e@3e@2e@3g@3c@3d@3e"
@@ -53205,7 +53247,7 @@ for staccato =50 to 100 step 25
   	Print "Legato"
   end if
   score 1, tempo, a$, staccato
-  play 1,1
+  play to midi,  1,1
   while playscore
       wait 100
   end while

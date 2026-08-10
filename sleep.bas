@@ -114,6 +114,65 @@ Private Declare Function IsWow64Process Lib "kernel32" (ByVal hProc As Long, bWo
 Private Declare Function GetForegroundWindow Lib "user32" () As Long
     
 
+
+Private Type MIDIOUTCAPS_W
+    wMid As Integer
+    wPid As Integer
+    vDriverVersion As Long
+    szPname(0 To 63) As Byte
+    wTechnology As Integer
+    wVoices As Integer
+    wNotes As Integer
+    wChannelMask As Integer
+    dwSupport As Long
+End Type
+
+Private Declare Function midiOutGetNumDevs Lib "winmm.dll" () As Long
+
+Private Declare Function midiOutGetDevCapsW Lib "winmm.dll" ( _
+    ByVal uDeviceID As Long, _
+    ByVal lpMidiOutCapsPtr As Long, _
+    ByVal cbMidiOutCaps As Long) As Long
+Public Function GetMidiOutputDevicesW() As String()
+    Dim numDevs As Long
+    Dim i As Long
+    Dim capsW As MIDIOUTCAPS_W
+    Dim devices() As String
+    Dim rawName As String
+    Dim nullCharPos As Long
+    
+    numDevs = midiOutGetNumDevs()
+    
+    If numDevs > 0 Then
+        ReDim devices(0 To numDevs - 1)
+        
+        For i = 0 To numDevs - 1
+            ' Κλήση της W έκδοσης περνώντας τον δείκτη της δομής στη μνήμη
+            If midiOutGetDevCapsW(i, VarPtr(capsW), LenB(capsW)) = 0 Then
+                
+                ' Μετατροπή του Byte Array απευθείας σε εσωτερικό VB6 Unicode String
+                rawName = capsW.szPname
+                
+                ' Αφαίρεση του Null-terminator χαρακτήρα (ChrW$(0)) που βάζει το Windows API
+                nullCharPos = InStr(rawName, ChrW$(0))
+                If nullCharPos > 0 Then
+                    devices(i) = Left$(rawName, nullCharPos - 1)
+                Else
+                    devices(i) = Trim$(rawName)
+                End If
+            Else
+                devices(i) = "Unknown Device " & i
+            End If
+        Next i
+    Else
+        ReDim devices(0 To 0)
+        devices(0) = "No MIDI Output Devices Found"
+    End If
+    
+    GetMidiOutputDevicesW = devices
+End Function
+
+
 Public Function Is64bit() As Boolean
     Static M As Boolean, used As Boolean
 If used Then
@@ -162,21 +221,21 @@ End Function
 Public Sub BlockFree(ByVal Ptr As Long)
     HeapFree GetProcessHeap(), 0, Ptr
 End Sub
-Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByRef OldV As Long)
+Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByRef oldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
-    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, OldV ' PAGE_READWRITE
+    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, oldV ' PAGE_READWRITE
     VirtualLock Ptr, nBytes
 End Sub
-Public Sub SetUpForExecution2(ByVal Ptr As Long, ByVal nBytes As Long, ByRef OldV As Long)
+Public Sub SetUpForExecution2(ByVal Ptr As Long, ByVal nBytes As Long, ByRef oldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
-    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READWRITE, OldV ' PAGE_READWRITE
+    VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READWRITE, oldV ' PAGE_READWRITE
     VirtualLock Ptr, nBytes
 End Sub
-Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByVal OldV As Long)
+Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByVal oldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
     
     VirtualUnlock Ptr, nBytes
-    VirtualProtect Ptr, nBytes, OldV, OldV '  PAGE_EXECUTE_READ
+    VirtualProtect Ptr, nBytes, oldV, oldV '  PAGE_EXECUTE_READ
 End Sub
 Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
     If VirtualFree(Ptr, 0&, &H8000&) = 0 Then

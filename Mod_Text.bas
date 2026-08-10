@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 20
+Global Const Revision = 21
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -225,7 +225,7 @@ Public Declare Sub KillTimer Lib "user32" _
        (ByVal hWnd As Long, ByVal nIDEvent As Long)
 Public MasterTimer As Currency, tickTimer As Double
 Public TaskMaster As TaskMaster, MusicMaster As New TaskMaster
-Public hmidi As Long
+Public hmidi As Long, curDevice As Long
 Public mute As Boolean
 Public beat As Long
 Public baseNote As Long
@@ -8687,8 +8687,18 @@ fun118, fun119, fun120, fun121, fun122, fun123, fun124, fun125, fun126, fun127, 
 fun131, fun132, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, _
 fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun151, fun152, fun153, fun154, fun155, fun156, _
 fun157, fun158, fun159, fun160, fun161, fun162, fun163, fun164, fun165, fun166, fun167, fun168, fun169, _
-fun170
+fun170, fun171, fun172
 IsNumberNew = False
+Exit Function
+fun172: ' midi.out()
+If getMidiDeviceOrDevices(bstack, a$, r) Then
+If Not bstack.lastobj Is Nothing Then
+If FastSymbol1(a$, "#") Then GoTo comehere
+End If
+IsNumberNew = True
+
+End If
+
 Exit Function
 fun133: 'Mid() as Mid$ AND OTHER
 Select Case w1
@@ -9279,6 +9289,11 @@ fun20: ' "ARRAY(", "–…Õ¡ ¡”("
     IsNumberNew = IsArrayFun(bstack, a$, r)
     If FastSymbol1(a$, "#") Then GoTo comehere
     Exit Function
+fun171: ' "COPY.ARR(", "¡Õ‘…√—¡÷œ.–…Õ("
+    IsNumberNew = IsArrayCopy(bstack, a$, r)
+    If FastSymbol1(a$, "#") Then GoTo comehere
+    Exit Function
+    
 fun21: ' "FUNCTION(", "”’Õ¡—‘«”«(" ok
     If IsFlatStringExpr(bstack, a$, s$) Then
         If IsSymbolBracket(s$) Then
@@ -22697,7 +22712,7 @@ Case "COPY", "¡Õ‘≈√—¡ÿ≈", "¡Õ‘…√—¡ÿ≈"
     Identifier = MyCopy(basestack, rest$, Lang)
     Exit Function
 Case "–¡…Œ≈", "PLAY"
-    Identifier = MyPlayScore(basestack, rest$)
+    Identifier = MyPlayScore(basestack, rest$, Lang)
     Exit Function
 Case "SCORE", "÷ŸÕ«"
     Identifier = MyScore(basestack, rest$)
@@ -26653,7 +26668,11 @@ conthere:
         If pppp.SerialItem((0), dd, 5) Then
             dd = dd - 1
             Offset = 0
-            If dd < 0 Then If VarTypeName(pppp.GroupRef) = mProp Then GoTo contprop
+            If dd < 0 Then
+            If VarTypeName(pppp.GroupRef) = mProp Then GoTo contprop
+            mEmptyArray
+            Exit Function
+            End If
             Do While dn <= dd
                 pppp.GetDnum dn, w3, lim
                 If IsExp(bstack, rst$, p, flatobject:=True, nostring:=True) Then
@@ -27319,10 +27338,10 @@ End With
 If MyIsObject(anything) Then
     If TypeOf usehandler.objref Is FastCollection Then
         usehandler.t1 = 1
-        Set usehandler.objref = anything
+       ' Set usehandler.objref = anything
     ElseIf TypeOf usehandler.objref Is StructCollection Then
         usehandler.t1 = 5
-        Set usehandler.objref = anything
+       ' Set usehandler.objref = anything
     ElseIf TypeOf usehandler.objref Is Enumeration Then
         Set usehandler.objref = New mHandler
         Set usehandler = usehandler.objref
@@ -43960,10 +43979,86 @@ ElseIf IsExp(bstack, a$, r, , True) Then
     IsRandom = FastSymbol(a$, ")", True)
 
 End Function
-Private Function IsArrayFun(bstack As basetask, a$, r As Variant) As Boolean
+Private Function IsArrayCopy(bstack As basetask, a$, r As Variant) As Boolean
 Dim s$, w1 As Long, pppp As iBoxArray, anything As Object, p As Variant, ms As mStiva, usehandler As mHandler, RF As refArray
 Dim myGroup As Group, emp As ExtArray
-If IsStrExp(bstack, a$, s$) Then
+
+    If IsExp(bstack, a$, p) Then
+        If MemInt(VarPtr(p)) = vbString Then
+            SwapString2Variant s$, p
+            GoTo contstr
+        End If
+        If Not bstack.lastobj Is Nothing Then
+            If TypeOf bstack.lastobj Is mHandler Then
+                Set usehandler = bstack.lastobj
+                If usehandler.indirect >= 0 Then
+                    Set pppp = var(usehandler.indirect)
+                    If usehandler.UseIterator Then
+                    pppp.index = usehandler.index_cursor
+                    End If
+                    GoTo check123678
+                ElseIf IsobjArray(usehandler.objref) Then
+                    If usehandler.t1 = 1 Then
+                        If FastSymbol(a$, "!") Then
+                            Set bstack.lastobj = usehandler.objref.ExportKeys
+                        Else
+                            Set bstack.lastobj = usehandler.objref.ExportValues
+                        End If
+                        Set usehandler = Nothing
+                        IsArrayCopy = FastSymbol(a$, ")", True)
+                        Exit Function
+                    End If
+                    Set pppp = usehandler.objref
+                    GoTo check123678
+                ElseIf TypeOf usehandler.objref Is mStiva Then
+                    Set ms = usehandler.objref
+                    Set bstack.lastobj = Nothing
+                    Set usehandler = Nothing
+                    Set bstack.lastobj = ms.ExportArray(ms.Count)
+                    Set ms = Nothing
+                    IsArrayCopy = FastSymbol(a$, ")", True)
+                    Exit Function
+                Else
+                     Set bstack.lastobj = Nothing
+                    NotArray
+                End If
+            ElseIf IsobjArray(bstack.lastobj) Then
+                If FastSymbol(a$, ")") Then
+                IsArrayCopy = True
+                Exit Function
+                End If
+                Set pppp = bstack.lastobj
+                
+                GoTo check123678
+            ElseIf TypeOf bstack.lastobj Is refArray Then
+                Dim pppp0 As mArray
+                Set pppp0 = New mArray
+                Set RF = bstack.lastobj
+                pppp0.SupportRefArray CVar(RF)
+                Set bstack.lastobj = pppp0
+                IsArrayCopy = FastSymbol(a$, ")", True)
+                
+            End If
+        Else
+        If MemInt(VarPtr(p)) = 36 Then
+           If TypeOf p Is ExtArray Then
+cont112233:
+                'nMath2.DumpVBArray VarPtr(p)
+                Set pppp0 = New mArray
+                'pppp0.LoadTuple p
+                pppp0.LoadArray MemLong(VarPtr(p) + 8)
+                Set usehandler = New mHandler
+                usehandler.t1 = 3
+                Set usehandler.objref = pppp0
+                Set bstack.lastobj = usehandler
+                IsArrayCopy = FastSymbol(a$, ")", True)
+           End If
+        End If
+        
+        End If
+    ElseIf IsStrExp(bstack, a$, s$) Then
+contstr:
+        s$ = myUcase(s$, True)
         If bstack.lastobj Is Nothing Then
             If Right$("!!" + s$, 2) = "()" Then
                 Mid$(s$, Len(s$), 1) = " "
@@ -43994,68 +44089,47 @@ If IsStrExp(bstack, a$, s$) Then
             If neoGetArray(bstack, s$, pppp) Then
 check123678:
                 If Not pppp.arr Then NotArray: Exit Function
-                If FastSymbol(a$, ",") Then
-                    IsArrayFun = NeoGetArrayItem(pppp, bstack, s$, w1, a$)
-                Else
-                
-                    IsArrayFun = FastSymbol(a$, ")", True)
-                    If Not usehandler Is Nothing Then
+                IsArrayCopy = FastSymbol(a$, ")", True)
+                Dim usehandler1 As mHandler
+                    
+                If Not usehandler Is Nothing Then
                     If Not usehandler.UseIterator Then
-                        Dim usehandler1 As mHandler
-
                         usehandler.CopyTo usehandler1
                         Dim pppp1 As iBoxArray
                         pppp.CopyArray pppp1
                         Set usehandler1.objref = pppp1
-                        Set bstack.lastobj = usehandler1
-                        r = Empty
-                        Exit Function
-                    End If
-                    End If
-                    w1 = 0
-                    
-                   ' w1 = pppp.index
-                End If
-checkIterator:
-                If Not pppp.IsEmpty Then
-                    If MyIsObject(pppp.item(w1)) Then
-                        Set anything = pppp.item(w1)
-                        If Not anything Is Nothing Then
-                        If TypeOf anything Is Group Then
-                            bstack.soros.CopyGroupObj pppp.item(w1), anything
-                            Set bstack.lastobj = anything
-                        Else
-                            Set bstack.lastobj = anything
-                        End If
-                        
-                        Else
-                            Set bstack.lastobj = Nothing
-                        End If
-                        r = 0
                     Else
-                        Set bstack.lastobj = Nothing
-                        
-                        r = pppp.itemnumeric(w1)
+                        usehandler.CopyTo usehandler1
                     End If
-                Else
-                    
-                    mEmptyArray
+                    Set bstack.lastobj = usehandler1
+                    r = Empty
+                    Exit Function
                 End If
             Else
-                 Set bstack.lastobj = Nothing
+                Set bstack.lastobj = Nothing
                 NotArray
             End If
-
-                 Exit Function
-            
         ElseIf IsobjArray(bstack.lastobj) Then
-                Set pppp = bstack.lastobj
-                GoTo check123678
+            Set pppp = bstack.lastobj
+            GoTo check123678
         Else
             Set bstack.lastobj = Nothing
             SyntaxError
         End If
-    ElseIf IsExp(bstack, a$, p, nostring:=True) Then
+    Else
+        Set bstack.lastobj = New mArray
+        IsArrayCopy = FastSymbol(a$, ")", True)
+    End If
+End Function
+Private Function IsArrayFun(bstack As basetask, a$, r As Variant) As Boolean
+Dim s$, w1 As Long, pppp As iBoxArray, anything As Object, p As Variant, ms As mStiva, usehandler As mHandler, RF As refArray
+Dim myGroup As Group, emp As ExtArray
+
+    If IsExp(bstack, a$, p) Then
+        If MemInt(VarPtr(p)) = vbString Then
+            SwapString2Variant s$, p
+            GoTo contstr
+        End If
         If Not bstack.lastobj Is Nothing Then
             If TypeOf bstack.lastobj Is mHandler Then
                 Set usehandler = bstack.lastobj
@@ -44066,9 +44140,9 @@ checkIterator:
                     End If
                     GoTo check123678
                 ElseIf IsobjArray(usehandler.objref) Then
-                    If usehandler.t1 = 1 Then
-                        GoTo contFast
-                    End If
+                   ' If usehandler.t1 = 1 Then
+                   '     GoTo contFast
+                   ' End If
                     Set pppp = usehandler.objref
                     If usehandler.UseIterator Then
                     pppp.index = usehandler.index_cursor
@@ -44149,11 +44223,24 @@ contFast:
                     NotArray
                 End If
             ElseIf IsobjArray(bstack.lastobj) Then
+                Set pppp = bstack.lastobj
+                Set bstack.lastobj = Nothing
                 If FastSymbol(a$, ")") Then
-                IsArrayFun = True
+                
+                If Not pppp.arr Then NotArray: Exit Function
+                If pppp.Count = 0 Then
+                MyEr "No item found", "ƒÂÌ ‚Ò›ËÁÍÂ ÛÙÔÈ˜ÂﬂÔ"
+                Else
+                    If pppp.IsObjAt(0, anything) Then
+                    Set bstack.lastobj = anything
+                    r = 0
+                    Else
+                    r = pppp.item(0)
+                    End If
+                    IsArrayFun = True
+                End If
                 Exit Function
                 End If
-                Set pppp = bstack.lastobj
                 
                 GoTo check123678
             ElseIf TypeOf bstack.lastobj Is refArray Then
@@ -44182,11 +44269,126 @@ cont112233:
         End If
         
         End If
+    ElseIf IsStrExp(bstack, a$, s$) Then
+contstr:
+        s$ = myUcase(s$, True)
+        If bstack.lastobj Is Nothing Then
+            If Right$("!!" + s$, 2) = "()" Then
+                Mid$(s$, Len(s$), 1) = " "
+                s$ = RTrim$(s$)
+             Else
+                w1 = InStr("!" + s$, "(") - 1
+                If w1 > 0 And w1 <= Len(s$) Then
+                    s$ = Left$(s$, w1)
+                
+                Else
+                    Dim i As Long
+                    If GetVar(bstack, s$, i, True) Then
+                    If MemInt(VarPtr(var(i))) = 36 Then
+                    If TypeOf var(i) Is ExtArray Then
+                        p = emp
+                        SwapVariant p, var(i)
+                        GoTo cont112233
+                    End If
+                    End If
+                    End If
+                    If neoGetArray(bstack, s$, pppp) Then
+                        GoTo check123678
+                    Else
+                        s$ = s$ + "("
+                    End If
+                End If
+            End If
+            If neoGetArray(bstack, s$, pppp) Then
+check123678:
+                If Not pppp.arr Then NotArray: Exit Function
+                If FastSymbol(a$, ",") Then
+                    If TypeOf pppp Is FastCollection Then
+                    If IsExp(bstack, a$, p, , True, , True) Then
+                    w1 = CLng(p)
+                    If w1 >= 0 And w1 < pppp.Count Then
+                       If pppp.IsObjAt(w1, anything) Then
+                       Set bstack.lastobj = anything
+                       Else
+                        r = pppp.item(w1)
+                       End If
+                     IsArrayFun = FastSymbol(a$, ")", True)
+                     Exit Function
+                    End If
+                    End If
+                    Else
+                    IsArrayFun = NeoGetArrayItem(pppp, bstack, s$, w1, a$)
+                    End If
+                Else
+                
+                    
+                    If Not FastSymbol(a$, ")", True) Then
+                    
+                    'If Not usehandler Is Nothing Then
+                    'If Not usehandler.UseIterator Then
+                        Dim usehandler1 As mHandler
+
+                     '   usehandler.CopyTo usehandler1
+                        Dim pppp1 As iBoxArray
+                      '  pppp.CopyArray pppp1
+                       ' Set usehandler1.objref = pppp1
+                        'Set bstack.lastobj = usehandler1
+                        'r = Empty
+                        Exit Function
+                    'End If
+                    'End If
+                    End If
+                    
+                    IsArrayFun = True
+                    w1 = 0
+                    
+                   ' w1 = pppp.index
+                End If
+checkIterator:
+                If Not pppp.IsEmpty Then
+                    If MyIsObject(pppp.item(w1)) Then
+                        Set anything = pppp.item(w1)
+                        If Not anything Is Nothing Then
+                        If TypeOf anything Is Group Then
+                            bstack.soros.CopyGroupObj pppp.item(w1), anything
+                            Set bstack.lastobj = anything
+                        Else
+                            Set bstack.lastobj = anything
+                        End If
+                        
+                        Else
+                            Set bstack.lastobj = Nothing
+                        End If
+                        r = 0
+                    Else
+                        Set bstack.lastobj = Nothing
+                        
+                        r = pppp.itemnumeric(w1)
+                    End If
+                Else
+                    
+                    mEmptyArray
+                End If
+            Else
+                 Set bstack.lastobj = Nothing
+                NotArray
+            End If
+
+                 Exit Function
+            
+        ElseIf IsobjArray(bstack.lastobj) Then
+                Set pppp = bstack.lastobj
+                GoTo check123678
+        Else
+            Set bstack.lastobj = Nothing
+            SyntaxError
+        End If
     Else
         Set bstack.lastobj = New mArray
         IsArrayFun = FastSymbol(a$, ")", True)
     End If
 End Function
+
 Private Function IsStackObj(v$, bstack As basetask, a$, r As Variant) As Boolean
 Dim anything As Object, anything2 As Object, p As Variant, usehandler As mHandler, ms As mStiva
     Set usehandler = New mHandler
@@ -44853,7 +45055,7 @@ Dim p As Variant, s$, usehandler As mHandler
 End Function
 Private Function IsDocLen(bstack As basetask, a$, r As Variant) As Boolean
 Dim w1 As Long, s$, w2 As Long, pppp As iBoxArray
-w1 = Abs(IsLabel(bstack, a$, s$))
+        w1 = Abs(IsLabel(bstack, a$, s$))
         If w1 = 3 Then
             If GetVar(bstack, s$, w1) Then
                 If VarTypeName(var(w1)) = doc Then
@@ -46984,7 +47186,7 @@ conthere:
                         With usehandler
                             If Not .objref Is Nothing Then
                             
-                            If TypeOf .objref Is iBoxArray Then Set ppppl = .objref: Set p = ppppl: GoTo again99
+                            If TypeOf .objref Is iBoxArray And Not TypeOf .objref Is FastCollection Then Set ppppl = .objref: Set p = ppppl: GoTo again99
                             
                             If FindItem(bstack, p, a$, VarTypeName(p), w2) Then
                                 
@@ -50470,7 +50672,7 @@ Dim dn As Long, dd As Long, p, w3, w2 As Long, ppppl As iBoxArray, pppp As mArra
 Dim pp As Variant
 Set pp = curpp
 If pp Is Nothing Then Exit Function
-If Not TypeOf pp Is iBoxArray Then
+If Not TypeOf pp Is iBoxArray Or TypeOf pp Is FastCollection Then
 If TypeOf pp Is mHandler Then
 Set usehandler = pp
 With usehandler
@@ -50483,7 +50685,7 @@ cont:
 Set usehandler = Nothing
 Set ppppl = pp
 
-If ppppl.arr Then
+If ppppl.arr And Not TypeOf ppppl Is FastCollection Then
 dn = 0
 
 ppppl.SerialItem (0), dd, 5
@@ -52988,7 +53190,60 @@ fstr29: '"RIGHTPART$(", "ƒ≈Œ…Ã≈—œ”$("  OK
     End If
     Exit Function
 fstr30: ' "ARRAY$(", "–…Õ¡ ¡”$(" - OK
-    If IsStrExp(bstackstr, a$, q1$) Then
+    If IsExp(bstackstr, a$, p) Then
+        If VarType(p) = vbString Then q1$ = p: GoTo isStr0021
+        If Not bstackstr.lastobj Is Nothing Then
+            If TypeOf bstackstr.lastobj Is mHandler Then
+                Set usehandler = bstackstr.lastobj
+                If usehandler.indirect >= 0 Then
+                    If IsobjArray(var(usehandler.indirect)) Then
+                        Set ppppl = var(usehandler.indirect)
+                        GoTo check1236789
+                    End If
+                ElseIf IsobjArray(usehandler.objref) Then
+                    Set ppppl = usehandler.objref
+                    If bstackstr.lastobj.UseIterator Then
+                        If Not ppppl.arr Then NotArray: Exit Function
+                        If FastSymbol(a$, ",") Then
+                            strFunctions = IsExp(bstackstr, a$, r, , True)
+                            strFunctions = FastSymbol(a$, ")", True)
+                            dd = r
+                        Else
+                            strFunctions = FastSymbol(a$, ")", True)
+                            dd = usehandler.index_cursor
+                        End If
+                        If Not strFunctions Then Exit Function
+                        GoTo check999100
+                    Else
+                        GoTo check1236789
+                    End If
+                ElseIf TypeOf usehandler.objref Is mStiva Then
+                    Set ms1 = usehandler.objref
+                    Set bstackstr.lastobj = Nothing
+                    If FastSymbol(a$, ",") Then
+                        If IsExp(bstackstr, a$, p, flatobject:=True, nostring:=True) Then
+                            Set bstackstr.lastobj = ms1.ExportArray(CLng(MyRound(p)))
+                        End If
+                    Else
+                        Set bstackstr.lastobj = ms1.ExportArray(ms1.Count)
+                    End If
+                    Set ms1 = Nothing
+                    strFunctions = FastSymbol(a$, ")", True)
+                    Exit Function
+                Else
+                    Set bstackstr.lastobj = Nothing
+                    NotArray
+                End If
+            ElseIf TypeOf bstackstr.lastobj Is mArray Then
+                Set ppppl = bstackstr.lastobj
+                GoTo check1236789
+            End If
+        End If
+    
+    
+    ElseIf LastErNum1 Then
+    
+    ElseIf IsStrExp(bstackstr, a$, q1$) Then
 isStr0021:
         If bstackstr.lastobj Is Nothing Then
             If Right$("!!" + q1$, 2) = "()" Then
@@ -53043,56 +53298,8 @@ check999100:
             SyntaxError
             Set bstackstr.lastobj = Nothing
         End If
-    ElseIf LastErNum1 Then
-    ElseIf IsExp(bstackstr, a$, p) Then
-        If VarType(p) = vbString Then q1$ = p: GoTo isStr0021
-        If Not bstackstr.lastobj Is Nothing Then
-            If TypeOf bstackstr.lastobj Is mHandler Then
-                Set usehandler = bstackstr.lastobj
-                If usehandler.indirect >= 0 Then
-                    If IsobjArray(var(usehandler.indirect)) Then
-                        Set ppppl = var(usehandler.indirect)
-                        GoTo check1236789
-                    End If
-                ElseIf IsobjArray(usehandler.objref) Then
-                    Set ppppl = usehandler.objref
-                    If bstackstr.lastobj.UseIterator Then
-                        If Not ppppl.arr Then NotArray: Exit Function
-                        If FastSymbol(a$, ",") Then
-                            strFunctions = IsExp(bstackstr, a$, r, , True)
-                            strFunctions = FastSymbol(a$, ")", True)
-                            dd = r
-                        Else
-                            strFunctions = FastSymbol(a$, ")", True)
-                            dd = ppppl.index
-                        End If
-                        If Not strFunctions Then Exit Function
-                        GoTo check999100
-                    Else
-                        GoTo check1236789
-                    End If
-                ElseIf TypeOf usehandler.objref Is mStiva Then
-                    Set ms1 = usehandler.objref
-                    Set bstackstr.lastobj = Nothing
-                    If FastSymbol(a$, ",") Then
-                        If IsExp(bstackstr, a$, p, flatobject:=True, nostring:=True) Then
-                            Set bstackstr.lastobj = ms1.ExportArray(CLng(MyRound(p)))
-                        End If
-                    Else
-                        Set bstackstr.lastobj = ms1.ExportArray(ms1.Count)
-                    End If
-                    Set ms1 = Nothing
-                    strFunctions = FastSymbol(a$, ")", True)
-                    Exit Function
-                Else
-                    Set bstackstr.lastobj = Nothing
-                    NotArray
-                End If
-            ElseIf TypeOf bstackstr.lastobj Is mArray Then
-                Set ppppl = bstackstr.lastobj
-                GoTo check1236789
-            End If
-        End If
+    
+    
     Else
         SyntaxError
         Set bstackstr.lastobj = Nothing

@@ -22197,11 +22197,12 @@ End Sub
 Function IsFlatStringExpr(bstackstr As basetask, a$, q$) As Boolean
     Dim p
     IsFlatStringExpr = False
-    If LastErNum1 Then
-    ElseIf IsStrExp(bstackstr, a$, q$) Then
-        IsFlatStringExpr = True
-    ElseIf LastErNum1 Then
-    ElseIf IsExp(bstackstr, a$, p, , True) Then
+    'If LastErNum1 Then
+    'ElseIf IsStrExp(bstackstr, a$, q$) Then
+    '    IsFlatStringExpr = True
+    'ElseIf LastErNum1 Then
+    'Else
+    If IsExp(bstackstr, a$, p, , True) Then
         If VarType(p) <> vbString Then WrongType: Exit Function
         SwapString2Variant q$, p
         IsFlatStringExpr = True

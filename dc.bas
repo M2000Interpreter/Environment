@@ -1073,7 +1073,7 @@ wi = DDD.currentX
 If collectit Then bstack.soros.PushStr mDoc.textDoc
 End Sub
 Public Sub EnableMidi()
-Dim curDevice As Long, rc As Long
+Dim rc As Long
 
  If hmidi = 0 Then
 rc = GetFuncPtr("winmm.dll", "midiOutOpen")

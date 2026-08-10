@@ -67,8 +67,8 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
@@ -147,6 +147,7 @@ IamBusy = True
     
 IamBusy = False
 End Sub
+
 Public Sub AddKey(RHS, Optional aValue As Variant)
     index = -1
     
@@ -598,12 +599,62 @@ Public Function Normalize(Key) As String
         Normalize = LTrim$(str$(Key))
         End If
 End Function
-Function ChangeKey(key1, Key2)
+Friend Sub passItem(ByVal where As Long, firsthash1, iValue1, Key1, KeyType1, sValue1)
+    With PriveSpace(where)
+    .firsthash = firsthash1
+    If MyIsObject(iValue1) Then
+        If Not iValue1 Is Nothing Then
+            If TypeOf iValue1 Is Group Then
+            Dim obj1 As Object, obj2 As Object
+            Set obj1 = iValue1
+            CopyGroupObjRef obj1, obj2
+            Set .iValue = obj2
+            Else
+            Set .iValue = iValue1
+            End If
+        Else
+            Set .iValue = Nothing
+        End If
+    Else
+    .iValue = iValue1
+    End If
+    .Key = Key1
+    .KeyType = KeyType1
+    .sValue = sValue
+    
+    End With
+    toplim = where
+End Sub
+Function Copy() As Variant
+Dim m As FastCollection, h As mHandler
+Set m = New FastCollection
+Set h = New mHandler
+ h.t1 = 1
+Set h.objref = m
+Set Copy = h
+If AllowSameKey Then
+    m.AllowAnyKey
+End If
+m.UcaseKeys = UseUcaseKeys
+If Count > 0 Then
+m.MakeSpace MaxSpace, mSortstyle
+
+Dim i As Long
+For i = 0 To Count - 1
+With PriveSpace(i)
+    m.passItem i, .firsthash, .iValue, .Key, .KeyType, .sValue
+End With
+Next
+m.ExpandHash
+End If
+
+End Function
+Function ChangeKey(Key1, Key2)
 If AllowSameKey Then Exit Function
     Dim Key As String, NewKey As String
     Dim k As Long
-    If key1 = Key2 Then ChangeKey = True
-    Key = Normalize(key1)
+    If Key1 = Key2 Then ChangeKey = True
+    Key = Normalize(Key1)
     If Len(Key) = 0 Then Exit Function
     If ExistKey(Key2) Then Exit Function
     
@@ -627,9 +678,9 @@ If AllowSameKey Then Exit Function
     Loop Until k < 0
     End If
 End Function
-Sub swap(key1, Key2)
+Sub swap(Key1, Key2)
 Dim k As Long, c As item
-If Find(key1) Then
+If Find(Key1) Then
 k = index
 If Find(Key2) Then
 
@@ -640,21 +691,21 @@ If Find(Key2) Then
 End If
 End If
 End Sub
-Sub SwapValues(key1, Key2)
+Sub SwapValues(Key1, Key2)
 Dim k As Long
-If Find(key1) Then
+If Find(Key1) Then
 k = index
 If Find(Key2) Then
     SwapVariant PriveSpace(k).iValue, PriveSpace(index).iValue
 End If
 End If
 End Sub
-Sub SwapNext(key1)
+Sub SwapNext(Key1)
 Dim k As Long
 On Error Resume Next
 If Done Then
     k = index
-    If Find(key1) Then
+    If Find(Key1) Then
         SwapVariant PriveSpace(k).iValue, PriveSpace(index).iValue
     End If
 End If
@@ -1983,7 +2034,6 @@ Private Function iBoxArray_IsObj() As Boolean
 End Function
 
 Private Function iBoxArray_IsObjAt(curitem As Long, peekvalue As Variant) As Boolean
-peekvalue = 0
 If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then
     iBoxArray_IsObjAt = False
 ElseIf MyIsObject(PriveSpace(curitem).iValue) Then
@@ -2053,17 +2103,18 @@ End Function
 
 Private Function iBoxArray_itemnumeric(curitem As Long) As Variant
 '
-If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then
-    If PriveSpace(curitem).KeyType = 8 Then
-        iBoxArray_itemnumeric = 0
-    Else
+'If VarTypeName(PriveSpace(curitem).iValue) = "Error" Then
+If MemInt(VarPtr(PriveSpace(curitem).iValue)) = 10 Then
+   ' If PriveSpace(curitem).KeyType = 8 Then
+   '     iBoxArray_itemnumeric = 0
+   ' Else
         iBoxArray_itemnumeric = iBoxArray_item(curitem)
-    End If
-ElseIf MyIsNumeric(PriveSpace(curitem).iValue) Then
+   ' End If
+Else 'If MyIsNumeric(PriveSpace(curitem).iValue) Then
 
     iBoxArray_itemnumeric = PriveSpace(curitem).iValue
-Else
-    iBoxArray_itemnumeric = 0
+'Else
+'    iBoxArray_itemnumeric = 0
 End If
 End Function
 
@@ -2130,7 +2181,7 @@ Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As V
 '
 End Function
 
-Private Sub iBoxArray_processAppend(M As Object)
+Private Sub iBoxArray_processAppend(m As Object)
 '
 End Sub
 

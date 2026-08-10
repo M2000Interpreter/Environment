@@ -80,7 +80,7 @@ Static a&, Cs#, Sn#, x1&(720), y1&(720), x2&(720), y2&(720) 'statics, to avoid r
   Dim cy#: cy = ScaleHeight / 2
   Dim r1#: r1 = IIf(cx < cy, cx, cy) - GetDeviceCaps(hDC, 88) / 96
   Dim R2#: R2 = r1 * InnerRadiusPerc
-  Dim sL$: sL = Format$(mPercVal, "0%")
+  Dim sL$: sL = format$(mPercVal, "0%")
   
   FontSize = R2 * 0.4 / (GetDeviceCaps(hDC, 88) / 96)
   TextOutW hDC, cx - TextWidth(sL) * 0.48, cy - TextHeight(sL) * 0.5, StrPtr(sL), Len(sL)
