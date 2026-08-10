@@ -206,12 +206,11 @@ ReDim a(1 To 20)
 a(1) = RHS
 a(2) = job
 End Property
-Public Property Let Stat(RHS)
-If MyIsObject(RHS) Then
+Public Property Set Stat(RHS)
     Set Delme = RHS
-Else
+End Property
+Public Property Let Stat(RHS)
     Delme = RHS
-End If
 End Property
 Public Property Get Stat() As Variant
     If MemInt(VarPtr(Delme)) = 0 Then

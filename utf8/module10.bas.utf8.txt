@@ -1903,8 +1903,9 @@ Const b12345 = vbCr + "'\/:}"
 If AscW(W$) = 46 Then
     If Not expanddot(bstack, W$) Then ManyDots: GoTo err000
 End If
-If funid.Find(W$, i) Then
+If funid.Find(W$, i, bstack.numfunnum) Then
     If i > 0 Then funid.ItemCreator W$, -i
+    i = 0
 End If
 If VarStat Or NewStat Or noVarStat Then
     If noVarStat Then
@@ -10148,7 +10149,7 @@ conter00:
                 If Not FastSymbol(rest$, ")") Then GoTo er107
 arrconthere:
                 what$ = myUcase(what$)
-                If ohere$ = vbNullString Then
+                If Len(ohere$) = 0 Then
                     If varhash.ExistKey(what$) Then
                         If flag2 Then
                             If i < 0 Then i = -i
@@ -10176,14 +10177,25 @@ arrconthere:
                             If CheckAnyArray(myobject) Then
                                 Set myobject = Nothing
                                 varhash.ItemCreator ohere$ + "." + what$, i, True, True
+                                                            
                             Else
                                 GoTo er103
                             End If
                         Else
                             GoTo er103
                         End If
+                        If Right$(what$, 2) = "$(" Then
+                            If strfunid.Find(what$, i, bstack.strfunnum) Then
+                                If i > 0 Then strfunid.ItemCreator what$, -Abs(i)
+                            End If
+                        Else
+                            If funid.Find(what$, i, bstack.numfunnum) Then
+                                If i > 0 Then funid.ItemCreator what$, -Abs(i)
+                            End If
+                        End If
                     End If
                 End If
+                
                 MyRead8 = True
             Else
                 If GetSub(s$, i) Then
@@ -13903,6 +13915,16 @@ arrconthere:
                             Else
                                 GoTo er103
                             End If
+                        If Right$(what$, 2) = "$(" Then
+                            If strfunid.Find(what$, i, bstack.strfunnum) Then
+                                If i > 0 Then strfunid.ItemCreator what$, -Abs(i)
+                            End If
+                        Else
+                            If funid.Find(what$, i, bstack.numfunnum) Then
+                                If i > 0 Then funid.ItemCreator what$, -Abs(i)
+                            End If
+                        End If
+                            
                         End If
                     End If
                 End If
@@ -19035,6 +19057,13 @@ conthereHandler:
                         End If
                         Set r = bstack.lastobj
                             Set bstack.lastobj = Nothing
+                            If TypeOf r1 Is PropReference Then
+                                If r1.ValueObjNoError Is Nothing Then
+                                    Set r1 = r1.lastobj
+                                Else  ' ????
+                                    Set r1 = r1.ValueObjNoError
+                                End If
+                            End If
                             If TypeOf r1 Is mHandler Then
                                 If CheckLastHandlerVariant(r1) Then
                                     Set usehandler = r1
@@ -19043,6 +19072,13 @@ conthereHandler:
                                     Else
                                         Set r1 = usehandler.objref
                                     End If
+                                End If
+                            End If
+                            If TypeOf r Is PropReference Then
+                                If r.ValueObjNoError Is Nothing Then
+                                    Set r = r.lastobj
+                                Else  ' ????
+                                    Set r = r.ValueObjNoError
                                 End If
                             End If
                             If TypeOf r Is mHandler Then
@@ -22170,6 +22206,12 @@ Function logical(basestack As basetask, s$, D As Variant, Optional par As Long =
     ElseIf Len(s$) > 0 Then
         If MaybeIsSymbol(s$, b123456) Then
             If AscW(s$) = 8 Then
+                If IsStr1(basestack, s$, b$) Then
+                    D = vbNullString
+                    SwapString2Variant b$, D
+                    logical = True
+                End If
+            ElseIf lookOne(s$, "&") Then
                 If IsStr1(basestack, s$, b$) Then
                     D = vbNullString
                     SwapString2Variant b$, D

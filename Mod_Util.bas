@@ -32863,29 +32863,36 @@ End Function
 
 Function StaticNew(bstack As basetask, b$, W$, Lang As Long) As Boolean
 Dim p As Variant, ii As Long, ss$, usehandler As mHandler, H As Variant, ok As Boolean
-
+Dim Name$, it As Long
 If IsLabelSymbolNew(b$, "ΣΥΝΑΡΤΗΣΗ", "FUNCTION", Lang) Then
 Do
     While FastSymbol(b$, "&") Or FastSymbol(b$, "."): Wend
-    Select Case IsLabel(bstack, b$, W$)
-    Case 1, 3, 4
-        If GetlocalVar(W$ + "(", ii) Then
-            GoTo baDName
-        ElseIf funid.Find(W$ + "(", ii) Then
-                GoTo BAD1
-        Else
-            W$ = here$ + "." + W$ + "()"
-            GoTo gogood
-        End If
+    it = IsLabel(bstack, b$, W$)
+    
+    Select Case it
+    Case 1
+        W$ = W$ + "("
+        it = 5
+        GoTo cont1345
+    Case 3
+        W$ = W$ + "("
+        it = 6
+        GoTo cont1345
+    Case 4
+        W$ = W$ + "("
+        it = 7
+        GoTo cont1345
+    End Select
+    Select Case it
     Case 5, 6, 7
         If FastSymbol(b$, ")") Then
+cont1345:
             If GetlocalVar(W$, ii) Then
 baDName:
                 MyEr "name used for array", "το όνομα χρησιμοποιείται από πίνακα"
                 Exit Function
-            ElseIf funid.Find(W$, ii) Then
-                GoTo BAD1
             Else
+                Name$ = W$
                 W$ = here$ + "." + W$ + ")"
 gogood:
                 If subHash.Find(W$, ii) Then
@@ -32898,6 +32905,16 @@ BAD1:
                         Exit Function
                     End If
                 Else
+                    Dim i As Long
+                    If it = 6 Then
+                        If strfunid.Find(Name$, i, bstack.strfunnum) Then
+                            If i > 0 Then strfunid.ItemCreator Name$, -Abs(i)
+                        End If
+                    ElseIf it = 5 Then
+                        If funid.Find(Name$, i, bstack.numfunnum) Then
+                            If i > 0 Then funid.ItemCreator Name$, -Abs(i)
+                        End If
+                    End If
                     subHash.ItemCreator W$, -1, True
                 End If
             End If
@@ -32918,16 +32935,24 @@ ElseIf IsLabelSymbolNew(b$, "ΡΟΥΤΙΝΑ", "SUB", Lang) Then
 Do
     While FastSymbol(b$, "&") Or FastSymbol(b$, "."): Wend
     If IsLabel(bstack, b$, W$) = 1 Then
+        Name$ = W$
         W$ = here$ + "." + W$
         If subHash.Find(W$, ii) Then
             If ii = -1 Then
                 ' just skip
             Else
+                If comhash.Find(Name$, 0&) Then
+                    comhash.ItemCreator2 Name$, 0, 33
+                End If
                 subHash.ItemCreator W$, -1, True
             End If
         Else
+            If comhash.Find(Name$, 0&) Then
+                comhash.ItemCreator2 Name$, 0, 33
+            End If
             subHash.ItemCreator W$, -1, True
         End If
+        
     Else
         StaticNew = False
         SyntaxError

@@ -96,7 +96,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 22
+Global Const Revision = 23
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -6433,6 +6433,9 @@ jumphere2:
                 GoTo jumphere2
 
             End Select
+            ' it isn't false ....
+            ' look for string
+            
             IsNumber = False
             Exit Function
         ElseIf Not Mid$(a$, sng&, 1) Like "[1-9]" Then
@@ -8415,7 +8418,13 @@ cont113321:
                                 Else
 cont3321:
                                     UseProp.UseIndex = False
+                                    
                                 End If
+                            If Not bstack.lastobj Is Nothing Then
+                            If FastSymbol1(a$, "#") Then GoTo comehere
+                            
+                            
+                            End If
                             End If
 cont223455:
                             Set bstack.lastobj = UseProp
@@ -14775,7 +14784,6 @@ enterthis:
                 If ppppl.arr = False Then
                 If MaybeIsSymbol(a$, "#") Then
                 If Not bstackstr.lastobj Is Nothing Then
-                Stop
                 GoTo final
                 End If
                 End If
@@ -15159,8 +15167,13 @@ findthird:
 IsStr1 = strFunctions(w2, q$, bstackstr, a$, r$)
 Exit Function
 itisarrayorfunction:
-    q1$ = q$
-    If Right$(q1$, 1) <> ")" Then q1$ = q1$ + ")"
+    If strfunid.Find(q$, w2, bstackstr.strfunnum) Then If w2 > 0 Then GoTo findthird
+    
+    If Right$(q$, 1) <> ")" Then
+        q1$ = q$ + ")"
+    Else
+        q1$ = q$
+    End If
     MakeThisSubNum bstackstr, q1$
             If IsSymbol(a$, "*") Then
             'is a function allways...
@@ -23514,7 +23527,7 @@ End Function
 
 Sub GlobalArr(bstack As basetask, Name$, rst$, items As Long, q As Long, Optional useglobalname As Boolean = False, Optional Reverse As Boolean = False, Optional declareglobal As Boolean = False)
 ' new mArray..
-Dim afto As New mArray, NewKey As Long, zeroitem As Object
+Dim afto As New mArray, NewKey As Long, zeroitem As Object, skipNumid As Boolean
 If rst$ = vbNullString And q = -1 Then
 ' Make an empty array
 rst$ = NLtrim(rst$)
@@ -23611,6 +23624,8 @@ If Right$(Name$, 2) <> "$(" Then
       '      afto.MyTypeToBe = vbDataObject
         End If
     End If
+Else
+skipNumid = True
 End If
 If p < 0 Then
 
@@ -23635,6 +23650,15 @@ dummyarray:
         varhash.ItemCreator here$ + "." + bstack.GroupName + Name$, NewKey, , , True
         'afto.arrname = here$ + "." + bstack.GroupName + Name$
         afto.arrname = bstack.GroupName + Name$
+    End If
+    If skipNumid Then
+        If strfunid.Find(Name$, i, bstack.strfunnum) Then
+            If i > 0 Then strfunid.ItemCreator Name$, -Abs(i)
+        End If
+    Else
+        If funid.Find(Name$, i, bstack.numfunnum) Then
+            If i > 0 Then funid.ItemCreator Name$, -Abs(i)
+        End If
     End If
     If q = -1 Then
             q = NewKey
@@ -24540,6 +24564,7 @@ End With
 If Not nameonly$ = vbNullString Then
 If sbgroupname = vbNullString Then
     nameonly$ = myUcase(nameonly$, True)
+    
     If comhash.Find(nameonly$, where) Then
     
     If n$ = nameonly$ Then
@@ -32292,7 +32317,6 @@ Private Function PushParamSUB(basestack As basetask, rest$) As Boolean
     Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
     Dim what As Integer, W$, u1 As Long, flag As Boolean
     Set ps = NewmStiva
-    
     Set basestack.lastobj = Nothing
     Do
         If FastSymbol(rest$, "?") Then
@@ -32306,19 +32330,19 @@ Private Function PushParamSUB(basestack As basetask, rest$) As Boolean
                     If TypeOf usehandler.objref Is mStiva Then
                         ps.MergeBottom usehandler.objref
                     ElseIf TypeOf usehandler.objref Is iBoxArray Then
-                     ps.MergeBottomCopyArray usehandler.objref
-                        Else
-                            PushParamSUB = False
-                            MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο τύπου Σωρού μετά το !"
-                            Set basestack.lastobj = Nothing
-                            Exit Function
+                        ps.MergeBottomCopyArray usehandler.objref
+                    Else
+                        PushParamSUB = False
+                        MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο τύπου Σωρού μετά το !"
+                        Set basestack.lastobj = Nothing
+                        Exit Function
                     End If
                     Set usehandler.objref = Nothing
                 ElseIf TypeOf basestack.lastobj Is iBoxArray Then
                      ps.MergeBottomCopyArray basestack.lastobj
                 End If
                 Set basestack.lastobj = Nothing
-                End If
+            End If
         Else
             u1 = 1
             aheadstatusNew rest$, u1, flag
@@ -32392,8 +32416,8 @@ aa1:
 Err1:
                 MyEr "Error in input list", "Πρόβλημα στις παραμέτρους"
                 PushParamSUB = False
-            Exit Do
-        End If
+                Exit Do
+            End If
         End If
 nextparam:
         If Not FastSymbol(rest$, ",") Then Exit Do
@@ -32413,95 +32437,92 @@ Dim p As Variant, s$, usehandler As mHandler, usestiva As mStiva
 Dim ParentStack As basetask
 Set ParentStack = basestack.Parent
 Set ParentStack.lastobj = Nothing
-            Do
-            If FastSymbol(rest$, "?") Then
-                ps.DataOptional
-            ElseIf FastSymbol(rest$, "!") Then
-                If IsExp(ParentStack, rest$, p) Then
-                    If ParentStack.lastobj Is Nothing Then
-                        ps.DataValLong p
-                    ElseIf TypeOf ParentStack.lastobj Is mHandler Then
-                        Set usehandler = ParentStack.lastobj
-                        If TypeOf usehandler.objref Is mStiva Then
-                            ps.MergeBottom usehandler.objref
-                        ElseIf TypeOf usehandler.objref Is iBoxArray Then
-                            ps.MergeBottomCopyArray usehandler.objref
-                        Else
-                            PushParamGeneralV7 = False
-                            MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο τύπου Σωρού μετά το !"
-                            Set ParentStack.lastobj = Nothing
-                            ParentStack.modfuncall = False
-                            Exit Function
-                        End If
-                        Set usehandler.objref = Nothing
-                    ElseIf TypeOf ParentStack.lastobj Is iBoxArray Then
-                          ps.MergeBottomCopyArray ParentStack.lastobj
-                    End If
-                    Set ParentStack.lastobj = Nothing
-                End If
-        ElseIf IsExp(ParentStack, rest$, p) Then
-            If Not ParentStack.lastobj Is Nothing Then
-                If TypeOf ParentStack.lastobj Is mStiva Then
-                    Set usestiva = ParentStack.lastobj
-                    ps.MergeBottom usestiva
-                    Set usestiva = Nothing
-                ElseIf Not ParentStack.lastpointer Is Nothing Then
-                    ps.DataObj ParentStack.lastobj
-                    Set ParentStack.lastpointer = Nothing
-                    Set ParentStack.lastobj = Nothing
+ParentStack.modfuncall = True
+Do
+    If FastSymbol(rest$, "?") Then
+        ps.DataOptional
+    ElseIf FastSymbol(rest$, "!") Then
+        If IsExp(ParentStack, rest$, p) Then
+            If ParentStack.lastobj Is Nothing Then
+                ps.DataValLong p
+            ElseIf TypeOf ParentStack.lastobj Is mHandler Then
+                Set usehandler = ParentStack.lastobj
+                If TypeOf usehandler.objref Is mStiva Then
+                    ps.MergeBottom usehandler.objref
+                ElseIf TypeOf usehandler.objref Is iBoxArray Then
+                    ps.MergeBottomCopyArray usehandler.objref
                 Else
-                    ps.DataObj ParentStack.lastobj
+                    PushParamGeneralV7 = False
+                    MyEr "Expected Stack Object after !", "Περίμενα αντικείμενο τύπου Σωρού μετά το !"
                     Set ParentStack.lastobj = Nothing
+                    ParentStack.modfuncall = False
+                    Exit Function
                 End If
+                Set usehandler.objref = Nothing
+            ElseIf TypeOf ParentStack.lastobj Is iBoxArray Then
+                  ps.MergeBottomCopyArray ParentStack.lastobj
+            End If
+            Set ParentStack.lastobj = Nothing
+        End If
+    ElseIf IsExp(ParentStack, rest$, p) Then
+        If Not ParentStack.lastobj Is Nothing Then
+            If TypeOf ParentStack.lastobj Is mStiva Then
+                Set usestiva = ParentStack.lastobj
+                ps.MergeBottom usestiva
+                Set usestiva = Nothing
+            ElseIf Not ParentStack.lastpointer Is Nothing Then
+                ps.DataObj ParentStack.lastobj
+                Set ParentStack.lastpointer = Nothing
                 Set ParentStack.lastobj = Nothing
             Else
+                ps.DataObj ParentStack.lastobj
+                Set ParentStack.lastobj = Nothing
+            End If
+            Set ParentStack.lastobj = Nothing
+        Else
             If myVarType(p, vbString) Then
                 SwapString2Variant s$, p
                 ps.DataStr s$
             Else
                 ps.DataVal p
             End If
-            End If
-    ElseIf Not LastErNum <> 0 Then
-    ParentStack.modfuncall = True
-    If IsStrExp(ParentStack, rest$, s$, False) Then 'Len(ParentStack.tmpstr) = 0
-       If Not ParentStack.lastpointer Is Nothing Then
-            ps.DataObj ParentStack.lastobj
-            Set ParentStack.lastpointer = Nothing
-            Set ParentStack.lastobj = Nothing
-        ElseIf Not ParentStack.lastobj Is Nothing Then
-            ps.DataObj ParentStack.lastobj
-            Set ParentStack.lastobj = Nothing
-        Else
-        ps.DataStr s$
         End If
-    ElseIf lookOne(rest$, ",") Then
-        ps.DataOptional
-    ' here
-    End If
-     ParentStack.modfuncall = False
+    ElseIf Not LastErNum <> 0 Then
+        If IsStrExp(ParentStack, rest$, s$, False) Then 'Len(ParentStack.tmpstr) = 0
+           If Not ParentStack.lastpointer Is Nothing Then
+                ps.DataObj ParentStack.lastobj
+                Set ParentStack.lastpointer = Nothing
+                Set ParentStack.lastobj = Nothing
+            ElseIf Not ParentStack.lastobj Is Nothing Then
+                ps.DataObj ParentStack.lastobj
+                Set ParentStack.lastobj = Nothing
+            Else
+                ps.DataStr s$
+            End If
+        ElseIf lookOne(rest$, ",") Then
+            ps.DataOptional
+        End If
     Else
-  If LastErNum <> 0 Then
-     PushParamGeneralV7 = False
-  Exit Do
+        If LastErNum <> 0 Then
+            PushParamGeneralV7 = False
+            Exit Do
+        End If
     End If
+    If LastErNum <> -2 And LastErNum <> 0 Then
+        MyEr "Error in input list", "Πρόβλημα στις παραμέτρους"
+        PushParamGeneralV7 = False
     End If
-      If LastErNum <> -2 And LastErNum <> 0 Then
-      MyEr "Error in input list", "Πρόβλημα στις παραμέτρους"
-      PushParamGeneralV7 = False
-      End If
     If Not FastSymbol(rest$, ",") Then Exit Do
-                Loop
-            
-            
-             Set ParentStack = Nothing
+Loop
+ParentStack.modfuncall = False
+Set ParentStack = Nothing
 End Function
 Function PushParamGeneral(basestack As basetask, rest$, Optional ByVal temphere$) As Boolean
 PushParamGeneral = True
-
 Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva As mStiva
     Set ps = NewmStiva
     Set basestack.lastobj = Nothing
+    basestack.modfuncall = True
     Do
         If FastSymbol(rest$, "%") Then
             p = IsLabel(basestack, rest$, s$, True)
@@ -32542,6 +32563,8 @@ Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva
                 End If
                 Set basestack.lastobj = Nothing
             End If
+        'ElseIf lookOne(rest$, "&") Then
+        'GoTo cont111222
         ElseIf IsExp(basestack, rest$, p) Then
             If Not basestack.lastobj Is Nothing Then
                 If TypeOf basestack.lastobj Is mStiva Then
@@ -32564,7 +32587,9 @@ Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva
                 End If
             End If
         ElseIf Not LastErNum <> 0 Then
-            basestack.modfuncall = True
+
+            
+            
             If IsStrExp(basestack, rest$, s$, False) Then ' Len(basestack.tmpstr) = 0
                 If Not basestack.lastpointer Is Nothing Then
                     ps.DataObj basestack.lastobj
@@ -32579,7 +32604,7 @@ Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva
                 ps.DataOptional
     ' here
             End If
-            basestack.modfuncall = False
+            
         Else
             If LastErNum <> 0 Then
                 PushParamGeneral = False
@@ -32592,6 +32617,7 @@ Dim ps As mStiva, p As Variant, s$, ok As Long, usehandler As mHandler, usestiva
     End If
     If Not FastSymbol(rest$, ",") Then Exit Do
 Loop
+basestack.modfuncall = False
 With basestack
     If .SorosNothing Then
         
@@ -32605,59 +32631,57 @@ End Function
 
 Sub PushParamStraight(basestack As basetask, rest$)
 Dim p As Variant, s$
-    Dim ps As mStiva
-    Set ps = basestack.soros
-    basestack.modfuncall = True
-                Do
-                    If IsExp(basestack, rest$, p) Then
-                            If Not basestack.lastpointer Is Nothing Then
-                                ps.DataObj basestack.lastobj
-                                Set basestack.lastpointer = Nothing
-                                Set basestack.lastobj = Nothing
-                            ElseIf Not basestack.lastobj Is Nothing Then
-                                If TypeOf basestack.lastobj Is VarItem Then
-                                    ps.DataOptional
-                                Else
-                                    ps.DataObj basestack.lastobj
-                                End If
-                                Set basestack.lastobj = Nothing
-                            Else
-                                If myVarType(p, vbString) Then
-                                    SwapString2Variant s$, p
-                                    ps.DataStr s$
-                                Else
-                                    ps.DataVal p
-                                End If
-                            End If
-                    ElseIf IsStrExp(basestack, rest$, s$, False) Then ' Len(basestack.tmpstr) = 0
-                    
-                            If Not basestack.lastpointer Is Nothing Then
-                                ps.DataObj basestack.lastobj
-                                Set basestack.lastpointer = Nothing
-                                Set basestack.lastobj = Nothing
-                            ElseIf Not basestack.lastobj Is Nothing Then
-                                If TypeOf basestack.lastobj Is VarItem Then
-                                    ps.DataOptional
-                                Else
-                                    ps.DataObj basestack.lastobj
-                                End If
-                                Set basestack.lastobj = Nothing
-                            Else
-                                ps.DataStr s$
-                            End If
-                    ElseIf lookOne(rest$, ",") Then
-                        ps.DataOptional
-                    ElseIf lookOne(rest$, ")") Then
-                        ps.DataOptional
-                    Else
-                    
-                            Exit Do
-                    End If
-                    If Not FastSymbol(rest$, ",") Then Exit Do
-                Loop
-        basestack.modfuncall = False
-             If Not ps Is Nothing Then ps.Recycle
-             Set ps = Nothing
+Dim ps As mStiva
+Set ps = basestack.soros
+basestack.modfuncall = True
+Do
+    If IsExp(basestack, rest$, p) Then
+        If Not basestack.lastpointer Is Nothing Then
+            ps.DataObj basestack.lastobj
+            Set basestack.lastpointer = Nothing
+            Set basestack.lastobj = Nothing
+        ElseIf Not basestack.lastobj Is Nothing Then
+            If TypeOf basestack.lastobj Is VarItem Then
+                ps.DataOptional
+            Else
+                ps.DataObj basestack.lastobj
+            End If
+            Set basestack.lastobj = Nothing
+        Else
+            If myVarType(p, vbString) Then
+                SwapString2Variant s$, p
+                ps.DataStr s$
+            Else
+                ps.DataVal p
+            End If
+        End If
+    ElseIf IsStrExp(basestack, rest$, s$, False) Then ' Len(basestack.tmpstr) = 0
+        If Not basestack.lastpointer Is Nothing Then
+            ps.DataObj basestack.lastobj
+            Set basestack.lastpointer = Nothing
+            Set basestack.lastobj = Nothing
+        ElseIf Not basestack.lastobj Is Nothing Then
+            If TypeOf basestack.lastobj Is VarItem Then
+                ps.DataOptional
+            Else
+                ps.DataObj basestack.lastobj
+            End If
+            Set basestack.lastobj = Nothing
+        Else
+            ps.DataStr s$
+        End If
+    ElseIf lookOne(rest$, ",") Then
+        ps.DataOptional
+    ElseIf lookOne(rest$, ")") Then
+        ps.DataOptional
+    Else
+    Exit Do
+    End If
+    If Not FastSymbol(rest$, ",") Then Exit Do
+Loop
+basestack.modfuncall = False
+If Not ps Is Nothing Then ps.Recycle
+Set ps = Nothing
 End Sub
 
 Function searchsub(ByVal Originalwhere As Long, ByVal where As Long, W$, final As Long, site As Long, code$, Optional needfunc As Boolean = False) As Boolean
@@ -41785,7 +41809,7 @@ Set basestack.Sorosref = NewmStiva
 s$ = vbNullString
 Do
     If IsLabelSymbolNew(rest$, "ΙΣΧΝΗ", "WEAK", Lang) Then
-        If IsStrExp(basestack, rest$, ss$) Then
+        If IsFlatStringExpr(basestack, rest$, ss$) Then
             If GetSub(ss$, x1) Then
                 If sbf(x1).Extern > 0 Then
                 basestack.soros.DataStr "{CALL EXTERN" + str$(sbf(x1).Extern) + "'" + ChrW(&H1FFD) + "}" + sbf(x1).sbgroup: x1 = 1: GoTo contlink2
@@ -41891,6 +41915,7 @@ Do
     If Len(ss$) > 0 Then
             If Left$(ss$, 1) = "&" Then ss$ = Mid$(ss$, 2)
             If it < 0 Then IsLabel basestack, (ss$), ss$
+            
             If it > 4 Then
                 ss$ = ss$ + ")"
                 If Not FastSymbol(rest$, ")") Then it = 0
@@ -41898,6 +41923,10 @@ Do
                     '   x1 = 1
                     '   aheadstatus rest$, False, x1
             basestack.NoError = True
+            If Left$(ss$, 1) = "{" Then
+                basestack.soros.DataStr ss$
+                     GoTo contLoop
+                End If
             ss$ = "&" + ss$
             bck$ = ss$
             If IsStr1(basestack, ss$, s$) Then

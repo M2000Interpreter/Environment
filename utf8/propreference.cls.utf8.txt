@@ -400,7 +400,11 @@ If TypeOf vNewValue Is mHandler Then
 Set usehandler = vNewValue
 If usehandler.t1 = 3 Then
  'vNewValue = usehandler.objref.VariantArray()
+ If TypeOf usehandler.objref Is mArray Then
  usehandler.objref.ExportVariant vNewValue
+ Else
+ Set vNewValue = usehandler.objref
+ End If
 End If
 ElseIf TypeOf vNewValue Is mArray Then
  'vNewValue = vNewValue.VariantArray()
