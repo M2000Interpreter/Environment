@@ -2466,6 +2466,7 @@ If kind > 0 Then
         ElseIf ismine33(drop$) Then
             ' fix for case >100, =50...
             pos2 = k - Len(a$) + 1
+            
             Do
                 lastcol = 14
                 addone pos2, 14
@@ -4203,6 +4204,35 @@ checkexp:
 End Function
 
 
+Private Function MyTrimLi(s$, l As Long) As Long
+Dim i&
+Dim P2 As Long, P1 As Integer, p4 As Long
+ If l > Len(s) Then MyTrimLi = Len(s) + 1: Exit Function
+ If l <= 0 Then MyTrimLi = 1: Exit Function
+  l = l - 1
+  i = Len(s)
+  P2 = StrPtr(s) + l * 2:  p4 = P2 + i * 2
+  For i = P2 To p4 Step 2
+  GetMem2 i, P1
+  Select Case P1
+    Case 32, 160, 9
+    Case Else
+     MyTrimLi = (i - P2) \ 2 + 1 + l
+   Exit Function
+  End Select
+  Next i
+ MyTrimLi = Len(s) + 1
+End Function
+
+Private Function MaybeIsSymbolAfterOneOnly(a$, c$, ByVal i As Long) As Boolean
+If a$ = vbNullString Then Exit Function
+Dim j As Long
+j = IIf(i > 0, i, 1)
+
+i = MyTrimLi(a$, j)
+If i > Len(a$) Or i = 0 Then i = j
+MaybeIsSymbolAfterOneOnly = c$ = Mid$(a$, i, 1)
+End Function
 Function MaybeIsSymbol(a$, c$, Optional tail$ = vbNullString, Optional Remove As Boolean = False) As Boolean
 Dim i As Long, ok As Boolean
 If a$ = vbNullString Then Exit Function
@@ -5633,22 +5663,23 @@ If word$ <> "" Then
             End If
             part$ = "o"
         Case " ", ChrW$(160)
-          If word$ <> "" Then
-  Select Case myUcase(word$, True)
-  Case "THEN", "ELSE", "ΤΟΤΕ"
-  Pos = Pos - 4
-  Exit Do
-  Case "ELSE.IF"
-  Pos = Pos - 7
-  Exit Do
-  Case "ΑΛΛΙΩΣ"
-  Pos = Pos - 6
-  Exit Do
-  Case "ΑΛΛΙΩΣ.ΑΝ"
-  Pos = Pos - 9
-  Exit Do
-  End Select
-  End If
+          ' this fix: "case else " with spaces after else
+          If word$ <> "" And MaybeIsSymbolAfterOneOnly(a$, "{", Pos + 1) Then
+                Select Case myUcase(word$, True)
+                Case "THEN", "ELSE", "ΤΟΤΕ"
+                Pos = Pos - 4
+                Exit Do
+                Case "ELSE.IF"
+                Pos = Pos - 7
+                Exit Do
+                Case "ΑΛΛΙΩΣ"
+                Pos = Pos - 6
+                Exit Do
+                Case "ΑΛΛΙΩΣ.ΑΝ"
+                Pos = Pos - 9
+                Exit Do
+                End Select
+            End If
 JUMPHERE:
         word$ = vbNullString
             If part$ <> "" Then

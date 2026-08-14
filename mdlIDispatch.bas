@@ -424,9 +424,9 @@ Public Function CallByNameFixParamArray _
         ReDim varDISPID(0 To fixnamearg)
         lngRet = IDsp.GetIDsOfNames(riid, myptr(0), fixnamearg + 1, Clid, varDISPID(0))
         dispid = varDISPID(0)
-        If dispid = -2147414014 Then
+       ' If dispid = -2147414014 Then
         'Stop
-        End If
+       ' End If
     End If
     If lngRet = 0 Then
 passhere:

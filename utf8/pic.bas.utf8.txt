@@ -5255,7 +5255,7 @@ mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK",
 , "GOSUB", "GOTO", "GRADIENT", "GREEK", "GROUP", "HALT", "HEIGHT", "HELP", "HEX", "HIDE", "HOLD", "HTML", "ICON", "IF", "IMAGE", "INLINE", "INPUT", "INSERT", "INTEGER", "INVENTORY", "ITALIC", "ITALICS", "INTERFACE", "JOYPAD", "KEYBOARD", "LATIN", "LAYER", "LEGEND", "LET", "LINE", "LINESPACE", "LINK", "LIST", "LOAD", "LOAD.DOC", "LOCAL", "LOCALE", "LONG", "LOOP", "MAIN.TASK", "MARK", "MEDIA", "MENU", "MERGE.DOC", "METHOD", "MODE", "MODULE" _
 , "MODULES", "MONITOR", "MOTION", "MOTION.W", "MOUSE.ICON", "MOVE", "MOVIE", "MOVIES", "MUSIC", "NAME", "NEW", "NEXT", "NORMAL", "OBJECT", "ON", "OPEN", "OPEN.FILE", "OPEN.IMAGE", "OPTIMIZATION", "ORDER", "OVER", "OVERWRITE", "PAGE", "PART", "PATH", "PEN", "PIPE", "PLAY", "PLAYER", "PLAYER(", "POLYGON", "PRINT", "PRINTER", "PRINTER.MARGINS", "PRINTER.QUALITY", "PRINTING", "PROFILER", "PROPERTIES", "PROTOTYPE", "PSET", "PUSH", "PUT", "READ", "RECURSION.LIMIT" _
 , "REFER", "REFRESH", "RELEASE", "REM", "REMOVE", "REPEAT", "REPORT", "RESTART", "RESTORE", "RETRIEVE", "RETURN", "SAVE", "SAVE.AS", "SAVE.DOC", "SCAN", "SCORE", "SCREEN.PIXELS", "SCRIPT", "SCROLL", "SEARCH", "SEEK", "SELECT", "SET", "SETTINGS", "SHIFT", "SHIFTBACK", "SHOW", "SINGLE", "SLOW", "SMOOTH", "SORT", "SOUND", "SOUNDREC", "SOUNDS", "SPEECH", "SPLIT", "SPRITE", "STACK", "START", "STATIC", "STEP", "STOCK", "STOP", "STRING", "STRUCTURE" _
-, "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VAR", "VARIABLE", "VARIABLES" _
+, "SUB", "SUBDIR", "SUPERCLASS", "SWAP", "SWEEP", "SWITCHES", "SYMBOL", "TAB", "TABLE", "TARGET", "TARGETS", "TASK.MAIN", "TEST", "TEXT", "THEN", "THREAD", "THREAD.PLAN", "THREADS", "TITLE", "TONE", "TRY", "TUNE", "UPDATE", "USE", "USER", "VAR", "VARIABLE", "VARIABLES" _
 , "VARIANT", "VERSION", "VIEW", "VOLUME", "WAIT", "WHILE", "WIDTH", "WIN", "WINDOW", "WITH", "WORDS", "WRITE", "WRITER", "ΑΓΓΛΙΚΑ", "ΑΔΕΙΑΣΕ", "ΑΚΕΡΑΙΟΣ", "ΑΛΤ", "ΑΛΛΑΓΗ", "ΑΛΛΑΞΕ", "ΑΛΛΙΩΣ", "ΑΛΛΙΩΣ.ΑΝ", "ΑΝ", "ΑΝΑΖΗΤΗΣΗ" _
 , "ΑΝΑΘΕΩΡΗΣΗ", "ΑΝΑΚΤΗΣΗ", "ΑΝΑΛΟΓΙΟ", "ΑΝΑΛΥΣΗ.ΟΘΟΝΗΣ", "ΑΝΑΛΥΤΗΣ", "ΑΝΑΜΟΝΗ", "ΑΝΑΝΕΩΣΗ", "ΑΝΑΦΟΡΑ", "ΑΝΑΨΕ", "ΑΝΕΘΕΣΕ", "ΑΝΟΙΓΜΑ.ΑΡΧΕΙΟΥ", "ΑΝΟΙΓΜΑ.ΕΙΚΟΝΑΣ", "ΑΝΟΙΞΕ", "ΑΝΤΕΓΡΑΨΕ", "ΑΝΤΙΓΡΑΨΕ", "ΑΝΤΙΚΕΙΜΕΝΟ", "ΑΞΙΩΣΗ", "ΑΠΑΡ", "ΑΠΑΡΙΘΜΗΣΗ", "ΑΠΕΔΩΣΕ", "ΑΠΛΟΣ", "ΑΠΟ", "ΑΠΟΘΗΚΕΥΣΗ.ΩΣ", "ΑΠΟΚΟΠΗ", "ΑΡΓΑ", "ΑΡΙΘΜΟΣ", "ΑΡΧΕΙΑ", "ΑΡΧΕΙΟ", "ΑΡΧΗ", "ΑΤΥΠΟΣ", "ΑΥΛΟΣ", "ΑΥΞΟΥΣΑ", "ΑΦΑΙΡΕΣΗ", "ΑΦΗΣΕ", "ΒΑΛΕ", "ΒΑΣΗ", "ΒΑΣΗ.ΠΑΡΟΧΟΣ", "ΒΑΣΗ.ΧΡΗΣΤΗΣ", "ΒΑΨΕ", "ΒΕΛΤΙΣΤΟΠΟΙΗΣΗ" _
 , "ΒΗΜΑ", "ΒΟΗΘΕΙΑ", "ΓΕΓΟΝΟΣ", "ΓΕΜΙΣΕ", "ΓΕΝΙΚΕΣ", "ΓΕΝΙΚΗ", "ΓΕΝΙΚΟ", "ΓΙΑ", "ΓΡΑΜΜΑ", "ΓΡΑΜΜΑΤΟΣΕΙΡΑ", "ΓΡΑΜΜΗ", "ΓΡΑΨΕ", "ΓΡΗΓΟΡΑ", "ΔΕΙΚΤΗ.ΜΟΡΦΗ", "ΔΕΙΞΕ", "ΔΕΚΑΕΞ", "ΔΕΣ", "ΔΙΑΒΑΣΕ", "ΔΙΑΓΡΑΦΗ", "ΔΙΑΚΟΠΗ", "ΔΙΑΚΟΠΤΕΣ", "ΔΙΑΜΕΣΟΥ", "ΔΙΑΡΘΡΩΣΗ", "ΔΙΑΡΚΕΙΑ", "ΔΙΑΣΤΙΧΟ", "ΔΙΑΦΑΝΕΙΑ", "ΔΙΑΦΑΝΟ", "ΔΙΑΦΥΓΗ", "ΔΙΑΚΟΠΗ", "ΔΙΕΚΟΨΕ", "ΔΙΕΠΑΦΗ", "ΔΙΟΡΘΩΣΕ", "ΔΙΠΛΑ", "ΔΙΠΛΟΣ", "ΔΟΚΙΜΗ", "ΔΟΜΗ", "ΔΡΟΜΕΑΣ", "ΔΥΑΔΙΚΟ", "ΔΩΣΕ", "ΕΓΓΡΑΦΟ", "ΕΙΚΟΝΑ", "ΕΙΚΟΝΕΣ", "ΕΙΚΟΝΙΔΙΟ" _
@@ -5263,7 +5263,7 @@ mycommands() = Array("ABOUT", "AFTER", "APPEND", "APPEND.DOC", "ASSERT", "BACK",
 , "ΕΠΙΠΕΔΟ", "ΕΠΙΣΤΡΟΦΗ", "ΕΠΙΦΑΝΕΙΑ", "ΕΠΟΜΕΝΟ", "ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ", "ΕΥΡΕΣΗ", "ΗΜΕΡΟΜΗΝΙΑ", "ΗΧΟΓΡΑΦΗΣΗ", "ΗΧΟΙ", "ΗΧΟΣ", "ΘΕΣΕ", "ΘΕΣΗ", "ΙΔΙΟΤΗΤΕΣ", "ΙΣΧΝΗ", "ΙΧΝΟΣ", "ΚΑΘΑΡΗ", "ΚΑΘΑΡΟ", "ΚΑΘΕ", "ΚΑΛΕΣΕ", "ΚΑΜΠΥΛΗ", "ΚΑΝΕ", "ΚΑΝΟΝΙΚΑ", "ΚΑΤ", "ΚΑΤΑΛΟΓΟΙ", "ΚΑΤΑΛΟΓΟΣ", "ΚΑΤΑΣΤΑΣΗ", "ΚΑΤΑΧΩΡΗΣΗ", "ΚΕΙΜΕΝΟ", "ΚΕΝΗ", "ΚΙΝΗΣΗ", "ΚΙΝΗΣΗ.Π", "ΚΛΑΣΗ", "ΚΛΕΙΔΙ", "ΚΛΕΙΣΕ", "ΚΟΝΣΟΛΑ", "ΚΡΑΤΑ", "ΚΡΑΤΗΣΕ", "ΚΡΥΨΕ" _
 , "ΚΥΚΛΙΚΑ", "ΚΥΚΛΟΣ", "ΚΥΛΙΣΗ", "ΚΥΡΙΟ.ΕΡΓΟ", "ΛΑΒΗ", "ΛΑΘΟΣ", "ΛΑΤΙΝΙΚΑ", "ΛΕΞΕΙΣ", "ΛΙΣΤΑ", "ΛΟΓΙΚΟΣ", "ΛΟΓΙΣΤΙΚΟΣ", "ΛΟΓΟΣ", "ΜΑΚΡΥΣ", "ΜΕ", "ΜΕ.ΑΝΤΙΚΕΙΜΕΝΟ", "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ", "ΜΕΘΟΔΟΣ", "ΜΕΛΩΔΙΑ", "ΜΕΡΟΣ", "ΜΕΤΑ", "ΜΕΤΑΒΛΗΤΗ" _
 , "ΜΕΤΑΒΛΗΤΕΣ", "ΜΕΤΑΘΕΣΗ", "ΜΟΥΣΙΚΗ", "ΜΠΙΠ", "ΜΙΓΑΔΙΚΟΣ", "ΝΕΟ", "ΝΗΜΑ", "ΝΗΜΑΤΑ", "ΞΕΚΙΝΑ", "ΟΘΟΝΗ", "ΟΜΑΔΑ", "ΟΜΑΛΑ", "ΟΝΟΜΑ", "ΟΡΙΑ.ΕΚΤΥΠΩΤΗ", "ΟΡΙΑ.ΕΚΤΥΠΩΣΗΣ", "ΟΡΙΟ.ΑΝΑΔΡΟΜΗΣ", "ΟΡΙΣΕ", "ΠΑΙΚΤΗΣ", "ΠΑΙΞΕ", "ΠΑΝΩ", "ΠΑΡΑΘΥΡΟ", "ΠΑΡΕ", "ΠΑΡΕΜΒΟΛΗ", "ΠΑΧΟΣ", "ΠΕΔΙΟ", "ΠΕΝΑ", "ΠΕΡΙ" _
-, "ΠΕΡΙΘΩΡΙΟ", "ΠΕΤΑ", "ΠΙΝΑΚΑΣ", "ΠΙΝΑΚΕΣ", "ΠΛΑΓΙΑ", "ΠΛΑΙΣΙΟ", "ΠΛΗΚΤΡΟΛΟΓΙΟ", "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", "ΠΟΛΥΓΩΝΟ", "ΠΡΟΣ", "ΠΡΟΣΘΕΣΕ.ΕΓΓΡΑΦΟ", "ΠΡΟΣΘΗΚΗ", "ΠΡΩΤΟΤΥΠΟ", "ΠΡΟΧΕΙΡΟ", "ΡΟΥΤΙΝΑ", "ΡΥΘΜΙΣΕΙΣ", "Σ", "ΣΑΡΩΣΕ", "ΣΒΗΣΕ", "ΣΕΙΡΑ", "ΣΕΛΙΔΑ", "ΣΕΝΑΡΙΟ", "ΣΗΜ", "ΣΗΜΑΔΙ", "ΣΤΑΘΕΡΗ", "ΣΤΑΘΕΡΕΣ", "ΣΤΑΤΙΚΗ", "ΣΤΑΤΙΚΕΣ", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΙΣ", "ΣΤΟ", "ΣΤΟΚ", "ΣΤΟΧΟΙ", "ΣΤΟΧΟΣ", "ΣΥΓΓΡΑΦΕΑΣ", "ΣΥΓΓΡΑΦΗ", "ΣΥΓΧΩΝΕΥΣΕ.ΕΓΓΡΑΦΟ", "ΣΥΜΠΙΕΣΗ" _
+, "ΠΕΡΙΘΩΡΙΟ", "ΠΕΤΑ", "ΠΙΝΑΚΑΣ", "ΠΙΝΑΚΕΣ", "ΠΛΑΓΙΑ", "ΠΛΑΙΣΙΟ", "ΠΛΗΚΤΡΟΛΟΓΙΟ", "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", "ΠΟΛΥΓΩΝΟ", "ΠΡΟΣ", "ΠΡΟΣΘΕΣΕ.ΕΓΓΡΑΦΟ", "ΠΡΟΣΘΗΚΗ", "ΠΡΩΤΟΤΥΠΟ", "ΠΡΟΧΕΙΡΟ", "ΡΟΥΤΙΝΑ", "ΡΥΘΜΙΣΕΙΣ", "Σ", "ΣΑΡΩΣΕ", "ΣΒΗΣΕ", "ΣΕΙΡΑ", "ΣΕΛΙΔΑ", "ΣΕΝΑΡΙΟ", "ΣΗΜ", "ΣΗΜΑΔΙ", "ΣΤΑΘΕΡΗ", "ΣΤΑΘΕΡΕΣ", "ΣΤΑΤΙΚΗ", "ΣΤΑΤΙΚΕΣ", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΙΣ", "ΣΤΟ", "ΣΤΟΚ", "ΣΤΟΧΟΙ", "ΣΤΟΧΟΣ", "ΣΥΓΓΡΑΦΕΑΣ", "ΣΥΓΓΡΑΦΗ", "ΣΥΓΧΩΝΕΥΣΕ.ΕΓΓΡΑΦΟ", "ΣΥΜΒΟΛΟ", "ΣΥΜΠΙΕΣΗ" _
 , "ΣΥΝΑΡΤΗΣΗ", "ΣΥΝΕΧΙΣΕ", "ΣΥΣ", "ΣΥΣΤΗΜΑ", "ΣΧΕΔΙΟ", "ΣΧΕΔΙΑ", "ΣΧΕΔΙΟ.ΝΗΜΑΤΩΝ", "ΣΩΡΟΣ", "ΣΩΣΕ", "ΣΩΣΕ.ΕΓΓΡΑΦΟ", "ΤΑΙΝΙΑ", "ΤΑΙΝΙΕΣ", "ΤΑΞΗ", "ΤΑΞΙΝΟΜΗΣΗ", "ΤΕΛΟΣ", "ΤΙΤΛΟΣ", "ΤΜΗΜΑ", "ΤΜΗΜΑΤΑ", "ΤΟΝΟΣ", "ΤΟΠΙΚΑ", "ΤΟΠΙΚΕΣ", "ΤΟΠΙΚΗ", "ΤΟΠΙΚΟ", "ΤΟΤΕ", "ΤΥΠΟΣ", "ΤΥΠΩΣΕ", "ΥΠΕΡΚΛΑΣΗ", "ΥΠΟΚΑΤΑΛΟΓΟΣ", "ΦΑΡΔΙΑ", "ΦΕΡΕ", "ΦΕΡΕΠΙΣΩ", "ΦΟΝΤΟ", "ΦΟΡΜΑ", "ΦΟΡΤΩΣΕ" _
 , "ΦΟΡΤΩΣΕ.ΕΓΓΡΑΦΟ", "ΦΩΝΗ", "ΧΑΡΑΚΤΗΡΕΣ", "ΧΑΡΑΞΕ", "ΧΡΗΣΗ", "ΧΡΗΣΤΗ", "ΧΡΗΣΤΗΣ", "ΧΡΩΜΑ", "ΧΡΩΜΑΤΙΣΕ", "ΨΗΦΙΟ", "?")
 
@@ -5378,6 +5378,10 @@ Case "COMMIT", "ΑΝΕΘΕΣΕ"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoComm)
 Case "REFER", "ΑΠΕΔΩΣΕ"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoRef)
+Case "LINK", "ΕΝΩΣΕ"
+    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLink)
+Case "ΣΥΜΒΟΛΟ", "SYMBOL"
+    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoSymbol)
 Case "READ", "ΔΙΑΒΑΣΕ"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoRead)
 Case "LET", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΟ", "ΣΤΙΣ", "ΣΤΑ"
@@ -5633,12 +5637,12 @@ For n = LBound(a) To UBound(a) 'many - 1
 cr.SectionKey = "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones\" + a(n)
 cr.ValueType = REG_SZ
 cr.ValueKey = "Dlt"
-Dlt$ = cr.Value
+Dlt$ = cr.value
 cr.ValueKey = "Std"
-Std$ = cr.Value
+Std$ = cr.value
 cr.ValueType = REG_BINARY
 cr.ValueKey = "TZI"
-that$ = cr.Value
+that$ = cr.value
 mem.FillDataFromMem StrPtr(that$)
 zHash.AddKey Std$, -(MemLong(mem.GetBytePtr(0)) / 60 + MemLong(mem.GetBytePtr(4)) / 60)
 If Dlt$ <> "" Then zHash.AddKey Dlt$, -(MemLong(mem.GetBytePtr(0)) / 60 + MemLong(mem.GetBytePtr(8)) / 60)

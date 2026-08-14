@@ -441,7 +441,7 @@ Public Function GetOutPtr() As Long
     GetOutPtr = VarPtr(m_btOutput(0))
 End Function
 
-Friend Function GetOutput() As Byte()
+Public Function GetOutput() As Byte()
     GetOutput = m_btOutput
 End Function
 

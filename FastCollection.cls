@@ -166,8 +166,11 @@ Public Sub AddKey(RHS, Optional aValue As Variant)
         Value = aValue
         End If
     Else
+        If lasttype = 36 Then
+        Value = RHS
+        Else
         Value = aValue
-        
+        End If
     End If
     If index >= 0 Then
         PriveSpace(index).KeyType = lasttype
@@ -444,6 +447,7 @@ ElseIf Not IsObject(PriveSpace(index).iValue) Then
     End If
 End If
 If VarType(Value) = vbUserDefinedType Then
+
 'Stop
 End If
 End Property
@@ -595,6 +599,8 @@ Public Function Normalize(Key) As String
         End If
         ElseIf VarType(Key) = vbBoolean Then
         Normalize = str(CLng(Key))
+        ElseIf TypeOf Key Is Symbol Then
+            Normalize = Key.Class
         Else
         Normalize = LTrim$(str$(Key))
         End If
@@ -626,26 +632,26 @@ Friend Sub passItem(ByVal where As Long, firsthash1, iValue1, Key1, KeyType1, sV
     toplim = where
 End Sub
 Function Copy() As Variant
-Dim m As FastCollection, h As mHandler
-Set m = New FastCollection
-Set h = New mHandler
- h.t1 = 1
-Set h.objref = m
-Set Copy = h
+Dim M As FastCollection, H As mHandler
+Set M = New FastCollection
+Set H = New mHandler
+ H.t1 = 1
+Set H.objref = M
+Set Copy = H
 If AllowSameKey Then
-    m.AllowAnyKey
+    M.AllowAnyKey
 End If
-m.UcaseKeys = UseUcaseKeys
+M.UcaseKeys = UseUcaseKeys
 If Count > 0 Then
-m.MakeSpace MaxSpace, mSortstyle
+M.MakeSpace MaxSpace, mSortstyle
 
 Dim i As Long
 For i = 0 To Count - 1
 With PriveSpace(i)
-    m.passItem i, .firsthash, .iValue, .Key, .KeyType, .sValue
+    M.passItem i, .firsthash, .iValue, .Key, .KeyType, .sValue
 End With
 Next
-m.ExpandHash
+M.ExpandHash
 End If
 
 End Function
@@ -750,12 +756,10 @@ IsObj = IsObject(PriveSpace(index).iValue)
 End If
 End Function
 Function IsObjAt(curitem As Long, peekvalue) As Boolean
-If index = -1 Then
-Else
-If IsObject(PriveSpace(index).iValue) Then
-    Set peekvalue = PriveSpace(index).iValue
+index = curitem
+If IsObject(PriveSpace(curitem).iValue) Then
+    Set peekvalue = PriveSpace(curitem).iValue
     IsObjAt = True
-End If
 End If
 End Function
 Function IsEnum(p As Variant) As Boolean
@@ -2181,7 +2185,7 @@ Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As V
 '
 End Function
 
-Private Sub iBoxArray_processAppend(m As Object)
+Private Sub iBoxArray_processAppend(M As Object)
 '
 End Sub
 

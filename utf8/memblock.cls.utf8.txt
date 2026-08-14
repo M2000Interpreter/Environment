@@ -67,8 +67,9 @@ Private Declare Function SetMetaFileBitsEx Lib "gdi32" (ByVal nSize As Long, lpD
 
 Private Declare Function GetEnhMetaFileHeader Lib "gdi32" (ByVal hmf As Long, ByVal cbBuffer As Long, lpemh As Any) As Long
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
+Private Declare Function IsBadReadPtr Lib "kernel32" (ByVal lp As Long, ByVal ucb As Long) As Long
 
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As Long)
 Private Declare Sub FillMemory Lib "kernel32" Alias "RtlFillMemory" (Destination As Any, ByVal Length As Long, ByVal Fill As Byte)
 Private Declare Function GlobalLock Lib "kernel32" (ByVal hMem As Long) As Long
@@ -89,6 +90,24 @@ Private Declare Function DeleteEnhMetaFile Lib "gdi32" (ByVal hEmf As Long) As L
 Const CF_ENHMETAFILE = 14
 
 
+
+Sub ImportFromByteArray(a() As Byte, Optional ByVal index As Long = &H7FFFFFFF, Optional ByVal items As Long = -1, Optional ByVal Offset As Long = 0)
+Dim from As Long
+If UBound(a) - LBound(a) + 1 = 0 Or items = 0 Then Exit Sub
+If index = &H7FFFFFFF Then index = LBound(a)
+from = VarPtr(a(LBound(a))) + index - LBound(a)
+If items > 0 Then
+    If UBound(a) - LBound(a) + 1 - items < 1 Then
+        items = UBound(a) + 1 - index
+        If items <= 0 Then Exit Sub
+    End If
+Else
+items = UBound(a) + 1 - index
+If items <= 0 Then Exit Sub
+End If
+
+Me.FillDataFromMem from, items, Offset
+End Sub
 
 Sub Construct(ByteLen As Long, Optional Times As Long = 1, Optional clearme As Long = 0, Optional executable As Boolean = False, Optional thatbasicitem As Integer)
 If mCallback Then ErrorMes = 1: Exit Sub
@@ -303,9 +322,9 @@ Public Property Get NoRun() As Boolean
 NoRun = mExecBloc
 End Property
 
-Public Function PutStringAtOffset(Addr As Variant, AnyString As String) As Variant
+Public Function PutStringAtOffset(addr As Variant, AnyString As String) As Variant
 Dim Offset
-Offset = uintnew(Addr) - uintnew(mPtr)
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
@@ -327,9 +346,9 @@ Else
     PutStringAtOffset = 0  ' null
 End If
 End Function
-Public Function GetStringFromOffset(Addr As Variant, AnyString As String) As Variant
+Public Function GetStringFromOffset(addr As Variant, AnyString As String) As Variant
 Dim Offset
-Offset = uintnew(Addr) - uintnew(mPtr)
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + 3 >= mitems * itemlen Then
         ErrorMes = 4
@@ -344,12 +363,12 @@ If ErrorMes = 0 And mitems > 0 Then
            AnyString = .Value
            GetStringFromOffset = .StrPointer
         Else
-            If MemLong(Addr) = 0 Then
+            If MemLong(addr) = 0 Then
             AnyString = vbNullString
             Else
             AnyString = "Crash"
             End If
-            GetStringFromOffset = Addr
+            GetStringFromOffset = addr
         End If
         .Done = False
         End With
@@ -361,9 +380,9 @@ Else
 End If
 
 End Function
-Public Function GetData1(f As Long, Addr, lengthInBytes As Long) As Boolean
+Public Function GetData1(f As Long, addr, lengthInBytes As Long) As Boolean
 Dim Offset, place
-Offset = uintnew(Addr) - uintnew(mPtr)
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
@@ -376,7 +395,7 @@ If ErrorMes = 0 And mitems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = Addr
+        .pvData = addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
 
@@ -395,15 +414,15 @@ there:
 End If
         
 End Function
-Public Function GetData(f As Long, ByVal Addr, lengthInBytes As Long) As Boolean
+Public Function GetData(f As Long, ByVal addr, lengthInBytes As Long) As Boolean
 Dim Offset, range
-range = uintnew(Addr) - uintnew1(GetPtr(0))
+range = uintnew(addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         GetData = False
         Exit Function
 End If
-Offset = uintnew(Addr) - uintnew(mPtr)
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= (mitems * itemlen - range) Then
         ErrorMes = 4
@@ -413,7 +432,7 @@ If ErrorMes = 0 And mitems > 0 Then
         Dim FH As Long
         FH = Module10.ReadFileHandler(CLng(f))
         If FH = 0 Then Exit Function
-        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
+        Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
         GetData = True
         Exit Function
   End If
@@ -454,15 +473,15 @@ there:
         
 
 End Function
-Public Function putData(f As Long, Addr, lengthInBytes As Long) As Boolean
+Public Function putData(f As Long, addr, lengthInBytes As Long) As Boolean
 Dim Offset, place, range
-range = uintnew(Addr) - uintnew1(GetPtr(0))
+range = uintnew(addr) - uintnew1(GetPtr(0))
 If range < 0 Or range >= mitems * itemlen Then
         ErrorMes = 4
         putData = False
         Exit Function
 End If
-Offset = uintnew(Addr) - uintnew(mPtr)
+Offset = uintnew(addr) - uintnew(mPtr)
 If ErrorMes = 0 And mitems > 0 Then
     If Offset < 0 Or Offset + lengthInBytes - 1 >= mitems * itemlen Then
         ErrorMes = 4
@@ -475,7 +494,7 @@ If ErrorMes = 0 And mitems > 0 Then
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = Addr
+        .pvData = addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         place = 1
@@ -1088,27 +1107,293 @@ Friend Sub ClearStringPartial(ByVal start_addr As Long, ByVal that_length As Lon
         Next i
     End If
 End Sub
-Sub FillDataFromMem(ByVal that As Long, Optional ByVal bytestocopy As Long = -1)
-    If BasicItem = vbString Or mSubtype > 0 Then
-        MyEr "Not for this type if buffer", "όχι για αυτή τη διάρθρωση"
+Property Get PeekInt64(ByVal addr As Long) As Variant
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    Dim p
+    If IsBadReadPtr(addr, 8) = 0 Then
+        CopyMemory ByVal (VarPtr(p) + 8), ByVal addr, 8&
+        MemInt(VarPtr(p)) = 20
+        SwapVariant p, PeekInt64
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+Property Get PeekUInt64(ByVal addr As Long) As Variant
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    Dim p
+
+    If IsBadReadPtr(addr, 8) = 0 Then
+        CopyMemory ByVal (VarPtr(p) + 8), ByVal addr, 8&
+        MemInt(VarPtr(p)) = 14
+        MemLong(VarPtr(p) + 4) = 0
+        SwapVariant p, PeekUInt64
+        
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+
+Property Get PeekCurrency(ByVal addr As Long) As Currency
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    If IsBadReadPtr(addr, 8) = 0 Then
+        CopyMemory PeekCurrency, ByVal addr, 8&
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+
+Property Get PeekDouble(ByVal addr As Long) As Double
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    If IsBadReadPtr(addr, 8) = 0 Then
+        CopyMemory PeekDouble, ByVal addr, 8&
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+Property Get PeekSingle(ByVal addr As Long) As Single
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    If IsBadReadPtr(addr, 4) = 0 Then
+        CopyMemory PeekSingle, ByVal addr, 4&
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+Property Get PeekUInt32(ByVal addr As Long) As Currency
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    Dim p As Currency
+    If IsBadReadPtr(addr, 4) = 0 Then
+        CopyMemory p, ByVal addr, 4&
+        PeekUInt32 = p * 10000#
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+
+Property Get PeekInt32(ByVal addr As Long) As Long
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    If IsBadReadPtr(addr, 4) = 0 Then
+        CopyMemory PeekInt32, ByVal addr, 4&
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+Property Get PeekInt16(ByVal addr As Long) As Integer
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    If IsBadReadPtr(addr, 2) = 0 Then
+        CopyMemory PeekInt16, ByVal addr, 2&
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+Property Get PeekWord(addr As Long) As Long
+    PeekWord = PeekUInt16(addr)
+End Property
+
+Property Get PeekUInt16(ByVal addr As Long) As Long
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    If IsBadReadPtr(addr, 2) = 0 Then
+        CopyMemory PeekUInt16, ByVal addr, 2&
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+Property Get Peek(ByVal addr As Long) As Byte
+    ' can be used to peek a long from everywhere unless we hit no memory.
+    If IsBadReadPtr(addr, 1) = 0 Then
+        CopyMemory Peek, ByVal addr, 1&
+    Else
+        MyEr "Can't Read - Invalid Address", "Δεν μπορώ να διαβάσω - Άκυρη Διεύθυνση"
+    End If
+End Property
+Property Let PokeUInt64(addr As Long, pval)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+    Dim val
+    If ValidArea(CVar(addr), CVar(8)) Then
+        SwapVariant val, cInt64(pval)
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val) + 8, 8
+        End If
+    Else
+        MyEr "Invalid PokeUInt64", "Ακυρο PokeUInt64"
+    End If
+End Property
+
+Property Let PokeInt64(addr As Long, pval)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+    Dim val
+    If ValidArea(CVar(addr), CVar(8)) Then
+        SwapVariant val, cInt64(pval)
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val) + 8, 8
+        End If
+    Else
+        MyEr "Invalid PokeInt64", "Ακυρο PokeInt64"
+    End If
+End Property
+
+Property Let PokeCurrency(addr As Long, val As Currency)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+
+    If ValidArea(CVar(addr), CVar(8)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val), 8
+        End If
+    Else
+        MyEr "Invalid PokeCurrency", "Ακυρο PokeCurrency"
+    End If
+End Property
+
+Property Let PokeDouble(addr As Long, val As Double)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+
+    If ValidArea(CVar(addr), CVar(8)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val), 8
+        End If
+    Else
+        MyEr "Invalid PokeDouble", "Ακυρο PokeDouble"
+    End If
+End Property
+
+
+Property Let PokeSingle(addr As Long, val As Single)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+
+    If ValidArea(CVar(addr), CVar(4)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val), 4
+        End If
+    Else
+        MyEr "Invalid PokeSingle", "Ακυρο PokeSingle"
+    End If
+End Property
+
+Property Let PokeInt32(addr As Long, ByVal val As Long)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+
+    If ValidArea(CVar(addr), CVar(4)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, val, 4
+        End If
+    Else
+        MyEr "Invalid PokeInt32", "Ακυρο PokeInt32"
+    End If
+End Property
+Property Let PokeUInt32(addr As Long, pval)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+    Dim val As Long
+    val = cInt64(pval)
+    If ValidArea(CVar(addr), CVar(4)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val) + 8, 4
+        End If
+    Else
+        MyEr "Invalid PokeInt32", "Ακυρο PokeInt32"
+    End If
+End Property
+Property Let PokeWord(addr As Long, val As Long)
+    PokeUInt16(addr) = val
+End Property
+
+Property Let PokeUInt16(addr As Long, val As Long)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+    If ValidArea(CVar(addr), CVar(2)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val), 2
+        End If
+    Else
+        MyEr "Invalid PokeInt16", "Ακυρο PokeInt16"
+    End If
+End Property
+Property Let PokeInt16(addr As Long, val As Integer)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+    If ValidArea(CVar(addr), CVar(2)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val), 2
+        End If
+    Else
+        MyEr "Invalid PokeInt16", "Ακυρο PokeInt16"
+    End If
+End Property
+Property Let Poke(addr As Long, val As Byte)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Property
+    End If
+    If ValidArea(CVar(addr), CVar(1)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal addr, ByVal VarPtr(val), 1
+        End If
+    Else
+        MyEr "Invalid Poke", "Ακυρο Poke"
+    End If
+End Property
+Sub FillDataFromMem(ByVal that As Long, Optional ByVal bytestocopy As Long = -1, Optional fromoffset As Long = 0)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
         Exit Sub
     End If
-    If ErrorMes = 0 Then
-        If bytestocopy = -1 Then
-            CopyMemory ByVal GetPtr(0), ByVal that, mBytes
-        ElseIf bytestocopy > 0 And bytestocopy <= mBytes Then
-            CopyMemory ByVal GetPtr(0), ByVal that, bytestocopy
+    If bytestocopy = -1 Then
+        bytestocopy = mBytes - fromoffset
+        If bytestocopy < 1 Then Exit Sub
+    ElseIf bytestocopy < 1 Then
+        Exit Sub
+    Else
+        If bytestocopy > mBytes - fromoffset Then
+            bytestocopy = mBytes - fromoffset
         End If
+    End If
+    If ValidArea(CVar(GetPtr(fromoffset)), CVar(bytestocopy)) Then
+        If ErrorMes = 0 Then
+            CopyMemory ByVal GetPtr(fromoffset), ByVal that, bytestocopy
+        End If
+    Else
+    MyEr "Invalid FillData", "Ακυρο FillData"
     End If
 End Sub
 Sub Clear()
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Sub
+    End If
     FillMemory ByVal GetPtr(0), mBytes, CByte(0)
 End Sub
 Sub FillByte(Optional ByVal that As Byte = 0)
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
+        MyEr "Not for this type of buffer", "όχι για αυτή τη διάρθρωση"
+        Exit Sub
+    End If
     FillMemory ByVal GetPtr(0), mBytes, that
 End Sub
 Function CopyItemString(ByVal that As Long, ByVal bytes As Long, Done As Boolean) As String
-    If BasicItem = vbString Or mSubtype > 0 Then
+    If BasicItem = vbString Or mSubtype > 0 Or ItemsHaveStrings Then
         Done = False
         Exit Function
     End If

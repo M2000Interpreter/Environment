@@ -16,6 +16,11 @@ Option Explicit
 Private Declare Function GetMem2 Lib "msvbvm60" (pSrc As Any, pDst As Any) As Long
 Private Declare Function GetMem4 Lib "msvbvm60" (pSrc As Any, pDst As Any) As Long
 Private Declare Function ArrPtr Lib "msvbvm60" Alias "VarPtr" (arr() As Any) As Long
+
+Public Type Symbol
+    Value As String
+    Class As String
+End Type
 Public Type ExtArray
     baseArr As Variant
 End Type
@@ -34,7 +39,6 @@ Private Const Pi = 3.14159265358979
 Private Const e = 2.71828182845905
 
 Private Const PI2 = Pi / 2
-
 Friend Sub CompactVBArray(Addr_variant, Addr_variant_out)
     Dim z, z1, z2, build As ExtArray
     If MemInt(Addr_variant_out) = 0 Then
@@ -96,8 +100,8 @@ Public Function Deg(ByVal Value As Double) As Double
 End Function
 
 ' // The logarithm to the base of a real number X
-Public Function LogX(ByVal Value As Double, ByVal base As Double) As Double
-    LogX = Log(Value) / Log(base)
+Public Function LogX(ByVal Value As Double, ByVal Base As Double) As Double
+    LogX = Log(Value) / Log(Base)
 End Function
 
 ' // The decimal logarithm of a real number
@@ -709,9 +713,9 @@ Public Function cxlogVar(Op) As Complex
     cxlogVar.r = Log(M): cxlogVar.i = a
 End Function
 ' // The logarithm of a complex number by base X
-Public Function cxLogX(Op As Complex, ByVal base As Double) As Complex
+Public Function cxLogX(Op As Complex, ByVal Base As Double) As Complex
     Dim M As Double, a As Double, nc As Complex
-    M = cxMod(Op): a = cxArg(Op): nc.r = Log(base)
+    M = cxMod(Op): a = cxArg(Op): nc.r = Log(Base)
     cxLogX.r = Log(M): cxLogX.i = a
     cxLogX = cxDiv(cxLogX, nc)
 End Function
@@ -864,13 +868,13 @@ End Function
 
 ' // Creating a matrix
 Public Function mxCreate(ByVal Row As Long, ByVal Col As Long, ParamArray Y()) As Matrix
-    Dim P As Variant, c As Long
+    Dim p As Variant, c As Long
     If Row <= 0 Or Col <= 0 Then Exit Function
     If Row * Col < UBound(Y) + 1 Then Exit Function
     mxCreate.Row = Row: mxCreate.Col = Col
     ReDim mxCreate.D(Row * Col - 1): c = 0
-    For Each P In Y
-        mxCreate.D(c) = P: c = c + 1
+    For Each p In Y
+        mxCreate.D(c) = p: c = c + 1
     Next
 End Function
 
@@ -890,8 +894,8 @@ End Function
 
 ' // Transpose matrix
 Public Function mxTrans(Op As Matrix) As Matrix
-    Dim i As Long, j As Long, P As Long
-    GetMem4 ByVal ArrPtr(Op.D), P: If P = 0 Then Exit Function
+    Dim i As Long, j As Long, p As Long
+    GetMem4 ByVal ArrPtr(Op.D), p: If p = 0 Then Exit Function
     mxTrans.Row = Op.Col: mxTrans.Col = Op.Row: ReDim mxTrans.D(UBound(Op.D))
     For j = 0 To mxTrans.Col - 1: For i = 0 To mxTrans.Row - 1
         mxTrans.D(i + j * mxTrans.Row) = Op.D(j + i * Op.Row)
@@ -900,17 +904,17 @@ End Function
 
 ' // Multiplication matrix on a real number
 Public Function mxMulReal(Op As Matrix, Op2 As Double) As Matrix
-    Dim P As Long, ij As Long
-    GetMem4 ByVal ArrPtr(Op.D), P: If P = 0 Then Exit Function
+    Dim p As Long, ij As Long
+    GetMem4 ByVal ArrPtr(Op.D), p: If p = 0 Then Exit Function
     ReDim mxMulReal.D(UBound(Op.D)): mxMulReal.Col = Op.Col: mxMulReal.Row = Op.Row
     For ij = 0 To UBound(Op.D): mxMulReal.D(ij) = Op.D(ij) * Op2: Next
 End Function
 
 ' // Addition of a two matrix
 Public Function mxAdd(Op1 As Matrix, Op2 As Matrix) As Matrix
-    Dim P As Long, ij As Long
-    GetMem4 ByVal ArrPtr(Op1.D), P: If P = 0 Then Exit Function
-    GetMem4 ByVal ArrPtr(Op2.D), P: If P = 0 Then Exit Function
+    Dim p As Long, ij As Long
+    GetMem4 ByVal ArrPtr(Op1.D), p: If p = 0 Then Exit Function
+    GetMem4 ByVal ArrPtr(Op2.D), p: If p = 0 Then Exit Function
     If Op1.Col <> Op2.Col Or Op1.Row <> Op2.Row Then Exit Function
     ReDim mxAdd.D(UBound(Op1.D)): mxAdd.Col = Op1.Col: mxAdd.Row = Op1.Row
     For ij = 0 To UBound(Op1.D): mxAdd.D(ij) = Op1.D(ij) + Op2.D(ij): Next
@@ -918,9 +922,9 @@ End Function
 
 ' // Subtaction of a two matrix
 Public Function mxSub(Op1 As Matrix, Op2 As Matrix) As Matrix
-    Dim P As Long, ij As Long
-    GetMem4 ByVal ArrPtr(Op1.D), P: If P = 0 Then Exit Function
-    GetMem4 ByVal ArrPtr(Op2.D), P: If P = 0 Then Exit Function
+    Dim p As Long, ij As Long
+    GetMem4 ByVal ArrPtr(Op1.D), p: If p = 0 Then Exit Function
+    GetMem4 ByVal ArrPtr(Op2.D), p: If p = 0 Then Exit Function
     If Op1.Col <> Op2.Col Or Op1.Row <> Op2.Row Then Exit Function
     ReDim mxSub.D(UBound(Op1.D)): mxSub.Col = Op1.Col: mxSub.Row = Op1.Row
     For ij = 0 To UBound(Op1.D): mxSub.D(ij) = Op1.D(ij) - Op2.D(ij): Next
@@ -928,9 +932,9 @@ End Function
 
 ' // Multiplication of a two matrix
 Public Function mxMul(Op1 As Matrix, Op2 As Matrix) As Matrix
-    Dim P As Long, i As Long, j As Long, k As Long, im As Long, i1 As Long, i2 As Long
-    GetMem4 ByVal ArrPtr(Op1.D), P: If P = 0 Then Exit Function
-    GetMem4 ByVal ArrPtr(Op2.D), P: If P = 0 Then Exit Function
+    Dim p As Long, i As Long, j As Long, k As Long, im As Long, i1 As Long, i2 As Long
+    GetMem4 ByVal ArrPtr(Op1.D), p: If p = 0 Then Exit Function
+    GetMem4 ByVal ArrPtr(Op2.D), p: If p = 0 Then Exit Function
     If Op1.Col <> Op2.Row Then Exit Function
     ReDim mxMul.D(Op1.Row * Op2.Col - 1): mxMul.Col = Op2.Col: mxMul.Row = Op1.Row
     For i = 0 To Op1.Row - 1

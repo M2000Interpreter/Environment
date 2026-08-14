@@ -16,6 +16,7 @@ Private mstack As New Collection
 Private mMany As Long
 Dim BeginFrom As Long
 Public index As Long
+Public NamedArguments As mStiva
 
 Public Function IsEmpty() As Boolean
 IsEmpty = mstack.Count = 0
@@ -232,7 +233,7 @@ Set aa = mstack.item(where)
 StackItemType = aa.Typename
 Exit Property
 mess:
-MyEr "offset out of limits", "Δείκτης εκτός ορίων"
+MyEr "stack offset out of limits", "δείκτης σωρού εκτός ορίων"
 End Property
 Public Property Get StackItemTypeiBoxArray(where As Long) As Boolean
 Dim aa As VarItem, bb As Object
@@ -322,7 +323,6 @@ For num = 1 To items
     aa.Recycle
     
     
-    
 Next num
 
 End Sub
@@ -403,6 +403,14 @@ mstack.Add aa, , 1
 End If
 Inc
 End Sub
+Public Sub PushObjVarItem2(RHS)
+If mstack.Count = 0 Then
+mstack.Add RHS
+Else
+mstack.Add RHS, , 1
+End If
+Inc
+End Sub
 Public Sub PushObjVarItem(RHS As Object)
 If mstack.Count = 0 Then
 mstack.Add RHS
@@ -475,6 +483,19 @@ If mMany > 0 Then
 LookTopVal = mstack.item(1).ItemDouble
 End If
 End Property
+Public Sub TopValSymbol()
+Dim emptysymbol As Symbol, v As VarItem
+If mMany > 0 Then
+Set v = mstack.item(1)
+If v.IhaveSymbol Then
+    
+Else
+    PushVal emptysymbol
+End If
+Else
+    PushVal emptysymbol
+End If
+End Sub
 Public Property Get LookNVal(n As Long) As Variant
 On Error Resume Next
 LookNVal = mstack.item(n).ItemVariant
@@ -761,7 +782,7 @@ With ExportArray
     .myarrbase = 0
     .PushDim (items)
     .PushEnd
-    .Arr = True
+    .arr = True
 
 
 For i = 1 To items
@@ -924,7 +945,22 @@ For i = item To thisstiva.Count
         Inc
 Next i
 End Sub
-
+Public Sub Roll(target As Object, Name$)
+Dim bstack As basetask, i As Long, aa As VarItem
+Set bstack = target
+For i = 1 To Count Step 2
+Set aa = mstack.item(i + 1)
+If aa.mItem = Name$ Then
+Set aa = mstack.item(i)
+bstack.soros.drop 1
+bstack.soros.PushObjVarItem2 aa
+mMany = mMany - 2
+mstack.Remove i
+mstack.Remove i
+Exit Sub
+End If
+Next
+End Sub
 Public Sub Recycle()
     Dim obj As IUnknown, GetRefCount As Long
     Set obj = Me

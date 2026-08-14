@@ -115,7 +115,7 @@ Public Function SaveJPG( _
       Optional UserComment As String) As Boolean
    Dim j As New cJpeg
         j.Quality = lQuality
-        If UserComment = vbNullString Then j.comment = "M2000 User" Else j.comment = Left$(UserComment, 64)
+        If UserComment = vbNullString Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
         If lQuality <= 50 Then
         j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
         Else
@@ -134,7 +134,7 @@ Public Function SaveJPGtoBuffer( _
       Optional UserComment As String) As Object
    Dim j As New cJpeg
         j.Quality = lQuality
-        If UserComment = vbNullString Then j.comment = "M2000 User" Else j.comment = Left$(UserComment, 64)
+        If UserComment = vbNullString Then j.Comment = "M2000 User" Else j.Comment = Left$(UserComment, 64)
         If lQuality <= 50 Then
         j.SetSamplingFrequencies 2, 2, 1, 1, 1, 1  ' for screen
         Else
@@ -165,19 +165,17 @@ End Sub
 Public Function RotateDib90(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long
 If cDibbuffer0.hDIb = 0 Then Exit Function
-   piw = cDibbuffer0.Width
-   pih = cDibbuffer0.Height
-      If piw = 0 Then Exit Function
-
- Dim cDIBbuffer1 As New cDIBSection
+piw = cDibbuffer0.Width
+pih = cDibbuffer0.Height
+If piw = 0 Then Exit Function
+Dim cDIBbuffer1 As New cDIBSection
 If cDIBbuffer1.create(pih, piw) Then
-
-cDIBbuffer1.GetDpiDIB cDibbuffer0
-Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, Y As Long
-Dim tSA As SAFEARRAY2D
-Dim tSA1 As SAFEARRAY2D
-On Error Resume Next
+    cDIBbuffer1.GetDpiDIB cDibbuffer0
+    Dim bDib() As Byte, bDib1() As Byte
+    Dim X As Long, Y As Long
+    Dim tSA As SAFEARRAY2D
+    Dim tSA1 As SAFEARRAY2D
+    On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
@@ -198,47 +196,40 @@ On Error Resume Next
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
     CopyMemory ByVal VarPtrArray(bDib1()), VarPtr(tSA1), 4
-'dDib1 το τελικό pih, piw
-Dim myx As Long, oldx As Long
-Dim ttt As Long, TTC As Long
-
-ttt = 1 + 100000 / piw
-
-myx = 0
-If MEDOEV Then
-  For Y = pih - 1 To 0 Step -1
-    oldx = 0
-    TTC = TTC - 1
-    If TTC = 0 Then DoEvents: TTC = ttt
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
-                        oldx = oldx + 3
-       Next X
-       myx = myx + 3
-    Next Y
-Else
-  For Y = pih - 1 To 0 Step -1
-    oldx = 0
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
-                        oldx = oldx + 3
-       Next X
-       myx = myx + 3
-    Next Y
+    Dim myx As Long, oldx As Long
+    Dim ttt As Long, TTC As Long
+    ttt = 1 + 100000 / piw
+    myx = 0
+    If MEDOEV Then
+        For Y = pih - 1 To 0 Step -1
+            oldx = 0
+            TTC = TTC - 1
+            If TTC = 0 Then DoEvents: TTC = ttt
+            For X = 0 To piw - 1
+                bDib1(myx, X) = bDib(oldx, Y)
+                bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+                oldx = oldx + 3
+            Next X
+            myx = myx + 3
+        Next Y
+    Else
+        For Y = pih - 1 To 0 Step -1
+            oldx = 0
+            For X = 0 To piw - 1
+                bDib1(myx, X) = bDib(oldx, Y)
+                bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+                oldx = oldx + 3
+            Next X
+            myx = myx + 3
+        Next Y
     End If
-
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
- cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
-cDibbuffer0.GetDpiDIB cDIBbuffer1
-    End If
-
-
-
+    cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
+    cDibbuffer0.GetDpiDIB cDIBbuffer1
+End If
 End Function
 Public Function RotateDib270(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long

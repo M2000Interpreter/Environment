@@ -95,7 +95,7 @@ If isok Then
         If flat Then
             z.writevalue = p
             z.flat = flat
-            If VarType(p) = VBArray + vbObject Then
+            If VarType(p) = vbArray + vbObject Then
                 For i = UBound(p) To 0 Step -1
                     If Not p(i) Is Nothing Then
                         If TypeOf p(i) Is refArray Then
@@ -161,7 +161,7 @@ Dim ppp As Object
                         End If
                     Next j
                 End If
-            ElseIf VarType(pp) = VBArray + vbObject Then
+            ElseIf VarType(pp) = vbArray + vbObject Then
                 If j > 0 Then
                     For j = j - 1 To 0 Step -1
                         Set M = pp(j)
@@ -194,7 +194,7 @@ Property Let writevalue(ByRef RHS)
 If IsObject(RHS) Then
     Set p = RHS
 Else
-    ihavearray = (VarType(RHS) And VBArray) <> 0
+    ihavearray = (VarType(RHS) And vbArray) <> 0
    ' flat = VarType(RHS) = vbArray + vbVariant
     p = RHS
     If ihavearray Then
@@ -207,7 +207,7 @@ Sub writevalueOnce(ByRef RHS)
 If IsObject(RHS) Then
     Set p = RHS
 Else
-    ihavearray = (VarType(RHS) And VBArray) <> 0
+    ihavearray = (VarType(RHS) And vbArray) <> 0
    ' flat = VarType(RHS) = vbArray + vbVariant
     SwapVariant p, RHS
     If ihavearray Then
@@ -322,7 +322,7 @@ entry1:
             ElseIf myVarType(that, vbObject) Then
                 Set p(where) = that
                 
-            ElseIf (MemInt(VarPtr(that)) And VBArray) <> 0 Then
+            ElseIf (MemInt(VarPtr(that)) And vbArray) <> 0 Then
             
                 SwapVariant p(where), that
             Else
@@ -514,7 +514,7 @@ If ihavearray Then
         If pp > 0 Then
             If what >= 0 And what < pp Then
                 
-                Select Case VarType(p(where)) - VBArray
+                Select Case VarType(p(where)) - vbArray
                 Case vbObject, vbDataObject
                     Set Value = p(where)(what)
                 Case 20
@@ -1003,7 +1003,7 @@ If ihavearray Then
     If isok Then
         If IsMissing(where) Or flat Then
             If Not IsMissing(where) Then
-                If VarType(p) = VBArray + vbVariant Then
+                If VarType(p) = vbArray + vbVariant Then
                     vtType = MemInt(VarPtr(p(where)))
                 Else
                     vtType = VarType(p(where))
@@ -1024,7 +1024,7 @@ If ihavearray Then
             End If
             If IsMissing(index) Then
             If pp > 0 Then
-                vtType = MemInt(VarPtr(p(where))) - VBArray
+                vtType = MemInt(VarPtr(p(where))) - vbArray
             Else
                 vtType = MemInt(VarPtr(p(where))) ' not an array ??
             End If
@@ -1076,7 +1076,7 @@ Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
     CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
 End Sub
 Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
-    Dim Addr, mitems, itemlen
+    Dim addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
@@ -1088,7 +1088,7 @@ Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolea
     If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - nDx) Then
         lengthInBytes = itemlen * (mitems - nDx)
     End If
-    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
+    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
     
     On Error GoTo there
     Dim a1 As SAFEARRAY1D, a() As Byte
@@ -1097,7 +1097,7 @@ Public Function putData(f As Long, nDx As Long, lengthInBytes As Long) As Boolea
         .cDims = 1
         .onebound(0).lLbound = 0
         .onebound(0).cElements = lengthInBytes
-        .pvData = Addr
+        .pvData = addr
     End With
         CopyMemory ByVal VarPtrArray(a()), VarPtr(a1), 4
         On Error GoTo there1
@@ -1113,7 +1113,7 @@ there1:
 there:
 End Function
 Friend Function GetData(f As Long, nDx As Long, lengthInBytes As Long) As Boolean
-    Dim Addr, mitems, itemlen
+    Dim addr, mitems, itemlen
     
     itemlen = MemInt(UnsignedAdd(MemLong(UnsignedAdd(VarPtr(p(0)), 8)), 4))
     mitems = Me.Elements(p(0))
@@ -1125,12 +1125,12 @@ Friend Function GetData(f As Long, nDx As Long, lengthInBytes As Long) As Boolea
     If lengthInBytes = 0 Or lengthInBytes > itemlen * (mitems - nDx) Then
         lengthInBytes = itemlen * (mitems - nDx)
     End If
-    Addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
+    addr = UnsignedAdd(Me.ArrPtr(0), itemlen * nDx)
     On Error GoTo there
     Dim FH As Long
     FH = Module10.ReadFileHandler(CLng(f))
     If FH = 0 Then Exit Function
-    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(Addr)
+    Module10.API_ReadBLOCK FH, lengthInBytes, cUlng(addr)
     GetData = True
     Exit Function
 there:
@@ -1292,6 +1292,8 @@ Private Function fixthis(p As Variant) As String '!!!!!!!!!
                     fixthis = "(" & fixthis(CVar(p.r)) & fixthis & fixthis(CVar(p.i)) & "i)"
                 End If
             End If
+        ElseIf TypeOf p Is Symbol Then
+            fixthis = p.Class
         Else
             Select Case MemInt(VarPtr(p))
             Case vbDate

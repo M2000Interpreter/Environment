@@ -703,7 +703,7 @@ If index >= 0 And index <= maxitems1 Then
 
 If IsObject(actualData(index)) Then
     If actualData(index) Is Nothing Then
-    Stop
+    MyEr "Null pointer encounter", "Βρέθηκε μηδενικός δείκτης"
     ElseIf TypeOf actualData(index) Is PropReference Then
         On Error Resume Next
         
@@ -1042,6 +1042,11 @@ End Sub
 Public Function VariantArray() As Variant
 Dim s1, s2, rA As refArray
 If MyIsObject(actualData) Then
+If Count = 0 Then
+s1 = LibMemory.EmptyArray(1, MyTypeToBe)
+SwapVariant s1, VariantArray
+Exit Function
+End If
 Set rA = actualData
 Set rA = rA.Copy
 rA.CreateLastRef VarPtr(s1)
@@ -1053,6 +1058,11 @@ If MemInt(VarPtr(VariantArray)) = 8212 Then
 End If
 Make1dArrayIntoNdArray VarPtr(VariantArray)
 Else
+If Count = 0 Then
+s1 = LibMemory.EmptyArray(1, MyTypeToBe)
+SwapVariant s1, VariantArray
+Exit Function
+End If
 VariantArray = actualData
 Make1dArrayIntoNdArray VarPtr(VariantArray)
 End If

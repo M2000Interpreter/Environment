@@ -102,6 +102,12 @@ End Property
 Public Property Get ObjectRef() As Variant
     If slot = 1 Then Set ObjectRef = mItem Else Set ObjectRef = Nothing
 End Property
+Public Property Get IhaveSymbol() As Boolean
+If slot = 2 Then
+    IhaveSymbol = TypeOf mItem Is Symbol
+End If
+End Property
+
 Public Sub Recycle()
     If SkipTrush Then Exit Sub
     Dim obj As IUnknown, GetRefCount As Long

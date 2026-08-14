@@ -57,7 +57,7 @@ Public Function Decode64toMemBloc(ByVal a$, ok As Boolean, Optional forcode As B
     End If
     
 End Function
-Public Function File2newMemblock(FileName As String, r, P) As Object
+Public Function File2newMemblock(FileName As String, r, p) As Object
     Dim mem As New MemBlock, BLen As Long, i As Long
     r = -1#
     FileName = CFname(FileName)
@@ -66,7 +66,7 @@ Public Function File2newMemblock(FileName As String, r, P) As Object
      
     BLen = FileLen(GetDosPath(FileName))
     If BLen Then
-    mem.Construct 1, BLen, , CBool(P)
+    mem.Construct 1, BLen, , CBool(p)
     i = FreeFile
     On Error Resume Next
 
@@ -165,19 +165,17 @@ End Sub
 Public Function RotateDib90(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long
 If cDibbuffer0.hDIb = 0 Then Exit Function
-   piw = cDibbuffer0.Width
-   pih = cDibbuffer0.Height
-      If piw = 0 Then Exit Function
-
- Dim cDIBbuffer1 As New cDIBSection
+piw = cDibbuffer0.Width
+pih = cDibbuffer0.Height
+If piw = 0 Then Exit Function
+Dim cDIBbuffer1 As New cDIBSection
 If cDIBbuffer1.create(pih, piw) Then
-
-cDIBbuffer1.GetDpiDIB cDibbuffer0
-Dim bDib() As Byte, bDib1() As Byte
-Dim X As Long, Y As Long
-Dim tSA As SAFEARRAY2D
-Dim tSA1 As SAFEARRAY2D
-On Error Resume Next
+    cDIBbuffer1.GetDpiDIB cDibbuffer0
+    Dim bDib() As Byte, bDib1() As Byte
+    Dim X As Long, Y As Long
+    Dim tSA As SAFEARRAY2D
+    Dim tSA1 As SAFEARRAY2D
+    On Error Resume Next
     With tSA
         .cbElements = 1
         .cDims = 2
@@ -198,47 +196,40 @@ On Error Resume Next
         .pvData = cDIBbuffer1.DIBSectionBitsPtr
     End With
     CopyMemory ByVal VarPtrArray(bDib1()), VarPtr(tSA1), 4
-'dDib1 το τελικό pih, piw
-Dim myx As Long, oldx As Long
-Dim ttt As Long, TTC As Long
-
-ttt = 1 + 100000 / piw
-
-myx = 0
-If MEDOEV Then
-  For Y = pih - 1 To 0 Step -1
-    oldx = 0
-    TTC = TTC - 1
-    If TTC = 0 Then DoEvents: TTC = ttt
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
-                        oldx = oldx + 3
-       Next X
-       myx = myx + 3
-    Next Y
-Else
-  For Y = pih - 1 To 0 Step -1
-    oldx = 0
-        For X = 0 To piw - 1
-                        bDib1(myx, X) = bDib(oldx, Y)
-                        bDib1(myx + 1, X) = bDib(oldx + 1, Y)
-                        bDib1(myx + 2, X) = bDib(oldx + 2, Y)
-                        oldx = oldx + 3
-       Next X
-       myx = myx + 3
-    Next Y
+    Dim myx As Long, oldx As Long
+    Dim ttt As Long, TTC As Long
+    ttt = 1 + 100000 / piw
+    myx = 0
+    If MEDOEV Then
+        For Y = pih - 1 To 0 Step -1
+            oldx = 0
+            TTC = TTC - 1
+            If TTC = 0 Then DoEvents: TTC = ttt
+            For X = 0 To piw - 1
+                bDib1(myx, X) = bDib(oldx, Y)
+                bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+                oldx = oldx + 3
+            Next X
+            myx = myx + 3
+        Next Y
+    Else
+        For Y = pih - 1 To 0 Step -1
+            oldx = 0
+            For X = 0 To piw - 1
+                bDib1(myx, X) = bDib(oldx, Y)
+                bDib1(myx + 1, X) = bDib(oldx + 1, Y)
+                bDib1(myx + 2, X) = bDib(oldx + 2, Y)
+                oldx = oldx + 3
+            Next X
+            myx = myx + 3
+        Next Y
     End If
-
     CopyMemory ByVal VarPtrArray(bDib), 0&, 4
     CopyMemory ByVal VarPtrArray(bDib1), 0&, 4
- cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
-cDibbuffer0.GetDpiDIB cDIBbuffer1
-    End If
-
-
-
+    cDibbuffer0.CreateFromPicture cDIBbuffer1.Picture
+    cDibbuffer0.GetDpiDIB cDIBbuffer1
+End If
 End Function
 Public Function RotateDib270(cDibbuffer0 As cDIBSection, Optional MEDOEV As Boolean = False)
 Dim piw As Long, pih As Long
