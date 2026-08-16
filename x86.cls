@@ -45,6 +45,7 @@ Private Const DOS_CODE_RELOCATIONS As String = _
 Private Const MEM_SECTION_SIZE  As Long = 4096
 Private Const FILE_SECTION_SIZE As Long = 512
 
+Private Const CHAR_AT           As Long = 64
 Private Const CHAR_SPACE        As Long = 32
 Private Const CHAR_LINEFEED     As Long = 10
 Private Const CHAR_CARRIAGE     As Long = 13
@@ -159,7 +160,7 @@ End Type
 Private Type SIB
     sscale                      As Long
     index                       As Long
-    base                        As Long
+    Base                        As Long
 End Type
 
 Private Type ASMLabel
@@ -557,7 +558,7 @@ Private Sub WriteStr0Ev(ByVal strN As String)
 End Sub
 
 
-Private Sub WriteIIDs(ByVal base As Long)
+Private Sub WriteIIDs(ByVal Base As Long)
     Dim i       As Long
     Dim j       As Long
     Dim im      As IMAGE_IMPORT_DIRECTORY
@@ -565,9 +566,9 @@ Private Sub WriteIIDs(ByVal base As Long)
     
     For i = 0 To m_lngExternCount - 1
         With im
-            .ModuleName = base + GetRelOfLibname(i)
-            .ImportAddressTable = base + GetIATLibStart(i)
-            .ImportLookupTable = base + GetILTLibStart(i)
+            .ModuleName = Base + GetRelOfLibname(i)
+            .ImportAddressTable = Base + GetIATLibStart(i)
+            .ImportLookupTable = Base + GetILTLibStart(i)
         End With
         
         OutputMem VarPtr(im), Len(im)
@@ -577,13 +578,13 @@ Private Sub WriteIIDs(ByVal base As Long)
 End Sub
 
 
-Private Sub WriteIAT(ByVal base As Long)
+Private Sub WriteIAT(ByVal Base As Long)
     Dim i   As Long
     Dim j   As Long
     
     For i = 0 To m_lngExternCount - 1
         For j = 0 To m_udtExtern(i).FunctionCount - 1
-            OutputLong base + GetRelOfFncname(i, j)
+            OutputLong Base + GetRelOfFncname(i, j)
         Next
         OutputLong 0
     Next
@@ -1080,14 +1081,14 @@ Private Function WriteSIB( _
         udtSIB.index = 4
         
         Select Case udeReg(0)
-            Case RegEAX:    udtSIB.base = 0
-            Case RegECX:    udtSIB.base = 1
-            Case RegEDX:    udtSIB.base = 2
-            Case RegEBX:    udtSIB.base = 3
-            Case RegESP:    udtSIB.base = 4  ' <= all the others encodable in ModR/M
-            Case RegEBP:    udtSIB.base = 5
-            Case RegESI:    udtSIB.base = 6
-            Case RegEDI:    udtSIB.base = 7
+            Case RegEAX:    udtSIB.Base = 0
+            Case RegECX:    udtSIB.Base = 1
+            Case RegEDX:    udtSIB.Base = 2
+            Case RegEBX:    udtSIB.Base = 3
+            Case RegESP:    udtSIB.Base = 4  ' <= all the others encodable in ModR/M
+            Case RegEBP:    udtSIB.Base = 5
+            Case RegESI:    udtSIB.Base = 6
+            Case RegEDI:    udtSIB.Base = 7
         End Select
         
     Else
@@ -1106,13 +1107,13 @@ Private Function WriteSIB( _
                 End If
                 
                 Select Case udeReg(0)
-                    Case RegEAX:    udtSIB.index = 0:   udtSIB.base = 0
-                    Case RegECX:    udtSIB.index = 1:   udtSIB.base = 1
-                    Case RegEDX:    udtSIB.index = 2:   udtSIB.base = 2
-                    Case RegEBX:    udtSIB.index = 3:   udtSIB.base = 3
-                    Case RegESI:    udtSIB.index = 6:   udtSIB.base = 6
-                    Case RegEDI:    udtSIB.index = 7:   udtSIB.base = 7
-                    Case RegEBP:    udtSIB.index = 5:   udtSIB.base = 5
+                    Case RegEAX:    udtSIB.index = 0:   udtSIB.Base = 0
+                    Case RegECX:    udtSIB.index = 1:   udtSIB.Base = 1
+                    Case RegEDX:    udtSIB.index = 2:   udtSIB.Base = 2
+                    Case RegEBX:    udtSIB.index = 3:   udtSIB.Base = 3
+                    Case RegESI:    udtSIB.index = 6:   udtSIB.Base = 6
+                    Case RegEDI:    udtSIB.index = 7:   udtSIB.Base = 7
+                    Case RegEBP:    udtSIB.index = 5:   udtSIB.Base = 5
                                     rm.Mod = 1
                     Case Else:
                         SetError "invalid multiple of a register in SIB", udtInstr.Line, udtInstr.Section
@@ -1123,7 +1124,7 @@ Private Function WriteSIB( _
                 ' if Mod of ModR/M byte would be > 0 here
                 ' EBP+sbyte/sdword would be encoded, too
                 rm.Mod = 0
-                udtSIB.base = 5
+                udtSIB.Base = 5
                 udtSIB.sscale = GetFirstSetBitIdx(lngRegCnt(0))
                 
                 Select Case udeReg(0)
@@ -1185,14 +1186,14 @@ Private Function WriteSIB( _
             End Select
             
             Select Case udeReg(lngBase)
-                Case RegEAX:    udtSIB.base = 0
-                Case RegECX:    udtSIB.base = 1
-                Case RegEDX:    udtSIB.base = 2
-                Case RegEBX:    udtSIB.base = 3
-                Case RegESP:    udtSIB.base = 4
-                Case RegEBP:    udtSIB.base = 5
-                Case RegESI:    udtSIB.base = 6
-                Case RegEDI:    udtSIB.base = 7
+                Case RegEAX:    udtSIB.Base = 0
+                Case RegECX:    udtSIB.Base = 1
+                Case RegEDX:    udtSIB.Base = 2
+                Case RegEBX:    udtSIB.Base = 3
+                Case RegESP:    udtSIB.Base = 4
+                Case RegEBP:    udtSIB.Base = 5
+                Case RegESI:    udtSIB.Base = 6
+                Case RegEDI:    udtSIB.Base = 7
                 Case Else:
                     SetError "invalid base register", udtInstr.Line, udtInstr.Section
                     Exit Function
@@ -1201,7 +1202,7 @@ Private Function WriteSIB( _
     End If
     
     OutputByte (rm.Mod * &H40) Or (rm.reg * &H8) Or rm.rm
-    OutputByte (udtSIB.sscale * &H40) Or (udtSIB.index * &H8) Or udtSIB.base
+    OutputByte (udtSIB.sscale * &H40) Or (udtSIB.index * &H8) Or udtSIB.Base
     If rm.DispSize <> BitsUnknown Then OutputBytes rm.disp, rm.DispSize
     
     WriteSIB = True
@@ -2776,8 +2777,25 @@ cont1231:
                             .Position = .Position + 1
                         Loop
                         clsToken.TType = TokenString
-                        
-                    Case CHAR_ALPHA_UA To CHAR_ALPHA_UZ, CHAR_ALPHA_LA To CHAR_ALPHA_LZ:
+                    Case CHAR_AT
+                        Do
+                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                            .Position = .Position + 1
+                        Loop While IsAlphaNumeric(.Source(.Position))
+                        Dim P
+                            If IsNumberNew(Basestack1, Mid$(clsToken.content, 2), P, True) Then
+                                If MemInt(VarPtr(P)) = vbString Then
+                                    SwapVariant clsToken.content, P
+                                    clsToken.TType = TokenString
+                                Else
+                                    clsToken.content = Trim(str$(CLng(P)))
+                                    clsToken.TType = TokenValue
+                                End If
+                            Else
+                                clsToken.TType = TokenInvalid
+                            End If
+                            .Position = .Position - 1
+                        Case CHAR_AT, CHAR_ALPHA_UA To CHAR_ALPHA_UZ, CHAR_ALPHA_LA To CHAR_ALPHA_LZ:
                         Do
                             clsToken.content = clsToken.content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
@@ -2799,7 +2817,6 @@ cont1231:
                             clsToken.TType = TokenExtern
                             
                         Else
-                            
                             If GetlocalVar(clsToken.content, i) Then
                                 'clsToken.content = Trim(str$(CLng(var(i))))
                                 If MemInt(VarPtr(var(i))) = vbString Then
@@ -2814,8 +2831,7 @@ cont1231:
                             Else
                                 clsToken.TType = tokensymbol
                             End If
-                         
-                        End If
+                         End If
                         
                         .Position = .Position - 1
                         

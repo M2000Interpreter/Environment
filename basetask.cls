@@ -14,13 +14,12 @@ Attribute VB_Exposed = False
 Option Explicit
 ' Basetask is a module task of M2000
 ' This is a utility soros for passing parammeters to functions
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Public LoadOnly As Boolean, NoRun As Boolean
 Public CheckUnReferenceGui As Long
 Public callx1 As Long, tpointer As Long
 Public RRCOUNTER As Long
 Public callohere As String
-Public machinecode As Boolean
 Public LastIdpos As Long ' reverse pos
 Public addlen As Long, NoFuncError As Boolean, CallW As String, fHere$, strg As Boolean
 Public nokillvars As Boolean
@@ -145,17 +144,17 @@ End With
 
 
 End Sub
-Public Sub SetVar(ByVal name$, var As Variant)
+Public Sub SetVar(ByVal Name$, var As Variant)
 
-    If Not StaticCollection.Find(name$) Then
-    StaticCollection.AddKey name$
+    If Not StaticCollection.Find(Name$) Then
+    StaticCollection.AddKey Name$
     End If
    StaticCollection.Value = var
 End Sub
 Public Property Get ForLevel() As Long
 ForLevel = curdotcol
 End Property
-Public Sub SetVarobJ(ByVal name$, var As Variant)
+Public Sub SetVarobJ(ByVal Name$, var As Variant)
     If StaticCollection Is Nothing Then
     Set StaticCollection = New FastCollection
     If Parent Is Nothing Then
@@ -166,14 +165,14 @@ Public Sub SetVarobJ(ByVal name$, var As Variant)
     If Me.Parent Is Nothing Then
     
     Else
-    If Not StaticCollection.Find(name$) Then StaticCollection.AddKey name$
+    If Not StaticCollection.Find(Name$) Then StaticCollection.AddKey Name$
     Set StaticCollection.ValueObj = var
     End If
 End Sub
 Public Sub clearbasket()
 
-    Dim oldname$, name$
-    name$ = "%_" + StaticInUse
+    Dim oldname$, Name$
+    Name$ = "%_" + StaticInUse
     If StaticCollection Is Nothing Then Exit Sub
     If Me.IamThread Or Me.IamAnEvent Or Not Me.IamChild Then
         Set StaticCollection = Nothing
@@ -181,18 +180,18 @@ Public Sub clearbasket()
     End If
     
     If Not Parent Is Nothing Then
-        oldname$ = name$
+        oldname$ = Name$
         
         If StaticCollection Is Nothing Then Exit Sub
-        name$ = "%_" + Parent.StaticInUse
-        If oldname$ = name$ Then Exit Sub
+        Name$ = "%_" + Parent.StaticInUse
+        If oldname$ = Name$ Then Exit Sub
         Set StaticCollection = Nothing
         If Parent.IamThread Or Parent.IamAnEvent Then Exit Sub
         If Parent.ExistVar(oldname$) Then Parent.StaticCollection.RemoveWithNoFind
     End If
     
 End Sub
-Public Sub SetBacket(ByVal name$)
+Public Sub SetBacket(ByVal Name$)
     Dim paren As basetask, var As Variant
     If StaticCollection Is Nothing Then
         Set StaticCollection = New FastCollection
@@ -214,7 +213,7 @@ Public Sub SetBacket(ByVal name$)
         If paren.StaticCollection Is Nothing Then
             Set paren.StaticCollection = New FastCollection
         End If
-        If Not paren.StaticCollection.Find(name$) Then paren.StaticCollection.AddKey name$
+        If Not paren.StaticCollection.Find(Name$) Then paren.StaticCollection.AddKey Name$
         
         Set paren.StaticCollection.ValueObj = var
         If paren.IamThread Or paren.IamAnEvent Then Exit Sub
@@ -222,21 +221,21 @@ Public Sub SetBacket(ByVal name$)
         Set oldcol = paren.StaticCollection
         Do While Not paren.Parent Is Nothing
         
-        name$ = "%_" + paren.StaticInUse
+        Name$ = "%_" + paren.StaticInUse
         Set paren = paren.Parent
         If paren.IamThread Or paren.IamAnEvent Then Exit Do
         If paren.StaticCollection Is Nothing Then
         
             Set paren.StaticCollection = New FastCollection
-            paren.StaticCollection.AddKey name$
+            paren.StaticCollection.AddKey Name$
             Set paren.StaticCollection.ValueObj = oldcol
             
-        ElseIf paren.StaticCollection.Find(name$) Then
+        ElseIf paren.StaticCollection.Find(Name$) Then
         
             Exit Do
             ' problem this exist
         Else
-            paren.StaticCollection.AddKey name$
+            paren.StaticCollection.AddKey Name$
             Set paren.StaticCollection.ValueObj = oldcol
         End If
         Set oldcol = paren.StaticCollection
@@ -244,9 +243,9 @@ Public Sub SetBacket(ByVal name$)
     End If
     
 End Sub
-Public Sub SetVarobJvalue(ByVal name$, var As Variant)
-    If Not StaticCollection.Find(name$) Then
-    StaticCollection.AddKey name$
+Public Sub SetVarobJvalue(ByVal Name$, var As Variant)
+    If Not StaticCollection.Find(Name$) Then
+    StaticCollection.AddKey Name$
     End If
     Dim myobject As Object, usehandler As mHandler
     
@@ -277,9 +276,9 @@ Public Sub SetVarobJvalue(ByVal name$, var As Variant)
     End If
 End Sub
 
-Function AlterVar(ByVal name$, p As Variant, ss$, inttype As Boolean) As Boolean
+Function AlterVar(ByVal Name$, p As Variant, ss$, inttype As Boolean) As Boolean
 Dim sp As Variant, usehandler As mHandler
-If Not StaticCollection.Find(name$) Then Exit Function
+If Not StaticCollection.Find(Name$) Then Exit Function
 
   With StaticCollection
   If .IsObj Then
@@ -497,38 +496,38 @@ MyRound = a
 If i < 0 Or i > 28 Then MyEr "Round Place exit range 0 to 28", "Η θέση στρογγυλοποίησης εκτός περιοχής από 0 έως 28"
 End Function
 
-Public Function ExistVar(ByVal name$, Optional IsObj As Boolean = False) As Boolean
-        ExistVar = StaticCollection.ExistKey(name$)
+Public Function ExistVar(ByVal Name$, Optional IsObj As Boolean = False) As Boolean
+        ExistVar = StaticCollection.ExistKey(Name$)
         IsObj = StaticCollection.IsObj
 End Function
 
-Public Function ExistVar2(ByVal name$) As Boolean
+Public Function ExistVar2(ByVal Name$) As Boolean
         If StaticCollection Is Nothing Then Exit Function
-        ExistVar2 = StaticCollection.ExistKey(name$)
+        ExistVar2 = StaticCollection.ExistKey(Name$)
 End Function
-Public Sub ReadVar(ByVal name$, var As Variant)
+Public Sub ReadVar(ByVal Name$, var As Variant)
     Dim i As Long, vv As Variant
     If StaticCollection Is Nothing Then Exit Sub
     With StaticCollection
-        If .Find(name$) Then
+        If .Find(Name$) Then
             If .IsObj Then
                     Set var = .ValueObj
                     
-            If Left$(name$, 1) = "%" Then Set .ValueObj = Nothing
+            If Left$(Name$, 1) = "%" Then Set .ValueObj = Nothing
             Else
                     var = .Value
             End If
         End If
     End With
 End Sub
-Public Sub ReadStaticCol(ByVal name$, var As Variant)
+Public Sub ReadStaticCol(ByVal Name$, var As Variant)
     Dim i As Long, vv As Variant
     If StaticCollection Is Nothing Then
     Set var = Nothing
     Exit Sub
     End If
     With StaticCollection
-        If .Find(name$) Then
+        If .Find(Name$) Then
             If .IsObj Then
                     Set var = .ValueObj
               Else
@@ -537,14 +536,14 @@ Public Sub ReadStaticCol(ByVal name$, var As Variant)
         End If
     End With
 End Sub
-Public Sub ReadStaticCol2(name$, var As Variant)
+Public Sub ReadStaticCol2(Name$, var As Variant)
     Dim i As Long, vv As Variant
     If StaticCollection Is Nothing Then
     Set var = Nothing
     Exit Sub
     End If
     With StaticCollection
-        If .Find(name$) Then
+        If .Find(Name$) Then
             If .IsObj Then
                     Set var = .ValueObj
               Else

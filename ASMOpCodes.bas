@@ -2079,7 +2079,7 @@ Public Function PreProcessAsm(ByVal strASM As String) As String
     Dim strOutput   As String
     Dim strID       As String
     Dim prep As New FastCollection
-    Dim final As New Document
+    Dim Final As New Document
     Dim i           As Long
     Dim j           As Long, j1 As Long
     Dim k           As Long
@@ -2183,10 +2183,10 @@ Public Function PreProcessAsm(ByVal strASM As String) As String
                         
                 End Select
             Next
-            final.AppendParagraph strOutput
+            Final.AppendParagraph strOutput
             strOutput = vbNullString
         End If
     Next
     
-    PreProcessAsm = final.textDoc
+    PreProcessAsm = Final.textDoc
 End Function

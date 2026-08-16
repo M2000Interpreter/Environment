@@ -9274,6 +9274,7 @@ existAs05:
                     Set cv = New Constant
                     cv.DefineOnce bs.soros.StackPickRef(1).mItem, , True
                     Set p = cv
+                    bs.soros.drop 1
                     Set cv = Nothing
                     globalvar what$, p, , , , checktype
                     If FastSymbol(rest$, "=") Then
@@ -9524,6 +9525,7 @@ existAs21:
 check0001:
                     Set cv = New Constant
                     cv.DefineOnce bs.soros.StackPickRef(1).mItem, , True
+                    bs.soros.drop 1
                     Set p = cv
                     If FastSymbol(rest$, "=") Then
                         i = 1
@@ -9769,16 +9771,21 @@ jump8:
             MyRead7 = True
         Case Else
 '        Set namedArg = Nothing
+        ' set bs.soros.NamedArguments=named
         End Select
     End If
 loopcont123:
     If MaybeIsSymbol(rest$, "=@&#~") Then SyntaxError: MyRead7 = False
     If optlocal Then useoptionals = False
 Loop Until Not FastSymbol(rest$, ",")
-'        Set bstack.soros.NamedArguments = namedArg
             If Not namedArg Is Nothing Then
-                what$ = namedArg.StackPickRef(2).mItem
+            
+                bs.soros.PushObjVarItem namedArg.StackPickRef2(1)
+                namedArg.drop 1
+                what$ = namedArg.PopStr
+                
                 x1 = IsLabelOnly((what$), (what$))
+                If namedArg.Total = 0 Then Set namedArg = Nothing
                 GoTo fromEnumDeref
             End If
 Exit Function
@@ -17581,13 +17588,13 @@ Dim pos2 As Long, what$, W$, lenA As Long, level2 As Integer
 Dim Lang As Long
 flag = False
 If a$ = vbNullString Then Exit Sub
-Dim v1 As Long
+Dim V1 As Long
 If Pos = 0 Then Pos = 1
 lenA = Len(a$)
 Do While Pos <= lenA
     W$ = Mid$(a$, Pos, 1)
-    v1 = AscW(W$)
-    If Abs(v1) > 8 Then
+    V1 = AscW(W$)
+    If Abs(V1) > 8 Then
     
     If W$ = """" Then
             If Len(what$) > 0 Then what$ = vbNullString
@@ -17621,8 +17628,8 @@ again22:
             If Len(what$) > 0 Then what$ = vbNullString
         Case " ", ChrW(160), vbCr, vbTab
             If Len(what$) > 3 Then
-                    v1 = Len(what$)
-                    If v1 = 4 Then
+                    V1 = Len(what$)
+                    If V1 = 4 Then
                         what$ = UCase(what$)
                         If what$ = "DATA" Then
                                 flag = True
@@ -17630,7 +17637,7 @@ again22:
                         Else
                             aheadstatusSkipParam a$, Pos
                         End If
-                    ElseIf v1 = 5 Then
+                    ElseIf V1 = 5 Then
                         what$ = myUcase(what$)
                         If what$ = "”≈…—¡" Then
                                 flag = True

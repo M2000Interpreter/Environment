@@ -99,7 +99,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 24
+Global Const Revision = 25
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -16682,7 +16682,7 @@ Dim di As Object, nchr As Integer
 Set di = bstack.Owner
 Dim myobject As Object, usehandler As mHandler, usehandler1 As mHandler
 If checkbreak(bstack, b$, once) Then
-    If Not bstack.machinecode Then GoTo enterbreak
+    GoTo enterbreak
 End If
 Dim pppp As mArray, ppppl As iBoxArray, bb$, ec$, i As Long, jump As Boolean, slct As Long, sp As Variant, sw$, ok As Boolean, IFCTRL As Long
 'If linebyline Then
@@ -16699,8 +16699,6 @@ sss = Len(b$): lbl = True
 Do While Len(b$) <> LLL
     If checkbreakEsc(bstack) Then
 enterbreak:
-        If bstack.machinecode Then GoTo continueMC
-    
         NOEXECUTION = False
         MyClear bstack, ""
         NOEXECUTION = True
@@ -27822,6 +27820,13 @@ End If
 End If
 If that.CallAddr = 0 Then Exit Sub
 On Error GoTo there
+Dim oldExecBaseStack As basetask, oldHere$
+Set oldExecBaseStack = ExecBaseStack
+Set ExecBaseStack = bstack
+
+SwapStrings here$, oldHere$
+
+here$ = bstack.fHere
 Select Case rtype
 Case 9, 13
 If that.CallType = 0 Then
@@ -27839,6 +27844,7 @@ Else
 
 rtype = Fast_cdeclCallW(that.CallAddr, rtype, Final(), Up)
 End If
+
 If ret Then
     If that.RetType <> vbString Then
         bstack.soros.PushVal rtype    ' FEEDBACK TO STACK
@@ -27848,6 +27854,8 @@ If ret Then
 End If
 
 End Select
+Set ExecBaseStack = oldExecBaseStack
+SwapStrings here$, oldHere$
 Else
 'error message
 

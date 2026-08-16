@@ -8,7 +8,7 @@ Public Errorlog As New Document, useDesktopInf As Boolean
 Private Const mProp = "PropReference"
 Private Const mHdlr = "mHandler"
 Private Const mGroup = "Group"
-Private ExecBaseStack As basetask, ExecHere$
+Public ExecBaseStack As basetask, ExecHere$
 Public doslast As Double
 Dim FontList As FastCollection
 Public PLM, PTM, PRM, PBM
@@ -21655,7 +21655,8 @@ If IsExp(basestack, rest$, p) Then
                 End If
             End If
             Set basestack.lastobj = Nothing
-            Dim what As Long
+            Dim what As Long, oldExecBaseStack As basetask
+            Set oldExecBaseStack = ExecBaseStack
             Set ExecBaseStack = basestack
             ExecHere$ = here$
             If FastSymbol(rest$, ",") Then
@@ -21701,7 +21702,7 @@ If IsExp(basestack, rest$, p) Then
             End If
             what = CallWindowProc(w2, ByVal P1, ByVal P2, ByVal p3, ByVal p4)
             here$ = ExecHere$
-            Set ExecBaseStack = Nothing
+            Set ExecBaseStack = oldExecBaseStack
             If Not mm.Callback Then
                 ReleaseExecution w2, mm.SizeByte, oldV
             End If
@@ -22696,7 +22697,7 @@ Dim x1 As Long, y1 As Long, par As Boolean, ss$, W$, what$, y3 As Boolean, y4 As
 Dim declobj As Object, ml As Long, s1$
 Dim dum As Boolean, usehandler As mHandler
 Dim pppp As mArray, removecontrol As IControlIndex
-Dim ii As Long, ev As ComShinkEvent
+Dim ii As Long, ev As ComShinkEvent, UseAddress As Boolean
 Dim stdFunc As stdCallFunction
 MyDeclare = True
 ml = -1
@@ -22827,10 +22828,31 @@ fornew:
         globalvar bstack.GroupName + W$, p, y1 = True
         MyDeclare = True
         Exit Function
+    ElseIf IsLabelSymbolNewExp(rest$, " Ÿƒ… ¡", "CODE", Lang, ss$) Then
+    UseAddress = True
+    GoTo contLib
     ElseIf IsLabelSymbolNewExp(rest$, "¡–œ", "LIB", Lang, ss$) Then
+contLib:
         If y1 = 100 Then y1 = 0
         par = Fast2LabelNoNum(rest$, "C", 1, "", 0, 1)
-        If IsStrExp(bstack, rest$, pa$, False) Then
+        If IsExp(bstack, rest$, p, , True, , UseAddress) Then
+            If UseAddress Then
+                pa$ = vbNullString
+                If (p And &HFFFF0000) = 0 Then
+                MyEr "Invalid pointer", "¢ÍıÒÔÚ ‰ÂﬂÍÙÁÚ"
+                MyDeclare = False
+                Exit Function
+                End If
+            Else
+            If VarType(p) = vbString Then
+                SwapString2Variant pa$, p
+                p = Empty
+            Else
+                MissStringExpr
+                MyDeclare = False
+                Exit Function
+            End If
+            End If
             dum = False
             If FastSymbol(rest$, "{") Then
                 ss$ = ""
@@ -22960,7 +22982,11 @@ cont123:
             Else
                 stdFunc.RetType = 0  ' BY DEFAULT RETURN VBLONG
             End If
-            stdFunc.CallThis pa$, ss$, Lang
+            If UseAddress Then
+                stdFunc.CallThis vbNullString, ss$, Lang, CLng(p)
+            Else
+                stdFunc.CallThis pa$, ss$, Lang
+            End If
             If Len(ss$) = 0 Then
                 FastSymbol rest$, "}"
             Else
@@ -23012,6 +23038,8 @@ entry10:
             Set stdFunc = Nothing
             Exit Function
         Else
+        
+        
             BadObjectDecl
             MyDeclare = False
             Set stdFunc = Nothing
@@ -34763,17 +34791,10 @@ Else
 End If
 End Sub
 
+
 Sub ExtCall(ByVal where As Long)
-   ''  ExecBaseStack
-    Dim old As basetask, oldHere$
-  '  On Error Resume Next
-    Set old = ExecBaseStack
-    ExecBaseStack.machinecode = True
-    SwapStrings oldHere$, here$
-    here$ = ExecHere$
+    If LastErNum <> 0 Or NOEXECUTION Then Exit Sub
     Execute ExecBaseStack, (sbf(where).sb), False
-    Set ExecBaseStack = old
-    SwapStrings oldHere$, here$
 End Sub
 Function findAddress(bstack As basetask, a$, r) As Boolean
     Dim s$, w1 As Long

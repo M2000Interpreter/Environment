@@ -5826,7 +5826,7 @@ If Module(Info) Then
 	Title "Info"
 end if
 }
-MODULE INFOBASIC {Italic 0
+MODULE INFOBASIC { \Italic 0
 Bold 1
 if val(piece$(os$+" 1"," ")(1))>9 then
 	Font "Segoe UI"
@@ -5883,7 +5883,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 20 and above"
+	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 25 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -5924,7 +5924,7 @@ Report {
 	Edit info  (press esc to exit editor) | Edit "disk_file.gsb"  (to edit from disk - saved at exit)
 	Edit  (no argument) open command editor (we pick in console line using up/down arrows)
 	Save filename   (without quotes, except If we want spaces) | load filename  (filename without "" and type)
-	Settings (open dialog for setting environment) |	Start  ' restart console
+	Settings (open dialog for setting environment) | Start  ' restart console
 	Use filename  (use info open another info in another console)  | Dir to show current directory or Dir user to set current dir to user folder
 	Files "GSB","PRINT|FOR" (search files *.gsb for words PRINT and FOR) | Win Dir$ | Win Calc | Win Appdir$ | End (to exit from console)  
 	}
@@ -54208,13 +54208,15 @@ if assembler=>assemble(ASM_TEST_RAWDATA, true) then
 		example1=>FillDataFromMem assembler=>GetOutPtr
 		' Execute Code! Example1, 0;  ' Execute_ReadWrite
 		cls
+		refresh 2000
 		profiler
 		Execute Code Example1, 0, 501; ' Execute_Read
-		print timecount
+		print timecount:refresh
 		Push Key$:Drop:CLS
-		profiler:for alfa=500 to 0:Call Local Beta:next:call local Cr:? timecount
+		profiler:for alfa=500 to 0:Call Local Beta:next:call local Cr:? timecount:refresh
 		Push Key$:Drop:CLS
-		profiler:for alfa=500 to 0:?alfa,:next:?:? timecount	
+		profiler:for alfa=500 to 0:?alfa,:next:?:? timecount
+		refresh 25	
 	end if
 end if
 }
@@ -54870,5 +54872,234 @@ Module Part.3 {
 	end sub
 }
 Part.3
+}
+MODULE CARTESIAN {module checkit {
+	showTuple = lambda (a as array) -> {
+		k=lambda m=1 ->{
+			shift 2
+			if m=1 then
+			m=0:drop
+			push "("+array#str$(",")+")"
+			else
+			push letter$+",("+array#str$(",")+")"
+			end if
+		}
+		="("+a#fold$(k)+")"
+	}
+	function cartesian_prod(a as array, b as array) {
+		rest=[]
+		aa=each(a)
+		while aa
+			bb=each(b)
+			while bb
+				data (array(aa), array(bb))
+			end while
+		end while
+		ccc=(,)
+		if len(rest)>0 then
+			cc=each(rest)
+			while cc
+				ccc=stackitem(cc)
+				d=array([])
+				dd=each(d)
+				while dd
+					ee=each(ccc)
+					while ee
+						data array(dd)#end((array(ee),))
+					end while
+				end while
+			end while
+		end if
+		=array([])
+	}
+	open "out.txt" for output as #f
+	print #f,"(1,2)x(3,4)=";showTuple(cartesian_prod((1,2), (3,4)))
+	print #f,"(3,4)x(1,2)=";showTuple(cartesian_prod((3,4), (1,2)))
+	print #f,"(1,2)x()=";showTuple(cartesian_prod((1,2), (,)))
+	print #f,"()x(1,2)=";showTuple(cartesian_prod((,), (1,2)))
+	print #f,"(1776,1789)x(7,12)x(4,14,23)x(0,1)=";showTuple(cartesian_prod((1776,1789), (7,12), (4,14,23), (0,1)))
+	print #f,"(1,2,3)x(30)x(500,100)=";showTuple(cartesian_prod((1,2,3), (30,), (500,100)))
+	print #f,"(1,2,3)x()x(500,100)=";showTuple(cartesian_prod((1,2,3), (,), (500,100)))	
+	print #f,"(1,2,3)x(500,100)x()=";showTuple(cartesian_prod((1,2,3), (,), (500,100), (,)))		
+	close #f
+	win notepad, dir$+"out.txt"
+}
+checkit
+}
+MODULE SPOTIFY {static once as boolean, thatname$
+if not match("N") then
+print "spotufy 0 for mute"
+print  "spotify 1 to up volume"
+print  "spotify -1 to down volume"
+print  "spotify 2 next"
+print "spotify -2 stop"
+break
+end if
+Read what
+Declare BringWindowToTop   lib "user32.BringWindowToTop" {long A} as long
+Declare GetTopWindow  lib "user32.GetTopWindow" {long A} as long
+Declare GetWindowText  lib "user32.GetWindowTextW" {long A, long b, long c} as long
+Declare FindWindow Lib "user32.FindWindowW" { long a, Long b} as long
+Declare SendMessage Lib "user32.SendMessageW" {Long  hWnd,  Long  wMsg, Long wParam, Long lParam}  As Long
+Declare PostMessage Lib "user32.PostMessageW" {Long  hWnd,  Long  wMsg, Long wParam, Long lParam}  As Long
+Buffer clear alfa as integer * 1000
+if thatname$<>"" then
+	alfa[0]=thatname$
+else
+	alfa[0]="MSCTFIME UI"
+end if
+z=FindWindow(0, alfa(0))
+if z=0 then
+	WIN "SPOTIFY://"
+	if not once then once=true: wait 2000 else wait 200
+	hw=GetTopWindow(0&)
+	n=GetWindowText(hw, alfa(0), 500)
+	if n=0 then break
+	thatname$=eval$(alfa,0, n*2)
+	z=FindWindow(0, alfa(0))
+end if
+if z<>0 then
+	if what=0 then
+		ret=SendMessage(z, 0x0319&, 0&, 524288&)  // mute
+	else.if what=-1 then
+		ret= SendMessage(z, 0x0319&, 0&, 589824&)
+	else.if what=1 then
+		ret= SendMessage(z, 0x0319&, 0&, 655360&)
+	else.if what=-2 then
+		ret= SendMessage(z, 0x0319&, 0&, 851968&)
+	else
+		ret= SendMessage(z, 0x0319&, 0&, 720896&)
+	end if
+else
+	WIN "SPOTIFY://"
+end if
+}
+MODULE ASM4 {' bydefault as long is the return value from the call,so we can remove "as long"
+Declare MessageBox Lib "user32.MessageBoxW" {long alfa, lptext$, lpcaption$, long type} as long 
+//		Print MessageBox(hwnd, "This is the text", "This is the Caption", 2&)
+	
+// these modules called local - so alfa is in scope
+module beta {
+	? alfa,
+}
+module cr {
+	?  ' just a new line
+	refresh
+}
+module prEax {
+	? "eax = ";outEax
+}
+long alfa, outEax
+ptrAlfa=varptr(alfa)
+ptrOutEax=varptr(outEax)
+CallModule=Module()
+AddrBeta=Addressof Beta
+AddrCr=Addressof Cr
+AddrPrEax=Addressof prEax
+ASM_TEST = {    
+    mov eax, [esp+4]
+    mov [ptrAlfa], eax	; we use a global variable 
+oneLabel:
+	mov eax, [ptrAlfa]
+	dec eax
+	js exit
+	mov [ptrAlfa], eax
+	push dword AddrBeta | call CallModule
+	jmp oneLabel
+exit:
+	push dword AddrCr | call CallModule
+	push dword 2 | 	push dword mCaption | push dword mText | push dword @HWND
+	Call @MessageBox	
+	mov [ptrOutEax], eax
+	push dword AddrPrEax | call CallModule
+	mov eax, dword 101
+	ret 4; stdcall
+localVar:
+	localVar1 equ ebp-4	
+	push ebp     ; save the value of ebp
+	mov ebp, esp ; ebp now points to the top of the stack
+	sub esp, 4  ; space allocated on the stack for the local variables
+	; alghough our parameter is by value and we can use it as local variable
+	; we make here a new local variable
+	mov eax, [ebp+8]  ; it is by value
+	mov [localVar1], eax 
+oneLabelL:	
+	mov eax, [LocalVar1]
+	dec eax
+	js exitL
+	mov [LocalVar1], eax
+	mov [ptrAlfa], eax
+	push dword AddrBeta | call CallModule
+	jmp oneLabelL
+exitL:
+	push dword AddrCr | call CallModule	
+	push dword 2 | 	push dword mCaption | push dword mText | push dword @HWND
+	Call @MessageBox	
+	mov [ptrOutEax], eax
+	push dword AddrPrEax | call CallModule
+	mov esp, ebp
+    pop ebp
+	mov eax, dword 101
+	ret 4; stdcall
+stdCall:
+	mov eax, [ebp+12]
+	mov [ptrAlfa], eax	
+oneLabel2:
+	mov eax, [ptrAlfa]
+	dec eax
+	js exit2
+	mov [ptrAlfa], eax
+	push dword AddrBeta | call CallModule
+	jmp oneLabel2
+exit2:
+	push dword AddrCr | call CallModule
+	ret 16  ; drop 4 long (4x4 bytes) and then return.
+	mText:          dw "HELLO THERE", 0
+	mCaption:       dw "GEORGE", 0
+}
+Assembler=getobject("","m2000.x86")
+function x86 (b as string, &outbuffer, useprep as boolean=false) {
+	if Assembler=>assemble(b, true) then
+		local OutPutSize=Assembler=>OutputSize
+		buffer code outbuffer as byte*OutputSize
+		Assembler=>BaseAddress = outbuffer(0)
+		if Assembler=>assemble(b) then
+			outbuffer=>FillDataFromMem Assembler=>GetOutPtr
+		else
+			error "x86 fault 2"
+		end if
+	else
+		error "x86 fault 1"
+	end if
+}
+var example1
+call local x86(ASM_TEST, &example1)
+cls
+refresh 2000
+' execute code pass to ebp	(call through WindowProc)
+' try 5001 and press ctrl+c to break it
+profiler
+    Execute Code Example1, Assembler=>labeloffset("stdCall"), 501;
+Example1=>callback2=true
+print timecount:refresh
+PressKey "Test 1 complete"
+' declare function (pass parameters to esp)
+declare runCode code Example1(0) {Long TopValue}
+call void runCode(401)
+PressKey "Test 2 complete"
+zz=runCode(301)
+Print "ret = "; zz
+PressKey "Test 3 complete"
+
+declare runCode2 code Assembler=>labelptr("localVar") {Long TopValue}
+zz=runCode2(101)
+print zz
+PressKey "Test 4 complete"
+refresh 25
+
+sub PressKey(a$="")
+	Print a$;" - Press any key":refresh
+	Push Key$:Drop:CLS
+end sub
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

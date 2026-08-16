@@ -225,22 +225,27 @@ Public Sub SetUpForExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByRef oldV
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
     VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READ, oldV ' PAGE_READWRITE
     VirtualLock Ptr, nBytes
+    'Debug.Print "SetUpForExecution", Ptr, nBytes, PAGE_EXECUTE_READ, oldV
 End Sub
 Public Sub SetUpForExecution2(ByVal Ptr As Long, ByVal nBytes As Long, ByRef oldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
     VirtualProtect Ptr, nBytes, PAGE_EXECUTE_READWRITE, oldV ' PAGE_READWRITE
     VirtualLock Ptr, nBytes
+    'Debug.Print "SetUpForExecution2", Ptr, nBytes, PAGE_EXECUTE_READWRITE, oldV
 End Sub
 Public Sub ReleaseExecution(ByVal Ptr As Long, ByVal nBytes As Long, ByVal oldV As Long)
     FlushInstructionCache GetCurrentProcess, Ptr, nBytes
-    
+    Dim prev As Long
+    prev = oldV
     VirtualUnlock Ptr, nBytes
-    VirtualProtect Ptr, nBytes, oldV, oldV '  PAGE_EXECUTE_READ
+    VirtualProtect Ptr, nBytes, prev, oldV '  PAGE_EXECUTE_READ
+   ' Debug.Print "ReleaseExecution", Ptr, nBytes, prev, oldV
 End Sub
 Public Sub BlockFreeVirtual(ByVal Ptr As Long, ByVal nBytes As Long)
     If VirtualFree(Ptr, 0&, &H8000&) = 0 Then
       Debug.Print GetLastError()
     End If
+    'Debug.Print "BlockFreeVirtual", Ptr
 End Sub
 Public Sub MyRefresh(bstack As basetask)
     On Error Resume Next

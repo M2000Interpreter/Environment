@@ -78,9 +78,13 @@ Public Function GetInterface(myobject As stdole.IUnknown, ByRef retobject As std
     GetInterface = True
 End Function
 
-Public Sub CallThis(ByVal vNewValue As String, ParamList As String, Lang As Long)
+Public Sub CallThis(ByVal vNewValue As String, ParamList As String, Lang As Long, Optional ByVal address As Long = 0)
 Dim l As Long, check$, M As Long
-If Not Me.IsInterfaceCall Then
+If vNewValue = vbNullString Then
+mLib = vbNullString
+mFunction = vbNullString
+CallAddr = address
+ElseIf Not Me.IsInterfaceCall Then
     l = InStr(vNewValue, ".")
     If l <> 0 Then
     mLib = Left$(vNewValue, l - 1)
