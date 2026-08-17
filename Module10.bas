@@ -16678,7 +16678,7 @@ End Function
 Function GetUDTValue(p, Name$)
     If Len(Name$) < 1 Then Exit Function
     If MemInt(VarPtr(p)) <> vbUserDefinedType Then Exit Function
-    
+    Dim vt As Integer
     Dim r As Long, ret, emp, D
     Static fptr As Long
     Static btASM(50)  As Byte
@@ -16691,8 +16691,32 @@ Function GetUDTValue(p, Name$)
         GetUDTValue = D ' copy string
         ' release pointer not string:
         MemCopy VarPtr(D), VarPtr(emp), 16
-    Else
+    ElseIf IsArray(ret) Then
         SwapVariant ret, GetUDTValue
+    ElseIf MyIsObject(ret) Then
+        Set GetUDTValue = ret
+    Else
+again:
+        vt = MemInt(VarPtr(ret))
+        If vt > &H4000 Then
+        vt = vt - &H4000
+        Select Case vt
+        Case vbDouble, vbCurrency, 20, vbDate
+            CopyMemory ByVal VarPtr(GetUDTValue) + 8, ByVal MemLong(VarPtr(ret) + 8), 8
+        Case vbDecimal
+            CopyMemory ByVal VarPtr(GetUDTValue), ByVal MemLong(VarPtr(ret) + 8), 16
+            Exit Function
+        Case vbVariant
+            CopyMemory ByVal VarPtr(ret), ByVal MemLong(VarPtr(ret) + 8), 16
+            GoTo again
+        Case Else
+            CopyMemory ByVal VarPtr(GetUDTValue) + 8, ByVal MemLong(VarPtr(ret) + 8), 4
+        End Select
+        MemInt(VarPtr(GetUDTValue)) = vt
+        Else
+            SwapVariant GetUDTValue, ret
+    
+        End If
     End If
     'CopyMemory ByVal VarPtr(GetUDTValue), ByVal VarPtr(t(0)), 16
 End Function
@@ -22630,3 +22654,42 @@ Sub EnumJob1(usehandler As mHandler)
         usehandler.objref.index = usehandler.objref.ErrorIndex - 1
         usehandler.sign = 1
 End Sub
+Function isX86(bstack As basetask, rest$, r) As Boolean
+Dim ass86 As x86, code$, OutputSize As Long
+Dim outbuffer As MemBlock, usehandler As mHandler
+Dim t As tuple, p
+Set ass86 = New x86
+If IsFlatStringExpr(bstack, rest$, code$) Then
+If ass86.Assemble(code$, True) Then
+    OutputSize = ass86.OutputSize
+    Set outbuffer = New MemBlock
+    outbuffer.Construct 1, OutputSize, &H8, True, vbByte
+    ass86.BaseAddress = outbuffer.GetBytePtr(0)
+    If ass86.Assemble(code$) Then
+        outbuffer.FillDataFromMem ass86.GetOutPtr
+        Set usehandler = New mHandler
+        Set usehandler.objref = outbuffer
+        usehandler.t1 = 2
+        If FastSymbol(rest$, ",") Then
+            If IsExp(bstack, rest$, p, , True, , True) Then
+                If p <> 0 Then
+                Set t = New tuple
+                    t.LoadTuple Array(usehandler, ass86)
+                    Set bstack.lastobj = t
+                Else
+                    Set bstack.lastobj = usehandler
+                End If
+            
+            End If
+        Else
+            Set bstack.lastobj = usehandler
+        End If
+        isX86 = True
+        Exit Function
+    End If
+End If
+MyEr "Can't Compile", "Δεν μπορώ να συνθέσω"
+End If
+
+End Function
+

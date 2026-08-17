@@ -1,86 +1,63 @@
 M2000 Interpreter and Environment
-Version 15 Revision 25
+Version 15 Revision 26
 
-August 16, 2026,
-1. Fix a small mistake from Revision 24:
+August 18, 2026,
+1. Fix a small mistake from previous 2-3 revisions
+a=(10,3i)
+print a|r ' was ok
+print a|r/3 ' had problem now fixed (revision 19 was ok)
 
-' 10 1000  - here was the error (returned fault: 1000 1000)
-' Double Constant
-TWOVALUE(Y:=1000) ' Y IS CONSTANT VALUE
+2. New function Assembly()
+This is from Help Assembly()
 
-' 50 1001
-' Double Double
-TWOVALUE(%Y=1000, %X=50) ' Y IS NORMAL VALUE
+' using assembly(code$) we get the machince code for running from the first offset 
+example1=Assembly({
+    fild  dword [esp+4]    ; st0 = numerator
+    fild  dword [esp+8]    ; st0 = divisor, st1 = numerator
+    fdivp                  ; st1 = st1 / st0, pop st0
+    mov eax, 0    
+    ret 8
+})
+Declare Division Code example1(0) {long a, long b} as single
+Print Division(34, 10)=3.4
 
-' 200 301
-' Double Double
-TWOVALUE(200, 300)
-
-' 10 301
-' Double Double
-PUSH 1001
-TWOVALUE(?, 300)
-PRINT NUMBER=1001
-
-SUB TWOVALUE(X=10, Y)
-	TRY {Y++}
-	PRINT X, Y
-	PRINT TYPE(X), TYPE(Y)
-END SUB
-
-2. Upgrade Assembler
-Use of @name to get values that are not variables, like:
-HWND (the current window hanlder) and addresses of exrternal functions:
-Also I made a variant in Declare starement to make functions to call at address using a signature for parameters
-The variant is like Declare .... Lib which accept only string, but Declare Code accept an address
-See Asm4 new advanced exampled (introduce local variables)
-
-Declare MessageBox Lib "user32.MessageBoxW" {long alfa, lptext$, lpcaption$, long type}
-ASM_TEST = {    
-start_code3:
-    push dword 2 | push dword mCaption | push dword mText |  push dword @HWND
-	Call @MessageBox
-    ret    
-    mText:          dw "HELLO THERE", 0
-    mCaption:       dw "GEORGE", 0
-start_code4:  ; C call then StdCall
-	push dword [esp+16] | push dword [esp+16]
-	push dword [esp+16] | push dword [esp+16] ; copy arguments
-	Call @MessageBox
-	ret
-start_code5:  ; StdCall -> StdCall
-	push dword [esp+16]	| push dword [esp+16]
-	push dword [esp+16] | push dword [esp+16] ; copy arguments
-	Call @MessageBox
-	ret 16
-}
-
-Assembler=getobject("","m2000.x86")
-function x86 (b as string, &outbuffer, useprep as boolean=false) {
-	if Assembler=>assemble(b, true) then
-		local OutPutSize=Assembler=>OutputSize
-		buffer code outbuffer as byte*OutputSize
-		Assembler=>BaseAddress = outbuffer(0)
-		if Assembler=>assemble(b) then
-			outbuffer=>FillDataFromMem Assembler=>GetOutPtr
-		else
-			error "x86 fault 2"
-		end if
-	else
-		error "x86 fault 1"
-	end if
-}
-var example1
-call local x86(ASM_TEST, &example1)
-Declare CallCode code c example1(0) As Long
-Print CallCode()
-' c call - by default ret value is long but here we place the type.
-Declare MsgBox code c assembler=>labelptr("start_code4") {long alfa, lptext$, lpcaption$, long type} as long
-Print MsgBox(hwnd, "This is the text", "This is the Caption", 2&)
-wait 300
-' stdcall
-Declare MsgBox2 code assembler=>labelptr("start_code5") {long alfa, lptext$, lpcaption$, long type}
-Print MsgBox2(hwnd, "This is the text", "This is the Caption", 2&)
+' using assembly(code$, true) we get tuple, machinecode in a buffer and the object to get pointers from labels
+(example1, Assembler)=Assembly({
+    fild  dword [esp+4]    ; st0 = numerator
+    fild  dword [esp+8]    ; st0 = divisor, st1 = numerator
+    fdivp                  ; st1 = st1 / st0, pop st0
+    mov eax, 0    
+    ret 8
+ASM_TEST_CPUID:
+    ;mov eax, [esp+4]
+    pushad ; 32 bytes
+    xor eax, eax
+    mov edi, [esp+36]
+    xor eax, eax
+    cpuid
+    mov [edi+0], ebx
+    mov [edi+4], edx
+    mov [edi+8], ecx
+    popad
+    xor eax, eax
+    ret 4
+}, true)
+Declare Division Code example1(0) {long a, long b} as single
+Print Division(34, 10)=3.4
+Dim Ret(12) as byte
+addrPtr=Assembler=>LabelPtr("ASM_TEST_CPUID")
+Hex "Call address of ASM_TEST_CPUID = ";addrPtr
+Declare CPUID Code addrPtr {long ptrArrayItem}
+call CPUID(VarPtr(Ret(0)))
+' chr(number) return ansi string
+for i=0 to len(Ret())-1
+    Print chr(Ret(i));
+next
+Print
+buffer clear retstring as byte*12
+call CPUID(retstring(0))
+' chr$(string_value) convert ANSI to UTF16LE
+Print chr(retstring[0, 12])
 
 
 George Karras, Kallithea Attikis, Greece.

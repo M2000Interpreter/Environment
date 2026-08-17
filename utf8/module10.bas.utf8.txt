@@ -16678,7 +16678,7 @@ End Function
 Function GetUDTValue(p, Name$)
     If Len(Name$) < 1 Then Exit Function
     If MemInt(VarPtr(p)) <> vbUserDefinedType Then Exit Function
-    
+    Dim vt As Integer
     Dim r As Long, ret, emp, D
     Static fptr As Long
     Static btASM(50)  As Byte
@@ -16691,8 +16691,32 @@ Function GetUDTValue(p, Name$)
         GetUDTValue = D ' copy string
         ' release pointer not string:
         MemCopy VarPtr(D), VarPtr(emp), 16
-    Else
+    ElseIf IsArray(ret) Then
         SwapVariant ret, GetUDTValue
+    ElseIf MyIsObject(ret) Then
+        Set GetUDTValue = ret
+    Else
+Again:
+        vt = MemInt(VarPtr(ret))
+        If vt > &H4000 Then
+        vt = vt - &H4000
+        Select Case vt
+        Case vbDouble, vbCurrency, 20, vbDate
+            CopyMemory ByVal VarPtr(GetUDTValue) + 8, ByVal MemLong(VarPtr(ret) + 8), 8
+        Case vbDecimal
+            CopyMemory ByVal VarPtr(GetUDTValue), ByVal MemLong(VarPtr(ret) + 8), 16
+            Exit Function
+        Case vbVariant
+            CopyMemory ByVal VarPtr(ret), ByVal MemLong(VarPtr(ret) + 8), 16
+            GoTo Again
+        Case Else
+            CopyMemory ByVal VarPtr(GetUDTValue) + 8, ByVal MemLong(VarPtr(ret) + 8), 4
+        End Select
+        MemInt(VarPtr(GetUDTValue)) = vt
+        Else
+            SwapVariant GetUDTValue, ret
+    
+        End If
     End If
     'CopyMemory ByVal VarPtr(GetUDTValue), ByVal VarPtr(t(0)), 16
 End Function
@@ -21991,7 +22015,7 @@ If a$ = vbNullString Then Exit Function
 If Left$(a$, 2) = vbCrLf Then Exit Function
 IsExp = IsExpA(basestack, a$, r, par, noand1, (Comp), (0))
 
-again:
+Again:
 If par > 0 Then
     If lookOne(a$, ",") Then
         IsExp = GetArr(basestack, a$, r, "", -CLng(IsExp), conthere)
@@ -22004,7 +22028,7 @@ If par > 0 Then
                 End If
             End If
             If par > 0 Then
-                GoTo again
+                GoTo Again
             End If
         End If
     End If

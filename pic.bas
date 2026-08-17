@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -4150,7 +4150,7 @@ a$ = myUcase(a$, True)
 Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
 Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
-Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
+Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASSEMBLY(", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
 Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BIGINTEGER(", "BIGINTEGER[", "BINARY", "BINARY.ADD(", "BIT64.ADD(", "BINARY.AND(", "BIT64.AND(", "BIT64.NEG(", "BINARY.NEG(", "BIT64.NOT(", "BINARY.NOT("
 Case "BINARY.OR(", "BIT64.OR(", "BIT64.RESET(", "BINARY.RESET(", "BIT64.ROTATE(", "BINARY.ROTATE(", "BIT64.SHIFT(", "BINARY.SHIFT(", "BIT64.SET(", "BINARY.SET(", "BIT64.SUB(", "BINARY.SUB(", "BIT64.TEST(", "BINARY.TEST(", "BIT64.XOR(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
 Case "BOOLEAN", "BORDER", "BREAK", "BROWSER", "BROWSER$", "BUFFER", "BUFFER(", "BYTE", "BYTE[", "CALL", "CASE", "CASCADE", "CAT", "CAR("
@@ -4240,7 +4240,7 @@ Case "йаме", "йамомийа", "йат", "йат$", "йатакоцои", "йатакоцос", "йатастасг", "
 Case "йатылисо(", "йатылисо64(", "йеилемо", "йемг", "йемо", "йемтяо", "йеж$(", "йеж(", "йимгсг", "йимгсг.п", "йимгсг.пу"
 Case "йимгсг.пв", "йимгсг.у", "йимгсг.уп", "йимгсг.ь", "йимгсг.ьп", "йимгсг.в", "йимгсг.вп", "йкасг", "йкеиди", "йкеисе", "йкилан.у", "йкилан.ь"
 Case "йкилан.в", "йол$", "йоимос", "йоимои", "йомсока", "йяата", "йяатгсе", "йяужо$(", "йяуье", "йуйкийа", "йуйкос"
-Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийосекида", "кабг", "кабг(", "кабг.амакоцийо.у(", "кабг.амакоцийо.ь("
+Case "йукисг", "йуяио", "йуяио.еяцо", "йыд(", "йыдийа", "йыдийас(", "йыдийосекида", "кабг", "кабг(", "кабг.амакоцийо.у(", "кабг.амакоцийо.ь("
 Case "кабг.амакоцийо.в(", "кабг.йатеухумсг(", "кахос", "кахос$", "кахос.таимиас$", "кахым", "калда", "калда(", "калда$", "калда$(", "катимийа", "кенеис", "киста", "коц("
 Case "коцийо", "коцийос", "коцистийо", "коцистийос", "коцистийос[", "коцос", "коцос$(", "кс$", "кж(", "лафи(", "лафеье(", "лайяу", "лайяус", "лайяус[", "ле", "ле.амтийеилемо", "лец(", "лец$(", "лецако("
 Case "лецако.сеияас$(", "лецако.сеияас(", "лецакосайеяаиос", "лецакосайеяаиос[", "лецакосайеяаиос(", "лецецомота", "лецехос", "лецехос.сыяоу", "лецехос.у(", "лецехос.в(", "лецехос.ь(", "леходос", "лекос$(", "лекоус.тупос$("
@@ -4397,7 +4397,7 @@ End Function
 
 
 
-Static Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
+Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
@@ -4410,7 +4410,7 @@ r1 = 1
     End If
 
 Dim v As Double, b$
-If final Then
+If Final Then
 If checktype > 0 Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
 Else
@@ -5232,7 +5232,7 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 , "HEX(", 144, "дейаен(", 144, "REPLACE(", 145, "аккацг(", 145, "FILTER(", 146, "жиктяо(", 146, "UCASE(", 147, "йеж(", 147, "LCASE(", 148, "пеф(", 148, "TYPE(", 149, "тупос(", 149, "TITLE(", 150, "титкос(", 150, "BIT64.XOR(", 151, "дуад64.апо(", 151, "BIT64.AND(", 152, "дуад64.йаи(", 152, "BIT64.OR(", 153, "дуад64.г(", 153 _
 , "BIT64.ADD(", 154, "дуад64.пяо(", 154, "дуад64.пяосхесг(", 154, "BIT64.SHIFT(", 155, "дуад64.окисхгсг(", 155, "BIT64.ROTATE(", 156, "дуад64.пеяистяожг(", 156, "BIT64.NOT(", 157, "дуад64.ови(", 157, "BIT64.NEG(", 158, "дуад64.амти(", 158, "дуад64.амтистяожо(", 158 _
 , "HILOWLONG(", 159, "дуолиса64(", 159, "HILONG(", 160, "памылисо64(", 160, "HIGHLONG(", 160, "LOLONG(", 161, "LOWLONG(", 161, "йатылисо64(", 161, "BINARY.TEST(", 162, "дуадийо.евеи(", 162, "BINARY.SET(", 163, "дуадийо.баке(", 163, "BINARY.RESET(", 164, "дуадийо.бцаке(", 164, "BIT64.TEST(", 165, "дуад64.евеи(", 165, "BIT64.SET(", 166, "дуад64.баке(", 166, "BIT64.RESET(", 167, "дуад64.бцаке(", 167 _
-, "BINARY.SUB(", 168, "дуадийо.ажаияесг(", 168, "дуадийо.аж(", 168, "дуад64.аж(", 169, "дуад64.ажаияесг(", 169, "BIT64.SUB(", 169, "дуад64(", 170, "дуадийо.айеяаио64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "амтицяажо.пим(", 171, "MIDI.OUT(", 172, "енодос.MIDI(", 172)
+, "BINARY.SUB(", 168, "дуадийо.ажаияесг(", 168, "дуадийо.аж(", 168, "дуад64.аж(", 169, "дуад64.ажаияесг(", 169, "BIT64.SUB(", 169, "дуад64(", 170, "дуадийо.айеяаио64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "амтицяажо.пим(", 171, "MIDI.OUT(", 172, "енодос.MIDI(", 172, "йыдийас(", 173, "ASSEMBLY(", 173)
 
 
 
@@ -5637,12 +5637,12 @@ For n = LBound(a) To UBound(a) 'many - 1
 cr.SectionKey = "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones\" + a(n)
 cr.ValueType = REG_SZ
 cr.ValueKey = "Dlt"
-Dlt$ = cr.value
+Dlt$ = cr.Value
 cr.ValueKey = "Std"
-Std$ = cr.value
+Std$ = cr.Value
 cr.ValueType = REG_BINARY
 cr.ValueKey = "TZI"
-that$ = cr.value
+that$ = cr.Value
 mem.FillDataFromMem StrPtr(that$)
 zHash.AddKey Std$, -(MemLong(mem.GetBytePtr(0)) / 60 + MemLong(mem.GetBytePtr(4)) / 60)
 If Dlt$ <> "" Then zHash.AddKey Dlt$, -(MemLong(mem.GetBytePtr(0)) / 60 + MemLong(mem.GetBytePtr(8)) / 60)

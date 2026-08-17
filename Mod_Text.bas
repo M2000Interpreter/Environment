@@ -99,7 +99,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 25
+Global Const Revision = 26
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8707,9 +8707,14 @@ fun118, fun119, fun120, fun121, fun122, fun123, fun124, fun125, fun126, fun127, 
 fun131, fun132, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, _
 fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun151, fun152, fun153, fun154, fun155, fun156, _
 fun157, fun158, fun159, fun160, fun161, fun162, fun163, fun164, fun165, fun166, fun167, fun168, fun169, _
-fun170, fun171, fun172
+fun170, fun171, fun172, fun173
 IsNumberNew = False
 Exit Function
+fun173:
+    If isX86(bstack, a$, r) Then
+    IsNumberNew = FastSymbol(a$, ")", True)
+    End If
+    Exit Function
 fun172: ' midi.out()
 If getMidiDeviceOrDevices(bstack, a$, r) Then
 If Not bstack.lastobj Is Nothing Then
