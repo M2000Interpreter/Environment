@@ -169,7 +169,7 @@ Dim white As Long, black As Long, dimm1 As Long, dimm2 As Long, capchroma As Lon
 Dim Quit
 Private OldPar As Long, dragCharpos As Long
 ' new
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Type DRAWTEXTPARAMS
      cbSize As Long
      iTabLength As Long
@@ -178,7 +178,7 @@ Private Type DRAWTEXTPARAMS
      uiLengthDrawn As Long
 End Type
 Dim tParam As DRAWTEXTPARAMS
-Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Function CreateRectRgnIndirect Lib "gdi32" (ByRef lpRect As RECT) As Long
 Private Declare Function SelectClipRgn Lib "gdi32" (ByVal hDC As Long, ByVal hRgn As Long) As Long
 Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
@@ -1159,7 +1159,7 @@ End Sub
 
 Private Sub gListN_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, b As RECT, i As Long, tmp As Long
-Dim final$, fbypass As Boolean
+Dim Final$, fbypass As Boolean
 Dim bb As RECT, cc As RECT
 Dim OldColor As Long
 Dim what$, ThatPara As Long
@@ -1200,14 +1200,14 @@ Else
                 If BlockEndCursor > 1 Then  ' if not leave it as is
                     b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1))
                     PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
-                    final$ = Mid$(glistN.list(item), BlockEndCursor)
+                    Final$ = Mid$(glistN.list(item), BlockEndCursor)
                     fbypass = True
                 End If
             Else
                 If BlockStartCursor > 1 Then  ' if not leave it as is
                     b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1))
                     PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
-                    final$ = Mid$(glistN.list(item), BlockStartCursor)
+                    Final$ = Mid$(glistN.list(item), BlockStartCursor)
                     fbypass = True
                  End If
             End If
@@ -1220,7 +1220,7 @@ Else
                     If BlockEndCursor > 1 Then ' if not leave it as is
                         b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
                         PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
-                        final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
+                        Final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
                         fbypass = False
                     Else
                         If ThatPara = mDoc.MarkParagraphID Then glistN.ExternalCursor2 RealX1(thisHDC, glistN.SelStart, mDoc.TextLine2(item + 1, showparagraph, NoColor)), OldColor
@@ -1232,7 +1232,7 @@ Else
                     If BlockStartCursor > 1 Then
                         b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
                         PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
-                        final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
+                        Final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
                         fbypass = False
                     Else
                         If ThatPara = mDoc.MarkParagraphID Then glistN.ExternalCursor2 RealX1(thisHDC, glistN.SelStart, mDoc.TextLine2(item + 1, showparagraph, NoColor)), OldColor
@@ -1255,10 +1255,10 @@ Else
                     b.Left = tmp
                 End If
                 If BlockStartCursor = 0 Then
-                    final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
+                    Final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
                 Else
                     skipcolor = False
-                    final$ = Mid$(glistN.list(item), BlockStartCursor, BlockEndCursor - BlockStartCursor)
+                    Final$ = Mid$(glistN.list(item), BlockStartCursor, BlockEndCursor - BlockStartCursor)
                 End If
                 PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
                 FillBack thisHDC, b, SelectionColor
@@ -1273,9 +1273,9 @@ Else
                     b.Left = tmp
                 End If
                 If BlockEndCursor > 0 Then
-                    final$ = Mid$(glistN.list(item), BlockEndCursor, BlockStartCursor - BlockEndCursor)
+                    Final$ = Mid$(glistN.list(item), BlockEndCursor, BlockStartCursor - BlockEndCursor)
                 Else
-                    final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
+                    Final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
                 End If
                 PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
                 FillBack thisHDC, b, SelectionColor
@@ -1305,7 +1305,7 @@ Else
     ElseIf Not skipcolor Then
         SetTextColor thisHDC, glistN.ForeColor
     End If
-    If final$ <> "" Or fbypass Then
+    If Final$ <> "" Or fbypass Then
         If Not fbypass Then
 
             PrintItem2X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, b, mDoc.lastcolordata(), False
@@ -1332,7 +1332,7 @@ End Sub
 Private Sub gListN_ExposeRect2(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
 Dim a As RECT, b As RECT, i As Long, pastchars As Long, hRgn As Long, tmp As Long
 Dim bb As RECT, cc As RECT
-Dim final$, fbypass As Boolean
+Dim Final$, fbypass As Boolean
 Dim OldColor As Long
 Dim what$, ThatPara As Long
 CopyFromLParamToRect a, thisrect
@@ -1372,7 +1372,7 @@ Else
                 If BlockEndCursor > 1 Then  ' if not leave it as is
                     b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1))
                     PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
-                    final$ = Mid$(glistN.list(item), BlockEndCursor)
+                    Final$ = Mid$(glistN.list(item), BlockEndCursor)
                     fbypass = True
                  End If
              Else
@@ -1380,7 +1380,7 @@ Else
                  b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1))
                  PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
               
-                 final$ = Mid$(glistN.list(item), BlockStartCursor)
+                 Final$ = Mid$(glistN.list(item), BlockStartCursor)
                  fbypass = True
                  End If
              End If
@@ -1397,7 +1397,7 @@ Else
                  If BlockEndCursor > 1 Then ' if not leave it as is
                     b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
                     PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
-                    final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
+                    Final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
                     fbypass = False
                  Else
                     If ThatPara = mDoc.MarkParagraphID Then glistN.ExternalCursor glistN.SelStart, what$, black
@@ -1410,7 +1410,7 @@ Else
                If BlockStartCursor > 1 Then
                b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
                  PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
-                final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
+                Final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
                fbypass = False
                      Else
                        If ThatPara = mDoc.MarkParagraphID Then glistN.ExternalCursor glistN.SelStart, what$, black
@@ -1431,10 +1431,10 @@ Else
             If BlockStartCursor > 1 Then b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1))
             If BlockEndCursor > 1 Then b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
             If BlockStartCursor = 0 Then
-                final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
+                Final$ = Mid$(glistN.list(item), 1, BlockEndCursor - 1)
             Else
                 skipcolor = False
-                final$ = Mid$(glistN.list(item), BlockStartCursor, BlockEndCursor - BlockStartCursor)
+                Final$ = Mid$(glistN.list(item), BlockStartCursor, BlockEndCursor - BlockStartCursor)
             End If
             PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
             FillBack thisHDC, b, SelectionColor
@@ -1444,9 +1444,9 @@ Else
             If BlockEndCursor > 1 Then b.Left = b.Left + glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockEndCursor - 1))
             If BlockStartCursor > 1 Then b.Right = glistN.UserControlTextWidthPixels(Mid$(glistN.list(item), 1, BlockStartCursor - 1)) + glistN.PanPosPixels + glistN.LeftMarginPixels
             If BlockEndCursor > 0 Then
-                final$ = Mid$(glistN.list(item), BlockEndCursor, BlockStartCursor - BlockEndCursor)
+                Final$ = Mid$(glistN.list(item), BlockEndCursor, BlockStartCursor - BlockEndCursor)
             Else
-                final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
+                Final$ = Mid$(glistN.list(item), 1, BlockStartCursor - 1)
             End If
             PrintItem1X thisHDC, mDoc.TextLine2(item + 1, showparagraph, NoColor), a, mDoc.lastcolordata()
                 FillBack thisHDC, b, SelectionColor
@@ -1487,7 +1487,7 @@ End If
  
 
     End If
-    If final$ <> "" Or fbypass Then
+    If Final$ <> "" Or fbypass Then
 
    If Not fbypass Then
  
@@ -4360,7 +4360,6 @@ Else
     IsLabelOnly = rr& + Extra&
     End If
     End If
- 'If IsLabelOnly = 1 And r$ = "" Then Stop
 End Function
 Function FastSymbol(a$, c$, Optional mis As Boolean = False, Optional cl As Long = 1) As Boolean
 Dim i As Long, j As Long
@@ -5801,7 +5800,7 @@ ElseIf FastSymbol(a$, "}") Then
         addone2000 1, 14
         If MaybeIsSymbol(a$, "(") Then
             GoTo CheckThis
-        ElseIf MaybeIsSymbol(a$, ",;") Then
+        ElseIf MaybeIsSymbol(a$, ",") Then
             a$ = Mid$(a$, 2)
             GoTo CheckThis
         End If
@@ -6850,7 +6849,7 @@ glistN.PanPos = 0
 glistN.ScrollToSilent 0
 Set mDoc = New Document
 mDoc.ColorEvent = True
-mDoc.final = mMultiLineComment2
+mDoc.Final = mMultiLineComment2
 mDoc.textDoc = RHS
 mDoc.NoIgnoreCase = Not mUseCase
 glistN.ListindexPrivateUse = 0
@@ -9708,7 +9707,7 @@ End Function
 
 Public Property Let MultiLineComment2(ByVal vNewValue As Variant)
 mMultiLineComment2 = vNewValue
-mDoc.final = vNewValue
+mDoc.Final = vNewValue
 End Property
 Public Sub PopUpMenu(poptitle$, X As Variant, Y As Variant)
 Dim oldModalId As Variant, i As Long

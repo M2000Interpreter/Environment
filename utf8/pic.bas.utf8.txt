@@ -1,10 +1,10 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
 Public Const KEYEVENTF_KEYUP = &H2
 Public Declare Sub keybd_event Lib "user32.dll" (ByVal bVk As Byte, ByVal bScan As Byte, ByVal dwFlags As Long, ByVal dwExtraInfo As Long)
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -4150,7 +4150,7 @@ a$ = myUcase(a$, True)
 Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
 Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
-Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
+Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASSEMBLY(", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
 Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BIGINTEGER(", "BIGINTEGER[", "BINARY", "BINARY.ADD(", "BIT64.ADD(", "BINARY.AND(", "BIT64.AND(", "BIT64.NEG(", "BINARY.NEG(", "BIT64.NOT(", "BINARY.NOT("
 Case "BINARY.OR(", "BIT64.OR(", "BIT64.RESET(", "BINARY.RESET(", "BIT64.ROTATE(", "BINARY.ROTATE(", "BIT64.SHIFT(", "BINARY.SHIFT(", "BIT64.SET(", "BINARY.SET(", "BIT64.SUB(", "BINARY.SUB(", "BIT64.TEST(", "BINARY.TEST(", "BIT64.XOR(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
 Case "BOOLEAN", "BORDER", "BREAK", "BROWSER", "BROWSER$", "BUFFER", "BUFFER(", "BYTE", "BYTE[", "CALL", "CASE", "CASCADE", "CAT", "CAR("
@@ -4240,7 +4240,7 @@ Case "ΚΑΝΕ", "ΚΑΝΟΝΙΚΑ", "ΚΑΤ", "ΚΑΤ$", "ΚΑΤΑΛΟΓΟΙ", 
 Case "ΚΑΤΩΜΙΣΟ(", "ΚΑΤΩΜΙΣΟ64(", "ΚΕΙΜΕΝΟ", "ΚΕΝΗ", "ΚΕΝΟ", "ΚΕΝΤΡΟ", "ΚΕΦ$(", "ΚΕΦ(", "ΚΙΝΗΣΗ", "ΚΙΝΗΣΗ.Π", "ΚΙΝΗΣΗ.ΠΥ"
 Case "ΚΙΝΗΣΗ.ΠΧ", "ΚΙΝΗΣΗ.Υ", "ΚΙΝΗΣΗ.ΥΠ", "ΚΙΝΗΣΗ.Ψ", "ΚΙΝΗΣΗ.ΨΠ", "ΚΙΝΗΣΗ.Χ", "ΚΙΝΗΣΗ.ΧΠ", "ΚΛΑΣΗ", "ΚΛΕΙΔΙ", "ΚΛΕΙΣΕ", "ΚΛΙΜΑΞ.Υ", "ΚΛΙΜΑΞ.Ψ"
 Case "ΚΛΙΜΑΞ.Χ", "ΚΟΜ$", "ΚΟΙΝΟΣ", "ΚΟΙΝΟΙ", "ΚΟΝΣΟΛΑ", "ΚΡΑΤΑ", "ΚΡΑΤΗΣΕ", "ΚΡΥΦΟ$(", "ΚΡΥΨΕ", "ΚΥΚΛΙΚΑ", "ΚΥΚΛΟΣ"
-Case "ΚΥΛΙΣΗ", "ΚΥΡΙΟ", "ΚΥΡΙΟ.ΕΡΓΟ", "ΚΩΔ(", "ΚΩΔΙΚΑ", "ΚΩΔΙΚΟΣΕΛΙΔΑ", "ΛΑΒΗ", "ΛΑΒΗ(", "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Υ(", "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Ψ("
+Case "ΚΥΛΙΣΗ", "ΚΥΡΙΟ", "ΚΥΡΙΟ.ΕΡΓΟ", "ΚΩΔ(", "ΚΩΔΙΚΑ", "ΚΩΔΙΚΑΣ(", "ΚΩΔΙΚΟΣΕΛΙΔΑ", "ΛΑΒΗ", "ΛΑΒΗ(", "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Υ(", "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Ψ("
 Case "ΛΑΒΗ.ΑΝΑΛΟΓΙΚΟ.Χ(", "ΛΑΒΗ.ΚΑΤΕΥΘΥΝΣΗ(", "ΛΑΘΟΣ", "ΛΑΘΟΣ$", "ΛΑΘΟΣ.ΤΑΙΝΙΑΣ$", "ΛΑΘΩΝ", "ΛΑΜΔΑ", "ΛΑΜΔΑ(", "ΛΑΜΔΑ$", "ΛΑΜΔΑ$(", "ΛΑΤΙΝΙΚΑ", "ΛΕΞΕΙΣ", "ΛΙΣΤΑ", "ΛΟΓ("
 Case "ΛΟΓΙΚΟ", "ΛΟΓΙΚΟΣ", "ΛΟΓΙΣΤΙΚΟ", "ΛΟΓΙΣΤΙΚΟΣ", "ΛΟΓΙΣΤΙΚΟΣ[", "ΛΟΓΟΣ", "ΛΟΓΟΣ$(", "ΛΣ$", "ΛΦ(", "ΜΑΖΙ(", "ΜΑΖΕΨΕ(", "ΜΑΚΡΥ", "ΜΑΚΡΥΣ", "ΜΑΚΡΥΣ[", "ΜΕ", "ΜΕ.ΑΝΤΙΚΕΙΜΕΝΟ", "ΜΕΓ(", "ΜΕΓ$(", "ΜΕΓΑΛΟ("
 Case "ΜΕΓΑΛΟ.ΣΕΙΡΑΣ$(", "ΜΕΓΑΛΟ.ΣΕΙΡΑΣ(", "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ", "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ[", "ΜΕΓΑΛΟΣΑΚΕΡΑΙΟΣ(", "ΜΕΓΕΓΟΝΟΤΑ", "ΜΕΓΕΘΟΣ", "ΜΕΓΕΘΟΣ.ΣΩΡΟΥ", "ΜΕΓΕΘΟΣ.Υ(", "ΜΕΓΕΘΟΣ.Χ(", "ΜΕΓΕΘΟΣ.Ψ(", "ΜΕΘΟΔΟΣ", "ΜΕΛΟΣ$(", "ΜΕΛΟΥΣ.ΤΥΠΟΣ$("
@@ -4397,7 +4397,7 @@ End Function
 
 
 
-Static Function ValidNum(a$, final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
+Static Function ValidNum(a$, Final As Boolean, Optional cutdecimals As Boolean = False, Optional checktype As Long = 0) As Boolean
 Dim r As Long
 Dim r1 As Long
 r1 = 1
@@ -4410,7 +4410,7 @@ r1 = 1
     End If
 
 Dim v As Double, b$
-If final Then
+If Final Then
 If checktype > 0 Then
 r1 = IsNumberOnly(a$, r1, v, r, cutdecimals)
 Else
@@ -5232,7 +5232,7 @@ myfun() = Array("PARAM(", 1, "ΠΑΡΑΜ(", 1, "STACKITEM(", 2, "ΤΙΜΗΣΩΡ�
 , "HEX(", 144, "ΔΕΚΑΕΞ(", 144, "REPLACE(", 145, "ΑΛΛΑΓΗ(", 145, "FILTER(", 146, "ΦΙΛΤΡΟ(", 146, "UCASE(", 147, "ΚΕΦ(", 147, "LCASE(", 148, "ΠΕΖ(", 148, "TYPE(", 149, "ΤΥΠΟΣ(", 149, "TITLE(", 150, "ΤΙΤΛΟΣ(", 150, "BIT64.XOR(", 151, "ΔΥΑΔ64.ΑΠΟ(", 151, "BIT64.AND(", 152, "ΔΥΑΔ64.ΚΑΙ(", 152, "BIT64.OR(", 153, "ΔΥΑΔ64.Η(", 153 _
 , "BIT64.ADD(", 154, "ΔΥΑΔ64.ΠΡΟ(", 154, "ΔΥΑΔ64.ΠΡΟΣΘΕΣΗ(", 154, "BIT64.SHIFT(", 155, "ΔΥΑΔ64.ΟΛΙΣΘΗΣΗ(", 155, "BIT64.ROTATE(", 156, "ΔΥΑΔ64.ΠΕΡΙΣΤΡΟΦΗ(", 156, "BIT64.NOT(", 157, "ΔΥΑΔ64.ΟΧΙ(", 157, "BIT64.NEG(", 158, "ΔΥΑΔ64.ΑΝΤΙ(", 158, "ΔΥΑΔ64.ΑΝΤΙΣΤΡΟΦΟ(", 158 _
 , "HILOWLONG(", 159, "ΔΥΟΜΙΣΑ64(", 159, "HILONG(", 160, "ΠΑΝΩΜΙΣΟ64(", 160, "HIGHLONG(", 160, "LOLONG(", 161, "LOWLONG(", 161, "ΚΑΤΩΜΙΣΟ64(", 161, "BINARY.TEST(", 162, "ΔΥΑΔΙΚΟ.ΕΧΕΙ(", 162, "BINARY.SET(", 163, "ΔΥΑΔΙΚΟ.ΒΑΛΕ(", 163, "BINARY.RESET(", 164, "ΔΥΑΔΙΚΟ.ΒΓΑΛΕ(", 164, "BIT64.TEST(", 165, "ΔΥΑΔ64.ΕΧΕΙ(", 165, "BIT64.SET(", 166, "ΔΥΑΔ64.ΒΑΛΕ(", 166, "BIT64.RESET(", 167, "ΔΥΑΔ64.ΒΓΑΛΕ(", 167 _
-, "BINARY.SUB(", 168, "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", 168, "ΔΥΑΔΙΚΟ.ΑΦ(", 168, "ΔΥΑΔ64.ΑΦ(", 169, "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", 169, "BIT64.SUB(", 169, "ΔΥΑΔ64(", 170, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "ΑΝΤΙΓΡΑΦΟ.ΠΙΝ(", 171, "MIDI.OUT(", 172, "ΕΞΟΔΟΣ.MIDI(", 172)
+, "BINARY.SUB(", 168, "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", 168, "ΔΥΑΔΙΚΟ.ΑΦ(", 168, "ΔΥΑΔ64.ΑΦ(", 169, "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", 169, "BIT64.SUB(", 169, "ΔΥΑΔ64(", 170, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "ΑΝΤΙΓΡΑΦΟ.ΠΙΝ(", 171, "MIDI.OUT(", 172, "ΕΞΟΔΟΣ.MIDI(", 172, "ΚΩΔΙΚΑΣ(", 173, "ASSEMBLY(", 173)
 
 
 
@@ -5388,6 +5388,10 @@ Case "LET", "ΣΤΗ", "ΣΤΗΝ", "ΣΤΟ", "ΣΤΙΣ", "ΣΤΑ"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLet)
 Case "PRINT", "ΤΥΠΩΣΕ", "?"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPrint)
+Case "ERROR", "ΛΑΘΟΣ"
+    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoError)
+Case "STACK", "ΣΩΡΟΣ"
+   aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoStack)
 Case "CALL", "ΚΑΛΕΣΕ"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 38
 Case "CHOOSE.OBJECT", "ΕΠΕΛΕΞΕ.ΑΝΤΙΚΕΙΜΕΝΟ", "ΕΠΙΛΕΞΕ.ΑΝΤΙΚΕΙΜΕΝΟ"
@@ -5637,12 +5641,12 @@ For n = LBound(a) To UBound(a) 'many - 1
 cr.SectionKey = "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Time Zones\" + a(n)
 cr.ValueType = REG_SZ
 cr.ValueKey = "Dlt"
-Dlt$ = cr.value
+Dlt$ = cr.Value
 cr.ValueKey = "Std"
-Std$ = cr.value
+Std$ = cr.Value
 cr.ValueType = REG_BINARY
 cr.ValueKey = "TZI"
-that$ = cr.value
+that$ = cr.Value
 mem.FillDataFromMem StrPtr(that$)
 zHash.AddKey Std$, -(MemLong(mem.GetBytePtr(0)) / 60 + MemLong(mem.GetBytePtr(4)) / 60)
 If Dlt$ <> "" Then zHash.AddKey Dlt$, -(MemLong(mem.GetBytePtr(0)) / 60 + MemLong(mem.GetBytePtr(8)) / 60)
@@ -5679,7 +5683,7 @@ Function ProcWriter(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim prive As Long
 prive = GetCode(basestack.Owner)
 If Lang = 1 Then
-PlainBaSket basestack.Owner, players(prive), "George Karras (C), Kallithea Attikis, Greece 1999-2025"
+PlainBaSket basestack.Owner, players(prive), "George Karras (C), Kallithea Attikis, Greece 1999-2026"
 Else
 PlainBaSket basestack.Owner, players(prive), ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962, 32, 40, 67, 41, 44, 32, 922, 945, 955, 955, 953, 952, 941, 945, 32, 913, 964, 964, 953, 954, 942, 962, 44, 32, 917, 955, 955, 940, 948, 945, 32, 49, 57, 57, 57, 45, 50, 48, 50, 53)
 End If

@@ -943,11 +943,14 @@ If Not er$ = vbNullString Then
 
         End If
         If Form2.Visible Then
-            If stoponerror And Not STbyST Then
+            If (stoponerror And Not STbyST) Or StepOver Then
                 trace = True
                 STq = False
                 STbyST = False
                 Form2.Busy = False
+                If StepOver Then
+                Form2.generalFkey 10 'getin
+                End If
                 Do
                     BLOCKkey = False
                     If Not IsWine Then If Form2.Process.Owner.Visible Then Form2.Process.Owner.Refresh
@@ -960,12 +963,16 @@ If Not er$ = vbNullString Then
                 If Not STEXIT Then
                     If Not STq Then
                         Form2.gList4.ListIndex = 0
+                    Else
+                    
+                    Form2.generalFkey 3
                     End If
                 End If
                 STq = False
                 If STEXIT Then
                     NOEXECUTION = True
                     trace = False
+                    
                     STEXIT = False
                     Form2.Busy = False
                 ElseIf STbyST Then
@@ -2389,7 +2396,7 @@ skipthis:
                 GoTo checkcombine1
             ElseIf A2(r) = 0 And a1(r) = 0 Then
                 If W >= 0 And W < 32 Then
-                    GoTo CHECK1
+                    GoTo check1
                 End If
                 GoTo cont1
             ElseIf (A2(r) And 254) = 2 And (a1(r) And &H8000) <> 0 Then
@@ -2424,7 +2431,7 @@ checkcombine1:
                 End If
                 DDD.currentX = DDD.currentX + .Xt
             Else
-CHECK1:
+check1:
                 If c$ = Chr$(7) Then
                     If Not TypeOf DDD Is MetaDc Then
                     If Not processcr Then If Not DDD Is Form1.PrinterDocument1 Then Beep
@@ -8353,7 +8360,7 @@ MyEr "No such variable " + nameOfvar$, "δεν υπάρχει τέτοια μεταβλητή " + nameOfv
 End Sub
 Public Sub NoValueForVar(W$)
 If LastErNum = 0 Then
-MyEr "No value for variable " + W$, "Χωρίς τιμή η μεταβλητή " + W$
+MyEr "No value for variable " + GetName(W$), "Χωρίς τιμή η μεταβλητή " + GetName(W$)
 End If
 End Sub
 Public Sub toomanydots()
@@ -8736,21 +8743,31 @@ Loop
 ReplaceSpace = a$
 End Function
 Function GetReturnArray(bstack As basetask, x1 As Long, b$, p As Variant, ss$, pppp As iBoxArray) As Boolean ' true is error
-
+Dim s As String * 3
 Do
         Set bstack.lastobj = Nothing
         If IsExp(bstack, b$, p) Then
         If x1 = 0 Then If lookOne(b$, ",") Then x1 = 1: Set pppp = New tuple: pppp.PushDim (1): pppp.PushEnd
         If x1 = 0 Then
-                    If Not myVarType(p, vbString) Then
-                        If Len(bstack.originalname$) > 3 Then
-                            If Mid$(bstack.originalname$, Len(bstack.originalname$) - 2, 1) = "$" Then
-                                MissStringExpr
+                s = Right$(bstack.originalname$, 3)
+                    If Left$(s$, 1) = "$" Then
+                        If Not myVarType(p, vbString) Then
+                            'If Mid$(bstack.originalname$, Len(bstack.originalname$) - 2, 1) = "$" Then
+                                MissString
                                 Exit Do
                             End If
+                    ElseIf Left$(s$, 1) = "%" Then
+                        If Not myVarType(p, vbString) Then
+                            If IsNumeric(p) Then
+                                p = MyRound(p)
+                            End If
+                        Else
+                            missNumber
+                        Exit Do
                         End If
                     End If
-                 If Right$(bstack.originalname$, 3) = "%()" Then p = MyRound(p)
+                
+                 'If Right$(bstack.originalname$, 3) = "%()" Then p = MyRound(p)
                  Set bstack.FuncObj = bstack.lastobj
                  Set bstack.lastobj = Nothing
                  bstack.FuncValue = p
@@ -9462,9 +9479,6 @@ End Sub
 Sub NeoPathDraw(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = ProcPath(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
-Sub NeoCreateEmf(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-resp = ProcCreateEmf(ObjFromPtr(basestackLP), rest$, Lang)
-End Sub
 Sub NeoDrawings(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = MyDrawings(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
@@ -9719,14 +9733,18 @@ End Sub
 Sub NeoWidth(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = ProcDrawWidth(ObjFromPtr(basestackLP), rest$)
 End Sub
-
 Sub NeoMove(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = ProcMove(ObjFromPtr(basestackLP), rest$)
 End Sub
 Sub NeoStep(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
-resp = ProcStep(ObjFromPtr(basestackLP), rest$, Lang)
+    resp = ProcStep(ObjFromPtr(basestackLP), rest$, Lang)
 End Sub
-
+Sub NeoError(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+    resp = MyError(ObjFromPtr(basestackLP), rest$, Lang)
+End Sub
+Sub NeoStack(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
+    resp = ProcStack(ObjFromPtr(basestackLP), rest$, Lang)
+End Sub
 Sub NeoPrint(basestackLP As Long, rest$, Lang As Long, resp As Boolean)
 resp = RevisionPrint(ObjFromPtr(basestackLP), rest$, 0, Lang)
 End Sub
@@ -10275,13 +10293,17 @@ End Function
 
 
 
-Function MakeEmf(bstack As basetask, b$, Lang As Long, Data$, Optional ww = 0, Optional hh = 0) As Boolean
-Dim W$, x1 As Long, label1$, usehandler As mHandler, par As Boolean, pppp As iBoxArray, p As Variant, it&, x2&
-x2 = Len(b$)
-If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
-            W$ = Funcweak(bstack, b$, x1, label1$)
-            If LastErNum1 = -1 And x1 < 5 Then Exit Function
-            If LenB(W$) = 0 Then
+Function MakeEmf(it As Long, bstack As basetask, b$, Lang As Long, Optional ww = 0, Optional hh = 0) As Boolean
+Dim W$, x1 As Long, label1$, usehandler As mHandler, par As Boolean, pppp As iBoxArray, p As Variant, x2&
+    Set usehandler = New mHandler
+    usehandler.t1 = 2
+    Set usehandler.objref = ExecuteEmfBlock(bstack, b$, it, ww, hh)
+    If it <> 1 Then Exit Function
+    If Not FastSymbol(b$, "}", True) Then Exit Function
+    If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
+        W$ = Funcweak(bstack, b$, x1, label1$)
+        If LastErNum1 = -1 And x1 < 5 Then Exit Function
+        If LenB(W$) = 0 Then
             If Len(bstack.UseGroupname) > 0 Then
                 If Len(label1$) > Len(bstack.UseGroupname) Then
                     If bstack.UseGroupname = Left$(label1$, Len(bstack.UseGroupname)) Then
@@ -10291,64 +10313,41 @@ If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
                 End If
             ElseIf x1 = 1 Then
 contvar1:
-            x1 = globalvar(label1$, 0#)
-            Set usehandler = New mHandler
-                usehandler.t1 = 2
-
-                Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
-
-
-                    Set var(x1) = usehandler
-                    MakeEmf = it <> 0
-                    If it = 0 Then b$ = Data$ + space$(x2&)
+                x1 = globalvar(label1$, 0#)
+                Set var(x1) = usehandler
+                MakeEmf = True
                 Exit Function
             ElseIf x1 = 5 Then
                 If GetVar(bstack, label1$, x1) Then
                     If GetArrayReference(bstack, b$, label1$, var(x1), pppp, x1) Then
-                        Set usehandler = New mHandler
-                        usehandler.t1 = 2
-
-                        Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
                         Set pppp.item(x1) = usehandler
-                        MakeEmf = it <> 0
-                        If it = 0 Then b$ = Data$ + space$(x2&) + b$
+                        MakeEmf = True
                     End If
                     Exit Function
-            
                 Else
                     MyEr "", ""
                     MyEr "Array not defined", "Ο πίνακας δεν έχει οριστεί"
                     Exit Function
                 End If
             End If
-            End If
+        End If
 
-            If x1 = 1 Then
-            If GetVar(bstack, label1$, x1) Then
-                Set usehandler = New mHandler
-                usehandler.t1 = 2
-        
-                Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
-          
-                    Set var(x1) = usehandler
-                    MakeEmf = it <> 0
-                    If it = 0 Then b$ = Data$ + space$(x2&) + b$
-            
-                Exit Function
-            Else
-                GoTo contvar1
+        If x1 = 1 Then
+        If GetVar(bstack, label1$, x1) Then
+            Set var(x1) = usehandler
+            MakeEmf = True
+            Exit Function
+        Else
+            GoTo contvar1
             End If
                 ElseIf x1 = 5 Then
                 If GetVar(bstack, label1$, x1) Then
                       DropLeft "(", W$
                     If GetArrayReference(bstack, W$, label1$, var(x1), pppp, x1) Then
-                        Set usehandler = New mHandler
-                        usehandler.t1 = 2
-                        Set usehandler.objref = ExecuteEmfBlock(bstack, Data$, it, ww, hh)
-                       
+   
                         Set pppp.item(x1) = usehandler
-                        MakeEmf = it <> 0
-                        If it = 0 Then b$ = Data$ + space$(x2&) + b$
+                        MakeEmf = True
+                        
                     End If
                     Exit Function
             
@@ -17947,12 +17946,15 @@ Case "CONST", "ΣΤΑΘΕΡΗ", "ΣΤΑΘΕΡΕΣ"
                               bstack.callohere = vbNullString
                               b$ = NLtrim(b$)
                               SetNextLineNL b$
-                              ElseIf Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
+                              Else
+                              FK(13) = vbNullString
+                              If Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
                                     If MOUT And b$ = vbNullString Then
                                     Else
                                         MyErMacro b$, "unknown identifier " + W$, "’γνωστο αναγνωριστικό " + W$
                                     End If
                                 End If
+                            End If
                                 bstack.RemoveOptionals
                                 End If
                               GoTo loopcontinue1
@@ -18007,6 +18009,7 @@ contnoproper:
                                 SetNextLineNL b$
                               Else
                               Set sbf(bstack.callx1).Pad = Nothing
+                              FK(13) = vbNullString
                               If Not ProcModuleEntry(bstack, "", 0, b$, Lang) Then
                                 If MOUT And b$ = vbNullString Then
                                 Else
@@ -19627,8 +19630,40 @@ s22222:
     MySwap = False
 End Function
 Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boolean
+    Dim ch As Long
+        TraceThis = True
+        If StepOver Then
+            ch = iRVAL22(steptothat)
+            If ch = 0 Then
+                GetSub steptothat, ch
+                If ch = 0 Then
+                ch = iRVAL22(stephere$)
+                If ch > 0 Then
+                   GoTo check1
+                End If
+                End If
+            Else
+check1:
+                If subHash.Count >= ch Then
+                    If Not GetName(sbf(ch).goodname) = steptothat Then
+                        ch = 0
+                    End If
+                Else
+                    ch = 0
+                End If
+            End If
+            If ch > 0 Then
+                If GetName(here$) <> steptothat Then
+                    Exit Function
+                Else
+                    STbyST = True
+                End If
+            Else
+                STbyST = True
+            End If
+        End If
+        
     
-    TraceThis = True
     If Form2.Busy Then Exit Function
     Form2.Busy = True
     PrepareLabel bstack
@@ -19641,9 +19676,11 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boo
     Form2.Busy = False
     Exit Function
     Else
-    If TestShowBypass Then
+        If TestShowBypass Then
  
         ElseIf WaitShow = 0 Or Len(b$) < WaitShow Then
+        
+            
             WaitShow = 0
             If bstack.OriginalCode < 0 Then
             lasttracecode = -bstack.OriginalCode
@@ -19708,8 +19745,14 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boo
      bypassST = False
           
     Set Form2.Process = bstack
+    If StepOver And Not STbyST Then
+    
+    If Not Form1.Visible Then
     stackshow bstack
-        
+    End If
+    Else
+    stackshow bstack
+    End If
     End If
     
     If Not Form1.Visible Then
@@ -19728,6 +19771,7 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boo
             If TaskMaster.QueueCount > 0 And TaskMaster.Processing Then TaskMaster.StopProcess
         End If
         Form2.Busy = False
+        
         Do
             BLOCKkey = False
             If Not IsWine Then If di.Visible Then di.Refresh
@@ -19735,7 +19779,7 @@ Public Function TraceThis(bstack As basetask, di As Object, b$, W$, SBB$) As Boo
         Loop Until STbyST Or STq Or STEXIT Or bypassST Or NOEXECUTION Or myexit(bstack) Or Not Form2.Visible
 
      
-        If Not TaskMaster Is Nothing Then
+1000       If Not TaskMaster Is Nothing Then
            If TaskMaster.QueueCount > 0 And Not TaskMaster.Processing Then TaskMaster.StartProcess
         End If
         If Not STEXIT Then
@@ -20642,9 +20686,9 @@ ElseIf Form2.switchview = 2 Then
         .ForeColor = rgb(255, 255, 0)
         If Errorlog.DocLines = 0 Then
             If pagio$ = "GREEK" Then
-                .Text = "Δεν έχουν καταγραφεί λάθη" & vbCrLf & "F1 - καθαρισμός" & vbCrLf & "F4 - αντιγραφή στη φόρμα βοήθειας"
+                .Text = "Δεν έχουν καταγραφεί λάθη" & vbCrLf & "F1 - καθαρισμός" & vbCrLf & "F4 - αντιγραφή στη φόρμα βοήθειας" & vbCrLf & "SHIFT F1 - Οδηγίες για άλλα πλήκτρα λειτουργιών"
             Else
-                .Text = "No Errors logged" & vbCrLf & "F1 - clear" & vbCrLf & "F4 - copy window to help form"
+                .Text = "No Errors logged" & vbCrLf & "F1 - clear" & vbCrLf & "F4 - copy window to help form" & vbCrLf & "SHIFT F1 - Help for functions keys"
             End If
             .SetRowColumn 1, 1
             Form2.GetPanelPos 2&
@@ -24719,7 +24763,7 @@ a$ = NLtrim$(a$)
 
 End Function
 Function ProcDrawWidth(bstack As basetask, rest$) As Boolean
-Dim X As Double, p As Variant, it As Long, ss$, i As Long, x1 As Long, nd&, once As Boolean
+Dim X As Double, p As Variant, it As Long, i As Long, x1 As Long, nd&, once As Boolean
 ProcDrawWidth = True
 Dim Scr As Object
 Set Scr = bstack.Owner
@@ -24742,12 +24786,8 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
         End If
    
     If FastSymbol(rest$, "{") Then
-        ss$ = block(rest$)
-         TraceStore bstack, nd&, rest$, 0
-        If FastSymbol(rest$, "}") Then
-            Call executeblock(it, bstack, ss$, False, once, , True)
-        End If
-        bstack.addlen = nd&
+            Call executeblock(it, bstack, rest$, False, once)
+       
     Else
         MissingBlockCode
     End If
@@ -24755,17 +24795,19 @@ Else
 MissNumExpr
 End If
 
-If it = 2 Then
-If ss$ = "" Then
-If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
-Else
-rest$ = ": Goto " + ss$
-If trace Then WaitShow = 2: TestShowSub = rest$
+If it = 1 Then
+    FastSymbol rest$, "}", True
+ElseIf it = 2 Then
+    If rest$ = "" Then
+        If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
+    Else
+        rest$ = ": Goto " + rest$
+        If trace Then WaitShow = 2: TestShowSub = rest$
+    End If
+    it = 1
 End If
 
-it = 1
-End If
-If it <> 1 Then ProcDrawWidth = False: rest$ = ss$ + rest$
+If it <> 1 Then ProcDrawWidth = False
 If i <= 0 Then i = 1
 Scr.DrawWidth = i
 Scr.DrawStyle = x1
@@ -27652,53 +27694,10 @@ Public Function AddBackslash(s As String) As String
    End If
 
 End Function
-Function ProcCreateEmf(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim W, H  ' these are twips - need to convert to .01 mm
-Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, X As Double, par As Boolean, prive As Long
-Dim nd&, once As Boolean
-ProcCreateEmf = True
-prive = GetCode(bstack.Owner)
-' skip for now
-If IsExp(bstack, rest$, W, , True) Then
-    If FastSymbol(rest$, ",") Then
-           If Not IsExp(bstack, rest$, H, , True) Then MissNumExpr
-    Else
-    
-    End If
-End If
-If FastSymbol(rest$, "{") Then
-            ss$ = block(rest$)
-            TraceStore bstack, nd&, rest$, 0
-            If FastSymbol(rest$, "}") Then
-                Call executeblock(it, bstack, ss$, False, once, , True)
-                If it = 2 Then
-                    If ss$ = "" Then
-                        If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
-                    Else
-                        rest$ = ": Goto " + ss$
-                        If trace Then WaitShow = 2: TestShowSub = rest$
-                    End If
-                    
-                    it = 1
-                End If
-                If it <> 1 Then ProcCreateEmf = False: rest$ = ss$ + rest$
-            Else
-                MissPar
-                ProcCreateEmf = False
-                Exit Function
-            End If
-            bstack.addlen = nd&
-        Else
-            MissPar
-            ProcCreateEmf = False
-            Exit Function
-        End If
-        If Not IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then Exit Function
-
-End Function
 Function ProcPath(bstack As basetask, rest$, Lang As Long) As Boolean
 Dim f As Boolean, p As Variant, Col As Long, it As Long, ss$, X As Double, par As Boolean, prive As Long
 Dim OldGDILines As Boolean, Region As Boolean, oldpathcolor As Long, oldpathfillstyle As Integer, nd&, once As Boolean
+Dim nn&
 ProcPath = True
 prive = GetCode(bstack.Owner)
 f = IsLabelSymbolNew(rest$, "ΠΑΝΩ", "OVER", Lang)
@@ -27714,7 +27713,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
            X = vbSolid
            End If
         If FastSymbol(rest$, "{") Then
-
+            nn& = Len(rest$)
             ss$ = block(rest$)
             
             TraceStore bstack, nd&, rest$, 0
@@ -27732,7 +27731,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
                 BeginPath bstack.Owner.hDC
               '  If (par Or F) And GDILines Then OldGDILines = True: players(prive).NoGDI = True
                 If (par Or Region) Then players(prive).NoGDI = True: If GDILines Then OldGDILines = True
-                Call executeblock(it, bstack, ss$, False, once, , True)
+                Call executeblock(it, bstack, ss$, False, once) ', , True)
 
                 
                 players(prive).pathgdi = players(prive).pathgdi - 1
@@ -27765,7 +27764,16 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
                     players(prive).pathcolor = oldpathcolor
                     players(prive).pathfillstyle = oldpathfillstyle
                 End If
-                If it = 2 Then
+                If it = 0 Then
+                        If bstack.ErrorOriginal <> 0 Then
+                            SwapStrings rest$, ss$
+                        Else
+                            If Len(ss$) - 1 - nn& + Len(rest$) * 2 > 0 Then
+                                rest$ = space$(Len(ss$) - 1 - nn& + Len(rest$) * 2)
+                            End If
+                        End If
+                        ProcPath = False: Exit Function
+                ElseIf it = 2 Then
                     If ss$ = "" Then
                         If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
                     Else
@@ -27775,7 +27783,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
                     
                     it = 1
                 End If
-                If it <> 1 Then ProcPath = False: rest$ = ss$ + rest$
+                If it <> 1 Then ProcPath = False: SwapStrings rest$, ss$ 'rest$ = ss$ + rest$
             Else
                 MissPar
                 ProcPath = False
@@ -27791,6 +27799,7 @@ If IsExp(bstack, rest$, p, flatobject:=True, nostring:=True) Then
 cont1:
         X = 1
         If FastSymbol(rest$, "{") Then
+            nn& = Len(rest$)
             ss$ = block(rest$)
             TraceStore bstack, nd&, rest$, 0
             If MyTrim(ss$) = vbNullString Then
@@ -27816,7 +27825,7 @@ contthere2:
                 BeginPath bstack.Owner.hDC
                 'If (par Or region) And GDILines Then OldGDILines = True: players(prive).NoGDI = True
                 If (par Or Region) Then players(prive).NoGDI = True: If GDILines Then OldGDILines = True
-                Call executeblock(it, bstack, ss$, False, once, , , True)
+                Call executeblock(it, bstack, ss$, False, once)
                 
                 EndPath bstack.Owner.hDC
                 players(prive).pathgdi = players(prive).pathgdi - 1
@@ -27842,7 +27851,17 @@ contthere2:
                     If par Then bstack.Owner.DrawMode = 13
                 End If
                 bstack.Owner.FillStyle = vbFSTransparent
-                If it = 2 Then
+                
+                If it = 0 Then
+                        If bstack.ErrorOriginal <> 0 Then
+                            SwapStrings rest$, ss$
+                        Else
+                            If Len(ss$) - nn& + Len(rest$) * 2 > 0 Then
+                                rest$ = space$(Len(ss$) - nn& + Len(rest$) * 2)
+                            End If
+                        End If
+                        ProcPath = False: Exit Function
+                ElseIf it = 2 Then
                     If ss$ = "" Then
                     If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
                     Else
@@ -29292,9 +29311,9 @@ NumberId numid, funid
 StringId strID, strfunid
 NoOptimum = False
 If Lang = 0 Then
-sHelp "Μ2000 [ΒΟΗΘΕΙΑ]", "Γράψε ΤΕΛΟΣ για να βγεις από το πρόγραμμα" + vbCrLf + "Δες τα ΟΛΑ (κάνε κλικ στο ΟΛΑ)" + vbCrLf + "George Karras 2025", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
+sHelp "Μ2000 [ΒΟΗΘΕΙΑ]", "Γράψε ΤΕΛΟΣ για να βγεις από το πρόγραμμα" + vbCrLf + "Δες τα ΟΛΑ (κάνε κλικ στο ΟΛΑ)" + vbCrLf + "George Karras 2026", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
 Else
-sHelp "Μ2000 [HELP]", "Write END for exit from this program" + vbCrLf + "See ALL commands  (click on ALL)" + vbCrLf + "George Karras 2025", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
+sHelp "Μ2000 [HELP]", "Write END for exit from this program" + vbCrLf + "See ALL commands  (click on ALL)" + vbCrLf + "George Karras 2026", (ScrInfo(Console).Width - 1) * 3 / 5, (ScrInfo(Console).Height - 1) * 1 / 7
 End If
 NERR = False
 lckfrm = 0
@@ -35814,9 +35833,9 @@ cont2:
 conthere:
     ProcPen = True
     If FastSymbol(rest$, "{") Then
-        ss$ = block(rest$)
-        TraceStore basestack, nd&, rest$, 0
-        rest$ = Mid$(rest$, 2)
+        'ss$ = block(rest$)
+        'TraceStore basestack, nd&, rest$, 0
+        'rest$ = Mid$(rest$, 2)
         
          y1 = GetCode(Scr)
             x1 = players(y1).mypen
@@ -35827,23 +35846,28 @@ conthere:
             If mytr >= 0 Then players(y1).mypentrans = CLng(mytr)
             TextColor Scr, players(y1).mypen
             
-            Call executeblock(it, basestack, ss$, False, once, , True)
-            TraceRestore basestack, nd&
+            Call executeblock(it, basestack, rest$, False, once)
+            
+        
+           ' TraceRestore basestack, nd&
             players(y1).mypen = x1
             players(y1).mypentrans = z1
             TextColor Scr, x1
-                If it = 2 Then
-                If ss$ = "" Then
+                If it = 1 Then
+                FastSymbol rest$, "}", True
+                ElseIf it = 2 Then
+                If rest$ = "" Then
                     If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
                 Else
-                    rest$ = ": Goto " + ss$
+                    rest$ = ": Goto " + rest$
                     If trace Then WaitShow = 2: TestShowSub = rest$
                 End If
                 
                         it = 1
                 End If
-            If it <> 1 Then ProcPen = False: rest$ = ss$ + rest$
-        
+                If it <> 1 Then ProcPen = False: Exit Function
+            ': SwapStrings rest$, ss$ ' rest$ = ss$ + rest$
+            
     Else
     Dim mp As Long
     

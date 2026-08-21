@@ -5883,7 +5883,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 25 and above"
+	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 27 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -10000,7 +10000,7 @@ FadeScreen &Dummy(), 1.7
 MODULE COMPILER {module global getExample {	
 	print "choose example",
 	menu "Mandelbrot", "primes","test Case 4", "99 Bottles of Beer", "FizzBuzz", "fibonacci of 44 is 701408733", "12 factorial is 479001600"
-	if menu Then print menu$(menu) else exit
+	if menu Then print menu$(menu) else print "exit":exit
 	Select Case menu
 	Case 1
 		Push {
@@ -10973,7 +10973,9 @@ module CompilerExample {
 		print
 		print round(Timecount/1000,2),"s"
 	}
+	flush
 	getExample
+	if not islet then exit
 	form! 104, 60
 	refresh
 	print "Lexical Analyzer" : refresh
@@ -21913,7 +21915,9 @@ MODULE MAXITEM {Module TestThis {
       Print C
       ret=MaxItem(C)
       if ret=-infinity then print "No numbers found" else print ret
-      
+      pen 11 {
+          Print "using C#max():"; c#max()
+      }
       Pen 15 {Print "Search a stack object"}
       \\ a stack object is the same as the stack of values
       \\ which always is present
@@ -21938,7 +21942,14 @@ MODULE MAXITEM {Module TestThis {
       }
       Print Len(D)
       Print D
-      Print MaxItemStack(D)     	
+      Print MaxItemStack(D)
+      ' array(D)#max() empty D
+      pen 11  {
+          Print "using array(stack(D))#max() preserving D:"; array(stack(D))#max()
+          Print "len(D):";len(D)
+          Print "using array(D)#max() consuming D:"; array(D)#max()
+          Print "len(D):";len(D)
+      }
 }
 TestThis
 }
@@ -55057,29 +55068,13 @@ exit2:
 	mText:          dw "HELLO THERE", 0
 	mCaption:       dw "GEORGE", 0
 }
-Assembler=getobject("","m2000.x86")
-function x86 (b as string, &outbuffer, useprep as boolean=false) {
-	if Assembler=>assemble(b, true) then
-		local OutPutSize=Assembler=>OutputSize
-		buffer code outbuffer as byte*OutputSize
-		Assembler=>BaseAddress = outbuffer(0)
-		if Assembler=>assemble(b) then
-			outbuffer=>FillDataFromMem Assembler=>GetOutPtr
-		else
-			error "x86 fault 2"
-		end if
-	else
-		error "x86 fault 1"
-	end if
-}
-var example1
-call local x86(ASM_TEST, &example1)
+(example1, Assembler)=Assembly(ASM_TEST, true)
 cls
 refresh 2000
 ' execute code pass to ebp	(call through WindowProc)
 ' try 5001 and press ctrl+c to break it
 profiler
-    Execute Code Example1, Assembler=>labeloffset("stdCall"), 501;
+Execute Code Example1, Assembler=>labeloffset("stdCall"), 501;
 Example1=>callback2=true
 print timecount:refresh
 PressKey "Test 1 complete"
@@ -55101,5 +55096,134 @@ sub PressKey(a$="")
 	Print a$;" - Press any key":refresh
 	Push Key$:Drop:CLS
 end sub
+}
+MODULE BABYLON {cls 15,0
+pen 0
+module babylonian_spiral (max=40) {
+	static function addtuple()
+	declare math math
+	const tau=6.283185307179586
+	fillsq=lambda i=0&&-> {
+		=i**2:i++
+	}
+	dim sq(max) as long long<<fillsq(), candidate()
+	xydeltas=((0&, 0&), (0&, 1&))
+	def isqrt(n)=val(sqrt(n)->long)
+	def pr(c)="("+c#str$(", ")+")"
+	long δsquared = 1
+	
+	for l=0 to max-3
+		(x,y)=xydeltas#val(len(xydeltas)-1)
+		θ = math=>atan2(y, x)
+		candidates=stack
+		while len(candidates)=0
+			δsquared++
+			for i=0& to max-1
+				a=sq(i)
+				if a > δsquared/2& then exit for
+				for j =isqrt(δsquared) + 1 to  1
+					b = sq(j)
+					if a + b < δsquared then exit for
+					if a + b = δsquared then
+						stack candidates {
+						data (i, j), (-i, j), (i, -j), (-i, -j)
+						data (j, i), (-j, i), (j, -i), (-j, -i)
+						}
+					end if
+				next
+			next
+		end while 
+		minimum=(,)
+		minval=tau
+		stack candidates {
+			while not empty
+				read candidate()
+				val =  (θ - math=>atan2(candidate(1), candidate(0))) mod# tau
+				if val < minval then minval = val : minimum = candidate()
+			end while
+		}
+		append xydeltas, (minimum,)
+	next
+	link xydeltas to xy() 
+	for i=0 to len(xydeltas)-2
+		xy(i+1)=addtuple(xy(i+1), xy(i))
+	next 
+	drawing 12000, 12000 {
+		cls, 0: pen 0 : move 0,0
+		(m1, m2, s1)=(6000, 6000, twipsx*10)
+		move m1, m2
+		k=each(xy())
+		while k
+			draw to xy(k^)(0)*s1+m1, m2-xy(k^)(1)*s1
+			circle fill 1, 30
+		end while
+	} as drw
+	image drw
+	clipboard drw as "emf"
+	document doc$
+	for i=0 to len(xydeltas)-2
+		doc$=pr(xydeltas#val(i))+", "
+	next
+	doc$=pr(xydeltas#val(i))
+	print doc$
+	save.doc doc$, "out.txt"
+	function addtuple(a(), b())
+		=a(0)+b(0), a(1)+b(1)
+	end function
+}
+babylonian_spiral 40
+}
+MODULE SPECIFIC {rem {
+	https://rosettacode.org/wiki/Specific_characters
+	RULES:
+	- It appears exactly twice in this string.
+	- It does not appear in any other string in the list.
+	Extra credit: count the distinct characters which do not satisfy the condition.
+}
+module chekcit {
+	function specific_characters(){
+		let strlist()=array([])
+		function twice(j,&check(), max){
+			sum=0
+			string a
+			swap a, check(j)
+			for i=1 to len(a)
+				c$=mid$(a,i,1)
+				one=instr(a,c$)
+				if one<i then continue
+				two=instr(a,c$,one+1)
+				if two=0 then data c$:continue
+				if instr(a,c$,two+1)>0 then data c$:continue
+				boolean ok=true
+				for k=0 to max
+					if instr(check(k), c$)=0 then continue
+					ok=false
+					exit for
+				next
+				if ok then sum++ else data c$
+			next
+			swap a,check(j)			
+			=sum,stack.size, quote$(array([])#str$(""))
+			
+		}
+		max=len(strlist())-1
+		if max=0 then =(,):exit
+		for i=0 to max
+			data twice(i, &strlist(), max)
+		next
+		=array([])
+	}
+	param=("ahwiueshaiu", "ajxxfioaaf", "ajrdsfroiwr")
+	arrdis=lambda (arr as array)->{
+			="["+arr#map(lambda ->{
+				if match("A") then read a:push a#str$(":")
+			})#str$(",")+"]"
+	}
+	disp=param#map(lambda->{push quote$(letter$)})
+	print arrdis(disp)+ " = " +arrdis(specific_characters(!param))
+	' output
+	' ["ahwiueshaiu","ajxxfioaaf","ajrdsfroiwr"] = [2:5:"awies",1:5:"ajfio",0:9:"ajrdsfoiw"]
+}
+chekcit
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

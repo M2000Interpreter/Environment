@@ -841,7 +841,7 @@ notweak = False
 MyReFill
 If Not IsSupervisor Then
 If CFname(userfiles & "desktop.inf") <> "" Then
-RenameFile userfiles & "desktop.inf", Format(Date, "YYYYMMDD") + Format$(Timer Mod 10000, "0000") + ".inf"
+RenameFile userfiles & "desktop.inf", format(Date, "YYYYMMDD") + format$(Timer Mod 10000, "0000") + ".inf"
 End If
 End If
 ShutMe
@@ -952,7 +952,7 @@ gList11.restrictLines = 6
 gList11.CenterText = True
 gList11.VerticalCenterText = True
 
-gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2025 ©"
+gList11.Text = "Warning: There is no " & vbCrLf & "warning about this " & vbCrLf & "software except that" & vbCrLf & "is given AS-IS" & vbCrLf & vbCrLf & "George Karras 1999-2026 ©"
 
 height1 = 6450 * DYP / 15
 width1 = 9900 * DXP / 15
@@ -1063,7 +1063,7 @@ Else
 myCommand.Caption = "OK"
 End If
   Set myCommand.Callback = Me
-  myCommand.Index = 1
+  myCommand.index = 1
 myCommand.enabled = True
 Set myUnicode = New myButton
 Set myUnicode.Container = command1(1)
@@ -1076,7 +1076,7 @@ End If
 myUnicode.enabled = True
 Set myCancel = New myButton
 Set myCancel.Container = command1(2)
-myCancel.Index = 2
+myCancel.index = 2
 If TweakLang = 0 Then
 myCancel.Caption = "ΑΚΥΡΟ"
 Else
@@ -1232,12 +1232,12 @@ DIS.ShowMe2
 
 End Sub
 
-Private Sub InterPress_Press(Index As Long)
-If Index = 1 Then
+Private Sub InterPress_Press(index As Long)
+If index = 1 Then
 
 Command111_Click
 'Unload Me  'remove this line
-ElseIf Index = 2 Then
+ElseIf index = 2 Then
 ShutMe
 Else
 If myUnicode.Caption = "Unicode Preview" Then

@@ -1,63 +1,56 @@
 M2000 Interpreter and Environment
-Version 15 Revision 26
+Not Finish: Version 15 Revision 27
 
-August 18, 2026,
-1. Fix a small mistake from previous 2-3 revisions
-a=(10,3i)
-print a|r ' was ok
-print a|r/3 ' had problem now fixed (revision 19 was ok)
+August 23.
+Not finish 27
+1. I do some changes so when I press Shift F1 after an error stop e program automatic open the fault module at the point of error.
+I have a little job to finish this (Works 95% of situations)
 
-2. New function Assembly()
-This is from Help Assembly()
+2. Upgrade Control Form with Step Over/Step In/Step out (for one level for this revision). Also Control Form Title change background color to dark gray when form missing focus. Also, pressing ctrl F1 or Shift F1 a sheet of functions keys displayed in help form, Using StepOver F9 in a module then F5 step on that module statements and not going in functions or modules which called from that module. Using StepIn F10 you can go in and pressing F11 (Step Out) quick executed code and stop and wait for f5 returning to module which we press the F9 (step Over).  I am thinking about make this functionallity with more than one level..
 
-' using assembly(code$) we get the machince code for running from the first offset 
-example1=Assembly({
-    fild  dword [esp+4]    ; st0 = numerator
-    fild  dword [esp+8]    ; st0 = divisor, st1 = numerator
-    fdivp                  ; st1 = st1 / st0, pop st0
-    mov eax, 0    
-    ret 8
-})
-Declare Division Code example1(0) {long a, long b} as single
-Print Division(34, 10)=3.4
+3. Fix a problem with arrays when we feed them from stack of values, from tuples
+' first using poiners to arrays (with no parenthesis) - no problem on old revisions
+push (1,2)
+read z
+m=z  ' point to z
+push (3,4)
+read z ' z point to (3,4)
+print m ' m point to (1,2)
+print m#str$()="1 2"
 
-' using assembly(code$, true) we get tuple, machinecode in a buffer and the object to get pointers from labels
-(example1, Assembler)=Assembly({
-    fild  dword [esp+4]    ; st0 = numerator
-    fild  dword [esp+8]    ; st0 = divisor, st1 = numerator
-    fdivp                  ; st1 = st1 / st0, pop st0
-    mov eax, 0    
-    ret 8
-ASM_TEST_CPUID:
-    ;mov eax, [esp+4]
-    pushad ; 32 bytes
-    xor eax, eax
-    mov edi, [esp+36]
-    xor eax, eax
-    cpuid
-    mov [edi+0], ebx
-    mov [edi+4], edx
-    mov [edi+8], ecx
-    popad
-    xor eax, eax
-    ret 4
-}, true)
-Declare Division Code example1(0) {long a, long b} as single
-Print Division(34, 10)=3.4
-Dim Ret(12) as byte
-addrPtr=Assembler=>LabelPtr("ASM_TEST_CPUID")
-Hex "Call address of ASM_TEST_CPUID = ";addrPtr
-Declare CPUID Code addrPtr {long ptrArrayItem}
-call CPUID(VarPtr(Ret(0)))
-' chr(number) return ansi string
-for i=0 to len(Ret())-1
-    Print chr(Ret(i));
-next
-Print
-buffer clear retstring as byte*12
-call CPUID(retstring(0))
-' chr$(string_value) convert ANSI to UTF16LE
-Print chr(retstring[0, 12])
+' second we get a pointer from array. -  has problem on old revisions
+clear ' erase variables for this module
+dim z() 
+push (1,2)
+read z() 
+print type(z())="mArray"
+m=z() ' m points to (1,2)
+push (3,4)
+read z() ' z() get a new object
+print type(z()) = "mArray"
+' here was the fault: m points to new z() value
+print m ' show 1 2 m points to old one - this was by design and restored
+z(0)+=100  ' fault show 103 2 on m
+print m ' right value show 1 2 m, points to old one - this was by design and restored
+
+print m#str$()="1 2"  ' this show 
+' third - we make a link (a reference) to an array()  - no problem on old revisions 
+clear '
+dim z() 
+push (1,2)
+read z() 
+link z() to m  ' now m is z()
+push (3,4)
+read z() ' z() get a new object
+print m  ' now m show 3, 4
+print type(z()) = "mArray"
+print m#str$()="3 4"
+z(0)+=100  '  show 103 2
+print m#str$()="103 4"
+
+
+No binaries yet fot Revision 27
+
 
 
 George Karras, Kallithea Attikis, Greece.

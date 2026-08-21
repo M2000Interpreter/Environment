@@ -3083,7 +3083,7 @@ ElseIf FastSymbol(a$, "}") Then
         addone 1, 14
         If MaybeIsSymbol(a$, "(") Then
             GoTo CheckThis
-        ElseIf MaybeIsSymbol(a$, ",;") Then
+        ElseIf MaybeIsSymbol(a$, ",") Then
             a$ = Mid$(a$, 2)
             GoTo CheckThis
         End If

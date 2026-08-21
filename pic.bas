@@ -5388,6 +5388,10 @@ Case "LET", "стг", "стгм", "сто", "стис", "ста"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoLet)
 Case "PRINT", "тупысе", "?"
     aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoPrint)
+Case "ERROR", "кахос"
+    aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoError)
+Case "STACK", "сыяос"
+   aHash.ItemCreator CStr(mycommands(i)), ProcPtr(AddressOf NeoStack)
 Case "CALL", "йакесе"
     aHash.ItemCreator2 CStr(mycommands(i)), 0, 38
 Case "CHOOSE.OBJECT", "епекене.амтийеилемо", "епикене.амтийеилемо"
@@ -5679,7 +5683,7 @@ Function ProcWriter(basestack As basetask, rest$, Lang As Long) As Boolean
 Dim prive As Long
 prive = GetCode(basestack.Owner)
 If Lang = 1 Then
-PlainBaSket basestack.Owner, players(prive), "George Karras (C), Kallithea Attikis, Greece 1999-2025"
+PlainBaSket basestack.Owner, players(prive), "George Karras (C), Kallithea Attikis, Greece 1999-2026"
 Else
 PlainBaSket basestack.Owner, players(prive), ListenUnicode(915, 953, 974, 961, 947, 959, 962, 32, 922, 945, 961, 961, 940, 962, 32, 40, 67, 41, 44, 32, 922, 945, 955, 955, 953, 952, 941, 945, 32, 913, 964, 964, 953, 954, 942, 962, 44, 32, 917, 955, 955, 940, 948, 945, 32, 49, 57, 57, 57, 45, 50, 48, 50, 53)
 End If

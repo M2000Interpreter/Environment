@@ -118,7 +118,7 @@ Private Type myImage
     Image As StdPicture
     Height As Long
     Width As Long
-    Top As Long
+    top As Long
     Left As Long
 End Type
 Private ShearchList As String
@@ -128,7 +128,7 @@ Dim nopreview As Boolean
 Dim oldLeftMarginPixels As Long
 Dim firstpath As Long
 Dim setupxy As Single
-Dim lX As Long, lY As Long, dr As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean
 Dim scrTwips As Long
 Dim bordertop As Long, borderleft As Long
 Dim allwidth As Long, itemWidth As Long
@@ -236,7 +236,7 @@ With gList1
 .additemFast "με διπλό κλικ στη λίστα"
 .menuEnabled(21) = False
 .AddSep
-.additemFast "Γιώργος Καρράς 2014-2025"
+.additemFast "Γιώργος Καρράς 1999-2026"
 .menuEnabled(23) = False
 
 oldLeftMarginPixels = .LeftMarginPixels + 10
@@ -287,7 +287,7 @@ With gList1
 .additemFast "or double click the file list"
 .menuEnabled(21) = False
 .AddSep
-.additemFast "George Karras 2014-2025"
+.additemFast "George Karras 1999-2026"
 .menuEnabled(23) = False
 
 oldLeftMarginPixels = .LeftMarginPixels + 10
@@ -368,7 +368,7 @@ If bordertop < 150 Then
 If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
 dr = True
 MousePointer = vbSizeNWSE
-lX = X
+Lx = X
 lY = Y
 End If
 
@@ -376,7 +376,7 @@ Else
 If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
 dr = True
 MousePointer = vbSizeNWSE
-lX = X
+Lx = X
 lY = Y
 End If
 
@@ -395,7 +395,7 @@ If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then Mo
 End If
 If dr Then
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-    If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
+    If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
     
    If Not ExpandWidth Then addX = 0
         If lastfactor = 0 Then lastfactor = 1
@@ -426,10 +426,10 @@ If dr Then
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, DialogPreview, Width
-        lX = X
+        Lx = X
         
         Else
-        lX = X * lastfactor / factor
+        Lx = X * lastfactor / factor
          ScaleDialog lastfactor, DialogPreview, (Width + addX) * lastfactor / factor
          End If
 
@@ -448,7 +448,7 @@ If dr Then
         'End If
         End If
         Else
-        lX = X
+        Lx = X
         lY = Y
    
 End If
@@ -494,7 +494,7 @@ Set Image1.Image = Nothing
 Image1.Width = 0
 
 selectorLastX = Left
-selectorLastY = Top
+selectorLastY = top
 Sleep 200
 loadfileiamloaded = False
 End Sub
@@ -1015,10 +1015,10 @@ b = CLng(Rnd * 3) + setupxy / 3
 
 CopyFromLParamToRect a, thatRect
 a.Left = a.Right - setupxy
-a.Top = b
+a.top = b
 a.Bottom = b + setupxy / 5
 mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
-a.Top = b + setupxy / 5 + setupxy / 10
+a.top = b + setupxy / 5 + setupxy / 10
 a.Bottom = b + setupxy \ 2
 mySelector.FillThere thathDC, VarPtr(a), thatbgcolor
 
@@ -1029,13 +1029,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 mySelector.FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 mySelector.FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -1044,7 +1044,7 @@ End Sub
 Sub PlaceSettings()
 ' using global var settings
 Dim a() As String, i As Long, j As Long
-a() = split(Settings, ",")
+a() = Split(Settings, ",")
 For i = 0 To gList1.listcount - 1
 gList1.ListSelectedNoRadioCare(i) = False
 Next i
@@ -1058,7 +1058,7 @@ Function ReadSettings() As Boolean
 ' using global var settings
 ' we have to read at NostateDir=true
 Dim a() As String, i As Long, j As Long
-a() = split(Settings, ",")
+a() = Split(Settings, ",")
 ' reset some flags
 gList1.StickBar = False
 mySelector.mselChecked = False
@@ -1181,7 +1181,7 @@ allheight = bordertop + heightTop + bordertop + heightSelector + bordertop + Hei
 
 End If
 
-move Left, Top, allwidth, allheight
+move Left, top, allwidth, allheight
 gList2.move borderleft, bordertop, itemWidth, heightTop
 gList1.move borderleft, 2 * bordertop + heightTop, itemWidth, heightSelector
 gList3.move borderleft, allheight - HeightBottom - bordertop, itemWidth, HeightBottom

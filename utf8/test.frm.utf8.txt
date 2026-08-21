@@ -23,23 +23,15 @@ Begin VB.Form Form2
       TabIndex        =   5
       Top             =   810
       Width           =   3705
-      _ExtentX        =   6535
-      _ExtentY        =   3387
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   12
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      BorderStyle     =   1
-      ShowBar         =   0   'False
-      Backcolor       =   3881787
-      ForeColor       =   16777215
+      _extentx        =   6535
+      _extenty        =   3387
+      max             =   1
+      vertical        =   -1
+      font            =   "TEST.frx":000C
+      borderstyle     =   1
+      showbar         =   0
+      backcolor       =   3881787
+      forecolor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   600
@@ -49,21 +41,13 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   810
       Width           =   3930
-      _ExtentX        =   6932
-      _ExtentY        =   1058
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   11.25
-         Charset         =   161
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Backcolor       =   3881787
-      ForeColor       =   16777215
+      _extentx        =   6932
+      _extenty        =   1058
+      max             =   1
+      vertical        =   -1
+      font            =   "TEST.frx":0030
+      backcolor       =   3881787
+      forecolor       =   16777215
    End
    Begin M2000.gList gList0 
       Height          =   555
@@ -71,22 +55,14 @@ Begin VB.Form Form2
       TabIndex        =   1
       Top             =   4620
       Width           =   7665
-      _ExtentX        =   13520
-      _ExtentY        =   979
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   11.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      Backcolor       =   657930
-      ForeColor       =   16777215
+      _extentx        =   13520
+      _extenty        =   979
+      max             =   1
+      vertical        =   -1
+      font            =   "TEST.frx":0054
+      showbar         =   0
+      backcolor       =   657930
+      forecolor       =   16777215
    End
    Begin M2000.gList gList1 
       Height          =   1800
@@ -94,22 +70,14 @@ Begin VB.Form Form2
       TabIndex        =   0
       Top             =   2775
       Width           =   7665
-      _ExtentX        =   13520
-      _ExtentY        =   3175
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   11.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      Backcolor       =   3881787
-      ForeColor       =   16777215
+      _extentx        =   13520
+      _extenty        =   3175
+      max             =   1
+      vertical        =   -1
+      font            =   "TEST.frx":0078
+      showbar         =   0
+      backcolor       =   3881787
+      forecolor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   615
@@ -119,22 +87,14 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   1455
       Width           =   3930
-      _ExtentX        =   6932
-      _ExtentY        =   1085
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   11.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      Backcolor       =   3881787
-      ForeColor       =   16777215
+      _extentx        =   6932
+      _extenty        =   1085
+      max             =   1
+      vertical        =   -1
+      font            =   "TEST.frx":009C
+      showbar         =   0
+      backcolor       =   3881787
+      forecolor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   615
@@ -144,22 +104,14 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   2115
       Width           =   3930
-      _ExtentX        =   6932
-      _ExtentY        =   1085
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   11.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      Backcolor       =   3881787
-      ForeColor       =   16777215
+      _extentx        =   6932
+      _extenty        =   1085
+      max             =   1
+      vertical        =   -1
+      font            =   "TEST.frx":00C0
+      showbar         =   0
+      backcolor       =   3881787
+      forecolor       =   16777215
    End
    Begin M2000.gList gList2 
       Height          =   495
@@ -168,23 +120,15 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   135
       Width           =   7635
-      _ExtentX        =   13467
-      _ExtentY        =   873
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   14.25
-         Charset         =   161
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Enabled         =   -1  'True
-      Backcolor       =   3881787
-      ForeColor       =   16777215
-      CapColor        =   16777215
+      _extentx        =   13467
+      _extenty        =   873
+      max             =   1
+      vertical        =   -1
+      font            =   "TEST.frx":00E4
+      enabled         =   -1
+      backcolor       =   3881787
+      forecolor       =   16777215
+      capcolor        =   16777215
    End
 End
 Attribute VB_Name = "Form2"
@@ -202,7 +146,7 @@ Private Label(0 To 2) As New myTextBox
 Dim run_in_basestack1 As Boolean
 Dim MyBaseTask As New basetask
 Dim setupxy As Single
-Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
@@ -213,18 +157,142 @@ Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpD
 Dim EXECUTED As Boolean
 Dim stolemodalid As Variant
 Public Sub generalFkey(a As Integer)
-Dim monitor As Long, titl$, once As Boolean
+Dim monitor As Long, titl0$, titl$, once As Boolean
 If once Then Exit Sub
+
 once = True
-If a = 2 Then
+If a = 13 Then
+If pagio$ = "GREEK" Then
+titl$ = "F1 - ανάλογα με την επιλεγμένη θέαση" + vbCrLf
+titl$ = titl$ + "F1 Shift ή Control επιλέγει αυτή τη φόρμα" + vbCrLf
+titl$ = titl$ + "F2 - Μετάβαση στο στοιχείο Εισαγωγή" + vbCrLf
+titl$ = titl$ + "F3 - Αλλαγή θέασης (τρεις επιλογές)" + vbCrLf
+titl$ = titl$ + "F4 - Θέαση στη Φόρμα Βοήθειας" + vbCrLf
+titl$ = titl$ + "F5 - Επόμενο Βήμα" + vbCrLf
+titl$ = titl$ + "* Με το Enter στο F5 δίνουμε πολλαπλά F5" + vbCrLf
+titl$ = titl$ + "F6 - Στο Λάθος, ίσως το ξεπεράσουμε με το F5" + vbCrLf
+titl$ = titl$ + "F7 - Αργή Ροή, τερματισμός στο λάθος (shift F1 για έλεγχο λάθους)" + vbCrLf
+titl$ = titl$ + "F8 - Τερματισμός Εκτέλεσης" + vbCrLf
+titl$ = titl$ + "f9 - Βήμα στο ίδιο επίπεδο" + vbCrLf
+titl$ = titl$ + "F10 - Βήμα χωρίς έλεγχο επιπέδου" + vbCrLf
+titl$ = titl$ + "F11 - Επαναφορά του ελέχου επιπέδου" + vbCrLf
+titl$ = titl$ + "F12 - Λίστα Τμημάτων στη Φόρμα Βοήθειας" + vbCrLf
+titl$ = titl$ + vbCrLf
+titl$ = titl$ + "Κλίκ στο όνομα τμήματος δίνει το κώδικα στη Φόρμα Βοήθειας" + vbCrLf
+titl$ = titl$ + "Κλίκ στην εντολή δίνει τη βοήθεια στη Φόρμα Βοήθειας" + vbCrLf
+titl$ = titl$ + "Κλίκ στις παραμέτρους αλλάζει την Θέαση (ίδιο με το F4" + vbCrLf
+titl$ = titl$ + vbCrLf
+titl$ = titl$ + "Στην Εισαγωγή με αρχικό σύμβολο ? βάζουμε τύπους που θελουμε να εμφανίζονται σε κάθε εκτέλεση γραμμής" + vbCrLf
+titl$ = titl$ + "Στην Εισαγωγή με αρχικό σύμβολο > δίνουμε άμεσα εντολές σαν να εκτελούνται στο κώδικα" + vbCrLf
+titl$ = titl$ + "Στην Εισαγωγή όταν σβήνουμε όλα τα στοιχεία με Backspace αλλάζουμε το σύμβολο εισαγωγής" + vbCrLf
+
+Else
+titl$ = "F1 - depend on view" + vbCrLf
+titl$ = titl$ + "F1 Shift or Control open this form" + vbCrLf
+titl$ = titl$ + "F2 - select textbox" + vbCrLf
+titl$ = titl$ + "F3 - change view (3 modes)" + vbCrLf
+titl$ = titl$ + "F4 - view on help form" + vbCrLf
+titl$ = titl$ + "F5 - Next Step" + vbCrLf
+titl$ = titl$ + "* Press Enter on F5 for auto repeat" + vbCrLf
+titl$ = titl$ + "F6 - Τo Error, may bypass error with F5" + vbCrLf
+titl$ = titl$ + "F7 - Slow Flow, Stop Execution on error (Shift + F1 to check error)" + vbCrLf
+titl$ = titl$ + "F8 - Stop Execution" + vbCrLf
+titl$ = titl$ + "f9 - Step Over" + vbCrLf
+titl$ = titl$ + "F10 - Step In" + vbCrLf
+titl$ = titl$ + "F11 - Step Out" + vbCrLf
+titl$ = titl$ + "F12 - List of Modules on help form" + vbCrLf
+titl$ = titl$ + vbCrLf
+titl$ = titl$ + "Click on module name to view code on Help Form" + vbCrLf
+titl$ = titl$ + "Click on command name to view help on Help Form" + vbCrLf
+titl$ = titl$ + "Click on parameters to change view (same as F4" + vbCrLf
+titl$ = titl$ + vbCrLf
+titl$ = titl$ + "On TextBox and prompt symbol ? place a list of expressios for view for each execution" + vbCrLf
+titl$ = titl$ + "On TextBox and prompt symbol > execute statments inline" + vbCrLf
+titl$ = titl$ + "On TextBox clear the line and press BackSpace to change prompt" + vbCrLf
+
+End If
+
+   If pagio$ = "GREEK" Then titl0$ = "Φόρμα Ελέγχου Πλήκτρα Λειτουργιών" Else titl0$ = "Control Form Function Keys"
+        GoSub FindWindow
+sHelp titl0$, titl$, (ScrInfo(monitor).Width - 1) * 3 / 5, (ScrInfo(monitor).Height - 1) * 4 / 7
+        If Not Form4.Visible Then vHelp True
+        Form4.label1.SelStartSilent = testpad.SelStart
+        vHelp
+ElseIf a = 12 Then
+    interpret Basestack1, "help f12"
+ElseIf a = 2 Then
 gList0.SetFocus
 ElseIf a = 3 Then
 glist3_CheckGotFocus 2
 ElseIf a = 5 Then
+again5:
+If stoponerror Then
+    MyEr "", ""
+End If
 gList4.ListIndex = 0
 gList4_Selected2 0
+ElseIf a = 11 Then
+' step out
+If StepIn And Len(steptothat) > 0 Then
+stoponerror = False
+StepOver = True
+StepIn = False
+GoTo again9
+End If
+Beep
+ElseIf a = 9 Then
+StepIn = False
+If here$ <> vbNullString Then
+If StepOver And steptothat = GetName(here$) Then
+GoTo again5
+End If
+End If
+If here$ <> vbNullString Then
+stoponerror = False
+StepOver = True
+StepIn = False
+stephere$ = here$
+steptothat = GetName(here$)
+again9:
+If pagio$ = "GREEK" Then
+gList4.list(1) = "Επόμενο Μέσα F10"
+Else
+gList4.list(1) = "Step In F10"
+End If
+
+gList4.ListIndex = 0
+gList4_Selected2 0
+Else
+Beep
+End If
+ElseIf a = 10 Then
+If StepOver Then
+StepOver = False
+StepIn = True
+STbyST = True
+If pagio$ = "GREEK" Then
+gList4.list(1) = "Επόμενο F9"
+Else
+gList4.list(1) = "Step Over F9"
+End If
+
+Else
+StepIn = True
+aaa:
+If pagio$ = "GREEK" Then
+gList4.list(1) = "Επόμενο F9"
+Else
+gList4.list(1) = "Step Over F9"
+End If
+GoTo again5
+End If
+
+GoTo again5
 ElseIf a = 6 Then
 stoponerror = True
+StepOver = False
+StepIn = False
+
 If pagio$ = "GREEK" Then
 gList4.list(1) = "Στο Λάθος F6"
 Else
@@ -235,6 +303,8 @@ End If
 gList4.ListIndex = 1
 gList4_Selected2 1
 ElseIf a = 7 Then
+StepOver = False
+StepIn = False
 If pagio$ = "GREEK" Then
 gList4.list(1) = "Αργή Ροή F7"
 Else
@@ -246,6 +316,15 @@ gList4_Selected2 1
 ElseIf a = 8 Then
 gList4.ListIndex = 2
 gList4_Selected2 2
+ElseIf switchview = 1 And a = 1 Then
+StepOver = False
+StepIn = False
+stoponerror = False
+
+Form_Load
+trace = True
+STq = False
+STbyST = True
 ElseIf switchview = 2 Then
     If a = 1 Then
         Errorlog.EmptyDoc
@@ -377,14 +456,21 @@ Modalid = Rnd * 645677887
 End If
 Else
 End If
+On Error Resume Next
+gList2.CapColor = rgb(255, 160, 0)
+gList2.ShowMe
 'If Not Busy Then generalFkey 2 Else Debug.Print "test is busy"
 End Sub
 
 Private Sub Form_Deactivate()
+
 If stolemodalid <> 0 Then
 Modalid = stolemodalid
 stolemodalid = 0
 End If
+On Error Resume Next
+gList2.CapColor = rgb(32, 32, 32)
+gList2.ShowMe
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, shift As Integer)
@@ -466,6 +552,11 @@ Label(2).Prompt = "Επόμενο: "
 gList4.additemFast "Επόμενο Βήμα F5"
 If stoponerror Then
 gList4.additemFast "Στο Λάθος F6"
+ElseIf StepIn Then
+gList4.additemFast "Επόμενο F9"
+ElseIf StepOver Then
+gList4.additemFast "Επόμενο Μέσα F10"
+
 Else
 gList4.additemFast "Αργή Ροή F7"
 End If
@@ -481,6 +572,10 @@ Label(2).Prompt = "Next: "
 gList4.additemFast "Next Step F5"
 If stoponerror Then
 gList4.additemFast "To Error F6"
+ElseIf StepIn Then
+gList4.additemFast "Step Over F9"
+ElseIf StepOver Then
+gList4.additemFast "Step In F10"
 Else
 gList4.additemFast "Slow Flow F7"
 End If
@@ -557,11 +652,16 @@ testpad.Dereference
 Compute.Dereference
 Set MyBaseTask = Nothing
 trace = False
+StepOver = False
 STq = True
 End Sub
 
 
 
+
+Private Sub gList0_CtrlPlusF1()
+generalFkey 13
+End Sub
 
 Private Sub gList0_Fkey(a As Integer)
 generalFkey a
@@ -582,9 +682,17 @@ GetPanelPos
 End Sub
 
 
+Private Sub gList1_CtrlPlusF1()
+generalFkey 13
+End Sub
+
 Private Sub gList1_Fkey(a As Integer)
 
 generalFkey a
+End Sub
+
+Private Sub gList2_CtrlPlusF1()
+generalFkey 13
 End Sub
 
 Private Sub gList2_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
@@ -604,16 +712,16 @@ End If
 
 End Sub
 
-Public Property Let Label1prompt(ByVal Index As Long, ByVal RHS As String)
-Label(Index).Prompt = RHS
+Public Property Let Label1prompt(ByVal index As Long, ByVal RHS As String)
+Label(index).Prompt = RHS
 End Property
 
-Public Property Get label1(ByVal Index As Long) As String
-label1 = Label(Index)
+Public Property Get label1(ByVal index As Long) As String
+label1 = Label(index)
 End Property
 
-Public Property Let label1(ByVal Index As Long, ByVal RHS As String)
-Label(Index) = RHS
+Public Property Let label1(ByVal index As Long, ByVal RHS As String)
+Label(index) = RHS
 End Property
 Public Sub FillThereMyVersion(thathDC As Long, thatRect As Long, thatbgcolor As Long)
 Dim a As RECT, b As Long
@@ -621,13 +729,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -671,16 +779,17 @@ End Sub
 
 
 
-Private Sub glist3_CheckGotFocus(Index As Integer)
+Private Sub glist3_CheckGotFocus(index As Integer)
 Dim s$, z$
-gList4.SetFocus
+
 On Error GoTo there1
-If Index < 2 Then
+gList4.SetFocus
+If index < 2 Then
 abt = False
 
 vH_title$ = vbNullString
-s$ = Label(Index)
-If Index = 1 Then
+s$ = Label(index)
+If index = 1 Then
    
         Dim i As Long
         If MyBaseTask.ExistVar2(s$) Then
@@ -744,7 +853,7 @@ sHelp s$, MyBaseTask.Process.CodeData, vH_x, vH_y
 vHelp
 End If
 Else
-If Index = 0 Then
+If index = 0 Then
 i = MyBaseTask.OriginalCode
 JUMPHERE:
 Dim aa As Long, aaa As String
@@ -779,7 +888,7 @@ Case "?", "!", " ", ".", ":", Is >= "A", Chr$(10), """"
 End Select
 End If
 End If
-ElseIf Index = 2 Then
+ElseIf index = 2 Then
     GetPanelPos
     switchview = switchview + 1: If switchview > 2 Then switchview = 0
     TestShowCode = switchview = 1
@@ -804,8 +913,16 @@ End If
 there1:
 End Sub
 
-Private Sub gList3_Fkey(Index As Integer, a As Integer)
+Private Sub gList3_CtrlPlusF1(index As Integer)
+generalFkey 13
+End Sub
+
+Private Sub gList3_Fkey(index As Integer, a As Integer)
 generalFkey a
+End Sub
+
+Private Sub gList4_CtrlPlusF1()
+generalFkey 13
 End Sub
 
 Private Sub gList4_ExposeRect(ByVal item As Long, ByVal thisrect As Long, ByVal thisHDC As Long, skip As Boolean)
@@ -824,7 +941,7 @@ b.Right = gList4.WidthPixels
              End If
              'EXECUTED = False
               SetTextColor thisHDC, 0
-              b.Top = b.Bottom - 1 * lastfactor
+              b.top = b.Bottom - 1 * lastfactor
        
             FillBack thisHDC, b, &H777777
            
@@ -832,7 +949,7 @@ b.Right = gList4.WidthPixels
           
           
     SetTextColor thisHDC, gList4.ForeColor
-    b.Top = b.Bottom - 1
+    b.top = b.Bottom - 1
     FillBack thisHDC, b, 0
     End If
     If item = gList4.ListIndex Then
@@ -872,6 +989,13 @@ trace = True
 STq = False
 STbyST = True
 Case 1
+If StepOver Then
+Me.generalFkey 10
+Exit Sub
+ElseIf StepIn Then
+Me.generalFkey 9
+Exit Sub
+End If
 trace = True
 STq = True
 STbyST = False
@@ -885,6 +1009,7 @@ NOEXECUTION = True
 trace = True
 STq = False
 STbyST = True
+
 End Select
 gList4.PanPos = 0
 gList4.ShowMe2
@@ -910,7 +1035,7 @@ If Button = 1 Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    lX = X
+    Lx = X
     lY = Y
     End If
     
@@ -919,7 +1044,7 @@ If Button = 1 Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    lX = X
+    Lx = X
     lY = Y
     End If
     End If
@@ -942,11 +1067,11 @@ If dr Then
 If bordertop < 150 Then
 
         If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - lX)
+     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
      
 Else
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
     End If
     
 
@@ -973,10 +1098,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        lX = X
+        Lx = X
         
         Else
-        lX = X * lastfactor / factor
+        Lx = X * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -991,7 +1116,7 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        lX = X
+        Lx = X
         lY = Y
    
 End If
@@ -1016,7 +1141,7 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = itemWidth * 2 / 5
 itemwidth2 = itemWidth * 3 / 5 - borderleft
-move Left, Top, allwidth, allheight
+move Left, top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
@@ -1064,27 +1189,27 @@ Dim oldlength As Long
 If pagio$ = "GREEK" Then
     Select Case that
     Case 0
-        testpad.Title = "Σωρός & Μεταβλητές | F4 = αντιγραφή στη βοήθεια"
+        testpad.Title = "Σωρός & Μεταβλητές | F3: Θέαση | F4: Αντιγραφή στη βοήθεια"
         testpad.ReplaceTitle = " "
     Case 1
         
-        testpad.Title = "Θέαση Κώδικα | F4  = αντιγραφή στη βοήθεια"
+        testpad.Title = "Θέαση Κώδικα | F1: Καθαρό | F4: Αντιγραφή στη βοήθεια"
         testpad.ReplaceTitle = " "
     Case 2
-        testpad.Title = "Καταγραφή Λαθών | F1 - Καθαρό | F4 = αντιγραφή στη βοήθεια"
+        testpad.Title = "Καταγραφή Λαθών | F1: Καθαρή Λίστα | F4: Αντιγραφή στη βοήθεια"
         testpad.ReplaceTitle = " "
     End Select
 Else
     Select Case that
     Case 0
-        testpad.Title = "Stack & Variables | F4 = copy to help form"
+        testpad.Title = "Stack & Variables | F3: Change View | F4: Copy to help form"
         testpad.ReplaceTitle = " "
     Case 1
         
-        testpad.Title = "Code View | F4 = copy to help form"
+        testpad.Title = "Code View |F1: Reset Form | F4: Copy to help form"
         testpad.ReplaceTitle = " "
     Case 2
-        testpad.Title = "Error Log | F1 - clear | F4 = copy to help form"
+        testpad.Title = "Error Log | F1: Clear Error | F4: Copy to help form"
         testpad.ReplaceTitle = " "
     End Select
 End If

@@ -1975,6 +1975,7 @@ conthere:
                 GoTo cont567
             End If
         End If
+        
         If Not interpret(Basestack1, qq$) Then
 cont123:
             If nOpenGl.Ready = True Then

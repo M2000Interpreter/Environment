@@ -39,10 +39,9 @@ UseIterator = False
 sign = 1
 End Sub
 
-''Public Par1 As Variant
 Private Sub Class_Terminate()
 If Not objref Is Nothing Then
-'If Typename(objref) = "GuiM2000" Then Stop
+
 Set objref = Nothing
 End If
 End Sub
@@ -125,7 +124,7 @@ If t1 = 2 Then
     End If
 End If
 End Property
-Friend Property Get CreateJpg(percent, comment$) As Object
+Friend Property Get CreateJpg(Percent, Comment$) As Object
 If t1 = 2 Then
     Dim mm As MemBlock, photo As cDIBSection
     Set mm = mObjRef
@@ -146,7 +145,7 @@ If t1 = 2 Then
     photo.CreateFromPicture pic
     
     If photo.bitsPerPixel <> 24 Then Conv24 photo
-    Set CreateJpg = SaveJPGtoBuffer(photo, percent, comment$)
+    Set CreateJpg = SaveJPGtoBuffer(photo, Percent, Comment$)
 
     End If
     End If

@@ -14501,6 +14501,8 @@ cher103_1:
                             Else
                                 GoTo er103
                             End If
+                        ElseIf TypeOf var(i) Is mArray Then
+                            'GoTo newArrayTreat
                         Else
                             Set var(i) = myobject
                         End If
@@ -14558,11 +14560,25 @@ existAs04:
                             End If
                         End If
                     ElseIf x1 = 1 And CheckAnyArray(myobject) Then
+newArrayTreat:
+                        If TypeOf var(i) Is mArray Then
+                            Set ppppl = New mArray
+                            If TypeOf myobject Is tuple Then
+                                
+                                myobject.CopyTuple2Array ppppl
+                            Else
+                                myobject.CopyArray ppppl
+                            End If
+                            Set var(i) = ppppl
+                            Set ppppl = Nothing
+                        Else
                         Set usehandler = New mHandler
+                        
                         Set var(i) = usehandler
                         usehandler.t1 = 3
                         Set usehandler.objref = myobject
                         Set usehandler = Nothing
+                        End If
                         If jumpAs Then jumpAs = False: GoTo existAs07
                         ff = 1
                         If Fast2VarNoTrim(rest$, "ыс", 2, "AS", 2, 3, ff) Then
@@ -17738,7 +17754,7 @@ Dim x2 As Long, y2 As Long, monce As Long, w3 As Long
 Dim myLevel As Long, oldexec As Long, loopthis As Boolean, RetStackSize As Long
 Dim subs As FastCollection
 Dim oldjump As Long, oldifctrl As Long, olduseofif As Long
-Dim S3 As Long, bb$, small$, ex2 As Long, sbi As Long
+Dim S3 As Long, bb$, small$, ex2 As Long, sbi As Long, LLL As Long
 ' save state in execution stack
 oldjump = bstack.jump: oldifctrl = bstack.IFCTRL: olduseofif = bstack.UseofIf
 RetStackSize = bstack.RetStackTotal
@@ -17756,14 +17772,24 @@ If Not skipblock Then  ' find block
 Else
     LL = bstack.addlen
 End If
+LLL = LL
 oldLL = bstack.addlen
-If ex2 > 0 Then ex2 = ex2 - 1 Else ex2 = Len(b$)
+If ex2 > 0 Then
+ex2 = ex2 - 1
+Else
+    ex2 = Len(b$)
+    LLL = bstack.addlen
+   ' LL = Len(b$)
+   ' oldLL = 0
+   ' LL = oldLL + Len(b$)
+
+End If
 sbi = ex2
 Do
     bb$ = Mid$(b$, i, ex2 - i + 1)
 fromfirst0:
     kolpo = once: once = False
-    bstack.addlen = LL
+    bstack.addlen = LLL
    
     w3 = Execute(bstack, bb$, kolpo, stepbystep, loopthis, noblock)
 
@@ -17771,39 +17797,6 @@ fromfirst0:
     bstack.addlen = oldLL
 cont111:
     Select Case w3
-    Case 100
-    SwapStrings b$, bb$
-    once = loopthis  ' TRUE IF i HAVE CASE ELSE ' FALSE IF I HAVE STANDARD ELSE
-    Exec = w3
-    Exit Function
-    Case 0
-Error1:
-                
-        If bstack.RetStackTotal - RetStackSize > 0 Then
-            bstack.UseofIf = olduseofif
-            bstack.RetStackDrop bstack.RetStackTotal - RetStackSize
-        End If
-        If myLevel <> bstack.SubLevel Then
-            b$ = bb$
-            Exec = 0
-            Exit Function
-        End If
-        If NocharsInLine(bb$) Then
-            b$ = vbNullString
-        Else
-            If LastErNum = -2 Then
-                SwapStrings b$, bb$
-            ElseIf skipblock Then
-                bstack.addlen = 0
-                b$ = bb$ + space$(oldLL)
-            ElseIf LL >= oldLL Then
-                b$ = bb$ + space$(LL - oldLL)
-            Else
-                b$ = vbNullString$
-            End If
-        End If
-        Exec = 0
-        Exit Function
     Case 1, 50, 51
 ALFA12:
         If LastErNum = -2 Then
@@ -18130,7 +18123,7 @@ AGAINGOTO:
                                         b$ = bb$
                                         ElseIf S3 <> 0 Then
                                             bstack.ErrorOriginal = S3
-                                            b$ = bb$ + space(sbi + 1) 'Mid$(sbf(S3).sb, Len(sbf(S3).sb) - sbi - Len(bb$))
+                                            b$ = bb$ + space(sbi)  'Mid$(sbf(S3).sb, Len(sbf(S3).sb) - sbi - Len(bb$))
                                         Else
                                             bstack.ErrorOriginal = 0
                                             b$ = bb$ + space(sbi)
@@ -18264,6 +18257,42 @@ AGAINGOTO:
             'If checkbreakEsc(bstack) Then Exec = oldexec: Exit Do
             Exec = 2: b$ = bb$: Exit Function
         End If
+    Case 100
+        SwapStrings b$, bb$
+        once = loopthis  ' TRUE IF i HAVE CASE ELSE ' FALSE IF I HAVE STANDARD ELSE
+        Exec = w3
+        Exit Function
+    Case 0
+Error1:
+                
+        If bstack.RetStackTotal - RetStackSize > 0 Then
+            bstack.UseofIf = olduseofif
+            bstack.RetStackDrop bstack.RetStackTotal - RetStackSize
+        End If
+        If myLevel <> bstack.SubLevel Then
+            b$ = bb$
+            Exec = 0
+            Exit Function
+        End If
+        'If NocharsInLine(bb$) And LastErNum = 0 Then
+        '    b$ = vbNullString
+        'Else
+   
+            If LastErNum = -2 Or LastErNum1 = -2 Then
+                SwapStrings b$, bb$
+            
+            ElseIf noblock And skipblock Then
+                bstack.addlen = 0
+                b$ = bb$ + space$(oldLL)
+            ElseIf LL >= oldLL Then
+                b$ = bb$ + space$(LL - oldLL)
+            Else
+                b$ = vbNullString$
+            End If
+        'End If
+        Exec = 0
+        Exit Function
+
     Case Else
         If w3 = 12 Then
             b$ = bb$

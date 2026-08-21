@@ -17,6 +17,7 @@ Global Const neoReadEng = "® "
 Global skiperror As Boolean
 Global maxlonglong, limitlonglong, plan As Long, lastpanel As Long
 Global OsInfo As New clsOSInfo, Zero64, One64, stoponerror As Boolean
+Global StepOver As Boolean, steptothat As String, stephere$, StepIn As Boolean
 Global HaltLevel As Long, errbag As ErrorBag
 Global startaddress As Long, stacksize As Long, findstack As Long
 Private Const mProp = "PropReference"
@@ -99,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 26
+Global Const Revision = 27
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4938,7 +4939,7 @@ conthere3:
     If True Then
         SpeedGroup = 1
         kolpo = False
-        once = True
+        'once = True
         i = 1
         ohere$ = here$
         Do
@@ -4976,7 +4977,9 @@ thh:
                 TestShowBypass = False
                 If LastErNum <> 0 Then b$ = vbNullString
                 If FastSymbol(b$, "}") Then
-                    If once Then Exit Do
+                    
+                    'If once Then exit do
+                    Exit Do ' check this
                 Else
                     If Len(bb$) > 0 Then b$ = Right$(ec$, Len(bb$)) + b$
                 End If
@@ -5235,14 +5238,15 @@ AGAINGOTO:
                     End If
                 Else
                     If kolpo Then b$ = "BREAK"
-                    once = kolpo
+                   ' once = kolpo
                     SpeedGroup = 2: Set bstack.lastobj = Nothing
                     bstack.addlen = nd&
                     GoTo breakexit
                 End If
             Case Else
                 If FastSymbol(b$, "}") Then
-                    If once Then bstack.addlen = nd&: Exit Do
+                    'If once Then
+                    bstack.addlen = nd&: Exit Do
                 Else
                     If Len(bb$) > 0 Then b$ = Right$(ec$, Len(bb$)) + b$
                 End If
@@ -8707,9 +8711,14 @@ fun118, fun119, fun120, fun121, fun122, fun123, fun124, fun125, fun126, fun127, 
 fun131, fun132, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun133, _
 fun133, fun133, fun133, fun133, fun133, fun133, fun133, fun151, fun152, fun153, fun154, fun155, fun156, _
 fun157, fun158, fun159, fun160, fun161, fun162, fun163, fun164, fun165, fun166, fun167, fun168, fun169, _
-fun170, fun171, fun172
+fun170, fun171, fun172, fun173
 IsNumberNew = False
 Exit Function
+fun173:
+    If isX86(bstack, a$, r) Then
+    IsNumberNew = FastSymbol(a$, ")", True)
+    End If
+    Exit Function
 fun172: ' midi.out()
 If getMidiDeviceOrDevices(bstack, a$, r) Then
 If Not bstack.lastobj Is Nothing Then
@@ -11310,7 +11319,7 @@ isasub:
         V1& = bstack.OriginalCode
         w2 = V1&
         v$ = bstack.originalname$
-        bstack.originalname$ = s1$
+        bstack.originalname$ = s1$ + ")"
         If gr Then
             s1$ = "ΣΥΝΑΡΤΗΣΗ " + s1$
         Else
@@ -11329,6 +11338,7 @@ againsub:
             bstack.FuncValue = r
             Set bstack.FuncObj = Nothing
             dn = bstack.addlen
+            'w3 = Len(n$)
             bstack.RetStack.PushVal CDec(0)
             
             If trace Then
@@ -11352,7 +11362,7 @@ againsub:
             Else
              w1 = w1 + Len(n$)
             dd = 1
-            Module10.executeblock dd, bstack, n$, False, True, , True
+            Module10.executeblock dd, bstack, n$, False, True, , True, False
             End If
             bstack.RetStackDrop 1
             bstack.addlen = dn
@@ -11404,16 +11414,22 @@ againsub:
             IsNumberNew = False
             If bstack.ErrorOriginal = 0 Then
             LastErNum = -1
-            LastErNum1 = -1
             bstack.ErrorOriginal = V1&
             If V1& > 0 Then
-                a$ = n$ + space$(Len(sbf(V1&).sb) - w1 + 1)
+                If Len(sbf(V1&).sb) - w1 + Len(n$) + 1 > 0 Then
+                    a$ = space$(Len(sbf(V1&).sb) - w1 + Len(n$) + 1)
+                Else
+                 a$ = ""
+                End If
             ElseIf V1& = 0 Then
                 a$ = n$
+                
             Else
                 a$ = n$ + space$(Len(var(-V1&).code) - w1 + 1)
             End If
             End If
+            MyEr "Problem in " + bstack.originalname$, "Πρόβλημα στο " + bstack.originalname$
+            LastErNum1 = -2
             
             Exit Function
             End If
@@ -11802,19 +11818,22 @@ GetLine:
     rest$ = Mid$(rest$, pos1)
 End If
 If bstack.OriginalCode < 0 Then
+    
     Set Find = bstack
-    Do While Find.IamChild
-        If Find.OriginalCode > -1 Then Exit Do
+    'Do While Find.IamChild
+        If Find.OriginalCode > -1 Then 'Exit Do
+        Else
         If TypeOf var(-Find.OriginalCode) Is Constant Then
             Set p = var(-Find.OriginalCode).Value
             k = k + p.lastlen
             body.OriginalCode = p.OriginalCode
         Else
-            k = k + var(-Find.OriginalCode).lastlen
+            k = k + 1 + var(-Find.OriginalCode).lastlen
             body.OriginalCode = var(-Find.OriginalCode).OriginalCode
         End If
-        Set Find = Find.Parent
-    Loop
+        End If
+    '    Set Find = Find.Parent
+    'Loop
     body.lastlen = k
 Else
     If Not bstack.Parent Is Nothing Then
@@ -11834,7 +11853,7 @@ Else
         Set Find = Find.Parent
     ElseIf Left$(sbf(Find.OriginalCode).sb, 10) = "'11001EDIT" Then
         frm$ = Mid$(sbf(Find.OriginalCode).sb, 1, InStr(sbf(Find.OriginalCode).sb, vbCr))
-        k = k - val(Mid$(frm$, InStr(frm$, ",") + 1))
+        'k = k - val(Mid$(frm$, InStr(frm$, ",") + 1))
         body.OriginalCode = iRVAL(Find.originalname, 0)
         Set Find = Find.Parent
     Else
@@ -11843,7 +11862,7 @@ Else
     End If
     Wend
     If body.OriginalCode = 0 Then body.OriginalCode = bstack.OriginalCode
-    body.lastlen = k
+    body.lastlen = k + 1
     Else
     If Left$(sbf(bstack.OriginalCode).sb, 10) = "'11001EDIT" Then
         frm$ = Mid$(sbf(bstack.OriginalCode).sb, 1, InStr(sbf(bstack.OriginalCode).sb, vbCr))
@@ -16734,7 +16753,9 @@ enterbreak:
         End If
     End If
 continueMC:
-    If (trace And Not stoponerror) Or SLOW Then
+    If trace Or SLOW Then
+    
+    If (trace And Not (stoponerror Or StepOver)) Or SLOW Then
        If WaitShow > 0 Then WaitShow = WaitShow - 1
         refreshGui
         If IsWine Then
@@ -16744,6 +16765,7 @@ continueMC:
         Else
             MyDoEvents1 di
         End If
+    End If
     End If
 again1:
 If LastErNum <> 0 Then
@@ -16808,8 +16830,7 @@ againExtra2:
             If Module10.executeblock(Execute, bstack, b$, once, kolpo) Then
                 Exit Function
             End If
-            '' WHY 4???
-            ''If Execute = 4 Then b$ = "{" + b$: Exit Function
+           
             If kolpo Then ec$ = block(b$)
             If Execute = 2 And Len(b$) > 0 Then Exit Function
            
@@ -17867,6 +17888,7 @@ eos:
                                 MyEr "Μissing Next", "Δεν βρήκα το Επόμενο"
                                 Execute = 0: Exit Function
                                 End If
+                                
                                 ss$ = Left$(b$, i - 1)
                                  b$ = Mid$(b$, i)
                                 sw$ = ss$
@@ -17882,9 +17904,11 @@ eos:
                                         ss$ = "NEXT " + W$
                                     End If
                                 End If
+                                i = Len(ss$) + Len(b$)
                                 GoTo contfor
                             Else
                                 y1 = False
+                                i = Len(b$)
                                 ss$ = block(b$)
                                 If Not Left$(b$, 1) = "}" Then
                                     Execute = CheckBlock(once): Exit Function
@@ -17893,7 +17917,7 @@ eos:
                                 sw$ = ss$
                                 TraceStore bstack, nd&, b$, 0
                                 slct = bstack.addlen ' reusing slct variable
-                                If FastSymbol(b$, "}") Then
+                                Mid$(b$, 1, 1) = " "
                                     If ForLikeBasic Or likebasic Then
                                         If st > 0 And sp < p Then
                                             ss$ = "exit"
@@ -17904,43 +17928,51 @@ contfor:
                                     ok = False
                                     v = Len(b$)
                                     y2 = 0
-                                    Set subs = Nothing
                                         If x1 = 1 Then
-                                            Do
+                                        Do
                                                 bstack.addlen = slct
-                                                If executeblock(Execute, bstack, subs, ss$, once, ok, , True) Then
-                                                    bstack.addlen = nd&
-                                                    If Execute <> 1 Then
-                                                        If Execute = 2 Then
-                                                             SwapStrings b$, ss$
-                                                             Exit Function
-                                                        Else
-                                                            b$ = ss$ + b$: Exit Function
-                                                        End If
-                                                    End If
-                                                Else
-                                                    bstack.addlen = nd&
-                                                    If Execute = 2 And ss$ <> "" And Not ok Then
+                                                Call executeblock(Execute, bstack, ss$, once, ok)
+                                                bstack.addlen = nd&
+                                                If Execute = 1 Then
+                                                ElseIf Execute = 3 Then
+                                                Execute = 1
+                                                    ss$ = sw$
+                                                    p = p + st
+                                                    GoTo a1122212
+                                                ElseIf Execute = 2 Then
+                                                    If Len(ss$) > 0 And Not ok Then
                                                         If y1 And ss$ = "NEXT" Then
                                                             Execute = 1: Exit Do
                                                         End If
-                                                        SwapStrings b$, ss$
-                                                        Exit Function
-                                                    ElseIf Execute = 12 Then
-                                                        bstack.RetStackDrop 2
-                                                        Execute = 2
-                                                        b$ = ss$
-                                                        Exit Function
                                                     End If
+                                                    SwapStrings b$, ss$
+                                                    Exit Function
+                                                ElseIf Execute = 12 Then
+                                                    bstack.RetStackDrop 2
+                                                    Execute = 2
+                                                    b$ = ss$
+                                                    Exit Function
+                                                ElseIf Execute = 0 Then
+                                                    If bstack.ErrorOriginal <> 0 Then
+                                                        SwapStrings b$, ss$
+                                                    ElseIf Len(ss$) - 1 - i + Len(b$) * 2 > 0 Then
+                                                        b$ = space$(Len(ss$) - 1 - i + Len(b$) * 2)
+                                                    End If
+                                                    Exit Function
+                                                Else
+                                                    bstack.RetStackDrop 2
+                                                    b$ = ss$
+                                                    Exit Function
                                                 End If
-                                                If Not (ok Or MOUT) Or Execute = 3 Then
+        
+                                                If Not (ok Or MOUT) Then
                                                     Execute = 1
                                                     ss$ = sw$
                                                     p = p + st
                                                 Else
                                                     Exit Do
                                                 End If
-                                              '  If checkbreakEsc(bstack) Then Execute = 1: Exit Do
+a1122212:
                                                 If x2 < 0 Then
                                                     bstack.SetVar W$, MyRound(p, 10)
                                                 Else
@@ -17995,39 +18027,50 @@ contfor:
                                         Else
                                             Do
                                                 bstack.addlen = slct
-                                                If executeblock(Execute, bstack, subs, ss$, once, ok, , True) Then
-                                                    bstack.addlen = nd&
-                                                    If Execute <> 1 Then
-                                                        If Execute = 2 Then
-                                                             SwapStrings b$, ss$
-                                                             Exit Function
-                                                        Else
-                                                            b$ = ss$ + b$: Exit Function
-                                                        End If
-                                                        End If
-                                                Else
+                                                Call executeblock(Execute, bstack, ss$, once, ok)
                                                 bstack.addlen = nd&
-                                                    If Execute = 2 And ss$ <> "" And Not ok Then
+                                                If Execute = 1 Then
+                                                ElseIf Execute = 2 Then
+                                                        If Len(ss$) > 0 And Not ok Then
+                                                    
                                                         If y1 And ss$ = "NEXT" Then
                                                             Execute = 1: Exit Do
                                                         End If
                                                         SwapStrings b$, ss$
                                                         Exit Function
-                                                    ElseIf Execute = 12 Then
-                                                        bstack.RetStackDrop 2
-                                                        Execute = 2
-                                                        b$ = ss$
-                                                        Exit Function
+                                                        End If
+                                                ElseIf Execute = 12 Then
+                                                    bstack.RetStackDrop 2
+                                                    Execute = 2
+                                                    b$ = ss$
+                                                    Exit Function
+                                                ElseIf Execute = 3 Then
+                                                    Execute = 1
+                                                    ss$ = sw$
+                                                    p = p + st
+                                                    GoTo cont11233
+                                                ElseIf Execute = 0 Then
+                                                    If bstack.ErrorOriginal <> 0 Then
+                                                        SwapStrings b$, ss$
+                                                    ElseIf Len(ss$) - 1 - i + Len(b$) * 2 > 0 Then
+                                                        b$ = space$(Len(ss$) - 1 - i + Len(b$) * 2)
                                                     End If
+                                                    Exit Function
+                                                Else
+                                                    bstack.RetStackDrop 2
+                                                    b$ = ss$
+                                                    Exit Function
+                                                
                                                 End If
-                                                If Not (ok Or MOUT) Or Execute = 3 Then
+                                               
+                                                If Not (ok Or MOUT) Then
                                                     Execute = 1
                                                     ss$ = sw$
                                                     p = p + st
                                                 Else
                                                     Exit Do
                                                 End If
-                                              '  If checkbreakEsc(bstack) Then Execute = 1: Exit Do
+cont11233:
                                                 If x2 < 0 Then
                                                      bstack.SetVar W$, p
                                                 Else
@@ -18050,7 +18093,7 @@ contfor:
                                         If MOUT Then Execute = 0: Exit Function
                                         ok = True
                                     End If
-                                End If
+                                
                             End If
                         End If
                     Else
@@ -18090,7 +18133,8 @@ startwithgroup:
                                 
                                 Execute = SpeedGroup(bstack, ppppl, "FOR", W$, b$, v)
                                 Set ppppl = Nothing ' ok here
-                                If Execute = 0 Then
+                                If Execute = 1 Then
+                                ElseIf Execute = 0 Then
                                     If LastErNum1 = 0 Then SyntaxError
                                     Exit Function
                                 ElseIf Execute <> 1 And b$ <> "" Then
@@ -18294,7 +18338,10 @@ contDraw:
                 End If
                 Execute = 0
                 If FastSymbol(b$, "{") Then
-                    GoTo contDrw2
+                    If Not MakeEmf(Execute, bstack, b$, Lang) Then
+                       Exit Function
+                    End If
+                    If Execute <> 1 Then Exit Function
                 ElseIf IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
                     If Not FastSymbol(b$, ",", True) Then Execute = 0: Exit Function
                     If FastSymbol(b$, "{") Then
@@ -18302,23 +18349,13 @@ contDraw:
                     ElseIf Not IsExp(bstack, b$, sp, flatobject:=True, nostring:=True) Then
                         missParam b$: Execute = 0: Exit Function
                     End If
-                    If FastSymbol(b$, "{") Then
+                    If FastSymbol(b$, "{", True) Then
 contDrw1:
-                        ss$ = block(b$)
-                        If Not Left$(b$, 1) = "}" Then
-                            Execute = CheckBlock(once): Exit Function
+                        If Not MakeEmf(Execute, bstack, b$, Lang, p, sp) Then
+                            Exit Function
                         End If
-                        TraceStore bstack, nd&, b$, 0
-                        Mid$(b$, 1, 1) = " "
-                        x2 = Len(b$)
-                    
-                        If Not MakeEmf(bstack, b$, Lang, ss$, p, sp) Then
-                            Execute = 0:  b$ = ss$ + space$(x2): Exit Function
-                        End If
-                        TraceRestore bstack, nd&
-                        Execute = 1
+                        If Execute <> 1 Then Exit Function
                     Else
-                        SyntaxError
                         Execute = 0: Exit Function
                     End If
                 ElseIf LastErNum1 Then
@@ -18326,22 +18363,6 @@ contDrw1:
                 Else
                     SyntaxError
                     Execute = 0: Exit Function
-                    
-contDrw2:
-                    ss$ = block(b$)
-                    If Not Left$(b$, 1) = "}" Then
-                        Execute = CheckBlock(once): Exit Function
-                    End If
-                    TraceStore bstack, nd&, b$, 0
-                    Mid$(b$, 1, 1) = " "
-                    x2 = Len(b$)
-                    ' second type
-                    If Not MakeEmf(bstack, b$, Lang, ss$) Then
-                        Execute = 0: b$ = ss$ + space$(x2): Exit Function
-                    End If
-                    TraceRestore bstack, nd&
-                    Execute = 1
-                    
                 End If
             Case "ΔΥΑΔΙΚΟ", "BINARY"
 contBinary:
@@ -18360,6 +18381,7 @@ contBinary:
                         Execute = 0: Exit Function
                     End If
                     Execute = 1
+
                 End If
             Case "ΜΕΡΟΣ", "PART"
 contPart:
@@ -18368,17 +18390,18 @@ contPart:
                 End If
                 Execute = 0
                 If FastSymbol(b$, "{") Then
+                
                     ss$ = block(b$)
-                                If Not Left$(b$, 1) = "}" Then
-                                    Execute = CheckBlock(once): Exit Function
-                                End If
+                    If Not Left$(b$, 1) = "}" Then
+                        Execute = CheckBlock(once): Exit Function
+                    End If
 
 
                     x2 = Len(b$)
-                    TraceStore bstack, nd&, b$, bstack.addlen + 1
-                    b$ = Mid$(b$, 2)
+                    TraceStore bstack, nd&, b$, 0 ', bstack.addlen + 1
+                    Mid$(b$, 1, 1) = " "
                     If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
-          ' search for variable name only
+                    ' search for variable name only
                         ok = False
                         If Abs(IsLabel(bstack, b$, W$)) = 1 Then
                             If GetlocalVar(W$, v) Then ' exist...
@@ -18394,11 +18417,29 @@ contPart:
                             If ok Then
                                 ok = False
                                 Execute = 1
-                                Call executeblock(Execute, bstack, subs, ss$, (once), ok, , True)
-                                bstack.addlen = nd& + 1
-                                If Execute = 0 Then b$ = ss$ + space$(x2): Exit Function
-                                
+                               x2 = 2 * Len(b$) - x2 + Len(ss$)
+                                Call executeblock(Execute, bstack, ss$, False, ok)
+                                TraceRestore bstack, nd&
                                 var(v) = False
+                                If Execute = 1 Then
+                                ElseIf Execute = 2 Then
+                                    If ss$ <> "" And Not ok Then
+                                        b$ = ss$: Exit Function
+                                    ElseIf ss$ = "" And ok Then
+                                        b$ = "BREAK": Exit Function
+                                    End If
+                                ElseIf Execute = 0 Then
+                                    If bstack.ErrorOriginal <> 0 Then
+                                        SwapStrings b$, ss$
+                                    ElseIf Len(ss$) - 1 - x2 + Len(b$) * 2 > 0 Then
+                                        b$ = space$(Len(ss$) - 1 - x2 + Len(b$) * 2)
+                                    End If
+                                    Exit Function
+                                Else
+                                    b$ = ss$: Exit Function
+                                End If
+                                
+                                
                                 ok = True
                                 If linebyline Then
                                     ClearStr b$
@@ -18426,79 +18467,101 @@ contPart:
 ContRepeat:
                 If linebyline Then
                     b$ = W$ + " " + b$
-                    sw$ = here$
+                    
                     Execute = Execute(bstack, b$, once, False)
-                    SwapStrings sw$, here$
+                    
                     Exit Do
                 End If
                 If once = True Then Execute = 0: Exit Function
-                sw$ = here$
+                
                 If Not FastSymbol(b$, "{") Then
-                i = 1
-                aheadstatusDO b$, i, Lang, ok
-                If ok Then
-                    v = Len(b$)
-                    ss$ = Left$(b$, i - 1)
-                    b$ = Mid$(b$, i)
-                    
-                    TraceStore bstack, x1, b$, 0
-                    
-                    y1 = bstack.addlen
-                    GoTo contdo
-                Else
-                    MissUntil
+                    i = 1
+                    aheadstatusDO b$, i, Lang, ok
+                    If ok Then
+                        x2 = Len(b$)
+                        ss$ = Left$(b$, i - 1)
+                        b$ = Mid$(b$, i)
+                        
+                        TraceStore bstack, x1, b$, 0
+                        
+                        y1 = bstack.addlen
+                        GoTo contdo
+                     Else
+                        MissUntil
                     Execute = 0
                     Exit Function
                 End If
                 Else
-
-                    v = Len(b$)
                     ss$ = block(b$)
-                                If Not Left$(b$, 1) = "}" Then
-                                    Execute = CheckBlock(once): Exit Function
-                                End If
+                    If Not Left$(b$, 1) = "}" Then
+                        Execute = CheckBlock(once): Exit Function
+                    End If
 
                     TraceStore bstack, x1, b$, 0
-                     b$ = Mid$(b$, 2)
+                    Mid$(b$, 1, 1) = " "
+                    
                     y1 = bstack.addlen
 contdo:
-                    Set subs = Nothing
+'                    Set subs = Nothing
                     ok = False
                     sss = Len(b$)
                     ec$ = ss$
+                    x2 = Len(b$)
                     If IsLabelSymbolNew(b$, "ΟΣΟ", "WHEN", Lang) Then
                     nchr = True
+                    x2 = 2 * Len(b$) - x2 + Len(ss$)
                     GoTo CONDwhen
                     End If
+                    x2 = Len(b$)
                     If IsLabelSymbolNew(b$, "ΜΕΧΡΙ", "UNTIL", Lang) Then
                     nchr = False
+                    x2 = 2 * Len(b$) - x2 + Len(ss$)
                     
 CONDwhen:
                         Execute = 1
                         bstack.addlen = y1
-                        Call executeblock(Execute, bstack, subs, ss$, once, ok, , True)
+                        Call executeblock(Execute, bstack, ss$, once, ok)
                         bstack.addlen = x1
-                            If Execute = 0 Then
-                                b$ = space$(v - (Len(ec$) - Len(ss$)))
-                                Execute = 0: Exit Function
-                            ElseIf Execute = 2 Then
-                                If ss$ <> "" And Not ok Then
-                                    b$ = ss$: Exit Function
-                                ElseIf ss$ = "" And ok Then
-                                    b$ = "BREAK": Exit Function
-                                End If
+                        If Execute = 1 Then
+                        ElseIf Execute = 2 Then
+                            If ss$ <> "" And Not ok Then
+                                b$ = ss$: Exit Function
+                            ElseIf ss$ = "" And ok Then
+                                b$ = "BREAK": Exit Function
                             End If
-                            If Execute = 3 Then ok = False
-                            If ok Or MOUT Or LastErNum <> 0 Then
-                                If ok Then
-                                    ss$ = GetNextLine(b$)  'FORGET ANY CODE TO THE RIGHT
-                                Else
-                                    Exit Function
-                                End If
+                        ElseIf Execute = 3 Then
+                            ok = False
+                        ElseIf Execute = 0 Then
+                            If bstack.ErrorOriginal <> 0 Then
+                                SwapStrings b$, ss$
+                            ElseIf Len(ss$) - 1 - x2 + Len(b$) * 2 > 0 Then
+                                b$ = space$(Len(ss$) - 1 - x2 + Len(b$) * 2)
+                            End If
+                            Exit Function
+                        Else
+                            SwapStrings ss$, b$
+                            Exit Function
+                        End If
+                        
+                        If ok Or MOUT Or LastErNum <> 0 Then
+                            If ok Then
+                                ss$ = GetNextLine(b$)  'FORGET ANY CODE TO THE RIGHT
                             Else
-                                sss = Len(b)
+                                Exit Function
+                            End If
+                        Else
+                            sss = Len(b)
+                            i = 0
+                            aheadstatusNew b$, i, True
+                            If i = 0 Then
                                 W$ = b$
-                                If IsExp(bstack, b$, p) Then
+                            Else
+                                W$ = Mid$(b$, 1, i)
+                            End If
+                            'W$ = b$
+                            
+                            If IsExp(bstack, W$, p) Then
+                                i = i - Len(W$)
                                 If Not bstack.lastobj Is Nothing Then
                                 If TypeOf bstack.lastobj Is mHandler Then
                                 
@@ -18507,8 +18570,7 @@ CONDwhen:
                                 
                                     With usehandler
                                             If .UseIterator Then
-                                                i = .indirect
-                                                If i < 0 Then
+                                                If .indirect < 0 Then
                                                     Set myobject = .objref
                                                     If TypeOf myobject Is mHandler Then
                                                         Set usehandler1 = myobject
@@ -18540,33 +18602,38 @@ CONDwhen:
                                         Set usehandler = Nothing
                                     End If
                                   End If
-                                W$ = Left$(W$, Len(W$) - Len(b$))
+                                'W$ = Mid$(b$, 1, i)
                                 If nchr Then p = p = 0
                                 If p = 0 Then
-                                    bb$ = W$
+                                   ' x2 = Len(b$) + Len(ec$)
+                            
                                     ok = False
-                                    Set subs = Nothing
                                     Do
                                         ss$ = ec$
-                                        W$ = bb$
+                                        W$ = Mid$(b$, 1, i)
                                         Execute = 1
                                         bstack.addlen = y1
-                                        Call executeblock(Execute, bstack, subs, ss$, once, ok, , True)
+                                        Call executeblock(Execute, bstack, ss$, once, ok)
                                         bstack.addlen = x1
-                                        If Execute = 0 Then
-                                            b$ = space$(v - (Len(ec$) - Len(ss$)))
-                                            SwapStrings sw$, here$
-                                            Execute = 0: Exit Function
+                                        If Execute = 1 Then
                                         ElseIf Execute = 2 Then
                                             If ss$ <> "" And Not ok Then
-                                                SwapStrings sw$, here$
                                                 b$ = ss$: Exit Function
                                             ElseIf ss$ = "" And ok Then
-                                                SwapStrings sw$, here$
                                                 b$ = "BREAK": Exit Function
                                             End If
+                                        ElseIf Execute = 3 Then
+                                            ok = False
+                                        ElseIf Execute = 0 Then
+                                            If bstack.ErrorOriginal <> 0 Then
+                                                SwapStrings b$, ss$
+                                            ElseIf Len(ss$) - 1 - x2 + Len(b$) * 2 > 0 Then
+                                                b$ = space$(Len(ss$) - 1 - x2 + Len(b$) * 2)
+                                            End If
+                                            Exit Function
+                                        Else
+                                            b$ = ss$: Exit Function
                                         End If
-                                        If Execute = 3 Then ok = False
                                         If ok Or MOUT Or LastErNum <> 0 Then Exit Do
                                         IsExp bstack, W$, p
                                     
@@ -18576,8 +18643,8 @@ CONDwhen:
                                         Set bstack.lastobj = Nothing
                                         With usehandler
                                             If .UseIterator Then
-                                                i = .indirect
-                                                If i < 0 Then
+                                                
+                                                If .indirect < 0 Then
                                                     Set myobject = .objref
                                                     If TypeOf myobject Is mHandler Then
                                                         Set usehandler1 = myobject
@@ -18610,38 +18677,42 @@ CONDwhen:
                                     End If
                                     If nchr Then p = p = 0
                                     Loop Until p
-                                    SwapStrings sw$, here$
                                 End If
+                                Mid$(b$, 1, i) = space$(i)
                             End If
                         End If
                     Else
                  ' play always
                         If IsLabelSymbolNew(b$, "ΠΑΝΤΑ", "ALWAYS", Lang) Then
-                        Set subs = Nothing
+                             x2 = 2 * Len(b$) - x2 + Len(ss$)
                             Do
                                 ss$ = ec$
                                 Execute = 1
                                 bstack.addlen = y1
-                                Call executeblock(Execute, bstack, subs, ss$, once, ok, , True, True)
+                                Call executeblock(Execute, bstack, ss$, once, ok)
                                 bstack.addlen = x1
                                 
-                                If Execute = 0 Then
-                                    b$ = space$(v - (Len(ec$) - Len(ss$)))
-                                    SwapStrings sw$, here$
-                                    Execute = 0: Exit Function
+                                If Execute = 1 Then
                                 ElseIf Execute = 2 Then
                                     If ss$ <> "" And Not ok Then
-                                        SwapStrings sw$, here$
                                         b$ = ss$: Exit Function
                                     ElseIf ss$ = "" And ok Then
-                                        SwapStrings sw$, here$
                                         b$ = "BREAK": Exit Function
                                     End If
-                                ElseIf Execute = 1 Then
-                                'If ok Then once = True: b$ = vbNullString: Exit Function
                                 ElseIf Execute = 3 Then
-                                ok = False
+                                    ok = False
+                                ElseIf Execute = 0 Then
+                                    If bstack.ErrorOriginal <> 0 Then
+                                        SwapStrings b$, ss$
+                                    ElseIf Len(ss$) - 1 - x2 + Len(b$) * 2 > 0 Then
+                                        b$ = space$(Len(ss$) - 1 - x2 + Len(b$) * 2)
+                                    End If
+                                    Exit Function
+                                Else
+                                    SwapStrings ss$, b$
+                                    Exit Function
                                 End If
+                                
                                 If ok Or MOUT Or LastErNum <> 0 Then Exit Do
                             Loop
                         Else
@@ -18658,9 +18729,9 @@ CONDwhen:
 contWhile:
             If linebyline Then
                 b$ = W$ + " " + b$
-                sw$ = here$
+                
                 Execute = Execute(bstack, b$, once, False)
-                SwapStrings sw$, here$
+                
                 Exit Do
             End If
             If once = True Then Execute = 0: Exit Function
@@ -18669,30 +18740,27 @@ contWhile:
 again112:
             i = i + 1
             If Len(aheadstatus(b$, False, i)) > 0 Then
-            x1 = i
-            If MaybeIsSymbol3(b$, ",", i) Then GoTo again112
+                x1 = i
+                If MaybeIsSymbol3(b$, ",", i) Then GoTo again112
             End If
             If x1 > 0 Then
             Else
-            SyntaxError
-            Execute = 0
-            Exit Function
+                SyntaxError
+                Execute = 0
+                Exit Function
             End If
             x1 = x1 - 1
             W$ = Left$(b$, x1)
-            
-            
-            
             If IsExp(bstack, W$, p, nostring:=True) Then
             
                 st = True
                 ss$ = vbNullString
 getanother:
-                            If Not bstack.lastobj Is Nothing Then
-                            If TypeOf bstack.lastobj Is mHandler Then
-                            Set usehandler = bstack.lastobj
-                            Set bstack.lastobj = Nothing
-                            With usehandler
+                If Not bstack.lastobj Is Nothing Then
+                    If TypeOf bstack.lastobj Is mHandler Then
+                        Set usehandler = bstack.lastobj
+                        Set bstack.lastobj = Nothing
+                        With usehandler
                             If .UseIterator Then
                                 i = .indirect
                                 If i < 0 Then
@@ -18728,7 +18796,7 @@ getanother:
                 End If
                 st = st And CBool(p)
                 If FastSymbol(W$, ",") Then
-                    If IsExp(bstack, W$, p) Then
+                    If IsExp(bstack, W$, p, , , , True) Then
                         If Not bstack.lastobj Is Nothing Then GoTo getanother
                     Else
                         MissNumExpr
@@ -18736,148 +18804,146 @@ getanother:
                         Exit Function
                     End If
                 End If
-                    If Not Len(NLtrim(W$)) = 0 Then
+                If Not Len(NLtrim(W$)) = 0 Then
                     If Len(W$) > x1 Then
-                    b$ = W$ + b$
+                        b$ = W$ + b$
                     ElseIf Len(W$) = x1 Then
-                    Mid$(b$, 1, x1) = W$
+                        Mid$(b$, 1, x1) = W$
                     Else
-                    Mid$(b$, 1, x1) = space$(x1 - Len(W$)) + W$
+                        Mid$(b$, 1, x1) = space$(x1 - Len(W$)) + W$
                     End If
-                    
-                    End If
-                    'w$ = Left$(w$, Len(w$) - Len(b$))
-                    W$ = Left$(b$, x1)
-                    b$ = Mid$(b$, x1 + 1)
-                    If p = 0# Then
-                        If FastSymbol(b$, "{") Then
-                            W$ = block(b$)
-                            If Not Left$(b$, 1) = "}" Then
-                                Execute = CheckBlock(once): Exit Function
-                            End If
-                          '  b$ = NLtrim$(b$)
-                            If FastSymbol(b$, "}") Then
-                                b$ = NLtrim(b$)
-                                If b$ = vbNullString Then Exit Function
-                                GoTo again1
-                            Else
-                                b$ = NLtrim$(b$)
-                                If b$ = vbNullString Then Exit Function
-                                GoTo again1
-                            End If
+                End If
+                W$ = Left$(b$, x1)
+                b$ = Mid$(b$, x1 + 1)
+                y1 = Len(b$)
+                If p = 0# Then
+                    If FastSymbol(b$, "{") Then
+                        W$ = block(b$)
+                        If Not Left$(b$, 1) = "}" Then
+                            Execute = CheckBlock(once): Exit Function
+                        End If
+                        If FastSymbol(b$, "}") Then
+                            b$ = NLtrim(b$)
+                            If b$ = vbNullString Then Exit Function
+                            GoTo again1
                         Else
-                                i = 1
-                                aheadstatusENDWHILE b$, i, Lang, ok, sss
-                               If Not ok Then
-                                   MissWhile
-                                Execute = 0
-                                Exit Function
-                            End If
-                                b$ = NLtrim(Mid$(b$, i))
-                                If b$ = vbNullString Then Exit Function
-                                                        lbl = False
-                                                If Len(b$) > 0 Then
-                                                If Left$(b$, 2) = vbCrLf Then lbl = True
-                                                End If
-                                GoTo again1
-                            Exit Do
+                            b$ = NLtrim$(b$)
+                            If b$ = vbNullString Then Exit Function
+                            GoTo again1
                         End If
                     Else
-                        If Not FastSymbol(b$, "{") Then
                         i = 1
                         aheadstatusENDWHILE b$, i, Lang, ok, sss
-                        If ok Then
-                            ss$ = Left$(b$, sss - 1) + space$(i - sss)
-                            b$ = Mid$(b$, i)
-                            TraceStore bstack, x1, b$, 0
-                            y1 = bstack.addlen
-                            ec$ = ss$
-                            
-                            GoTo contWhile1
-                        Else
+                        If Not ok Then
                             MissWhile
-                            Execute = 0
+                        Execute = 0
+                        Exit Function
+                    End If
+                    b$ = NLtrim(Mid$(b$, i))
+                    If b$ = vbNullString Then Exit Function
+                    lbl = False
+                    If Len(b$) > 0 Then
+                        If Left$(b$, 2) = vbCrLf Then lbl = True
+                    End If
+                    GoTo again1
+                End If
+            Else
+                If Not FastSymbol(b$, "{") Then
+                    i = 1
+                    aheadstatusENDWHILE b$, i, Lang, ok, sss
+                    If ok Then
+                        x2 = Len(b$)
+                        ss$ = Left$(b$, sss - 1) + space$(i - sss)
+                        b$ = Mid$(b$, i)
+                        TraceStore bstack, x1, b$, 0
+                        y1 = bstack.addlen
+                        ec$ = ss$
+                        GoTo contWhile1
+                    Else
+                        MissWhile
+                        Execute = 0
+                        Exit Function
+                    End If
+                Else
+                    x2 = Len(b$)
+                    ss$ = block(b$)
+                    If Not Left$(b$, 1) = "}" Then
+                        Execute = CheckBlock(once): Exit Function
+                    End If
+                    TraceStore bstack, x1, b$, 0
+                    y1 = bstack.addlen
+                    ec$ = ss$
+                    Mid$(b$, 1, 1) = " "
+contWhile1:
+                    sss = Len(b$)
+                    bb$ = W$
+                    Execute = 1
+                    ok = False
+                    '
+                    Do
+                        st = True
+                        ss$ = ec$
+                        W$ = bb$
+                        bstack.addlen = y1
+                        Call executeblock(Execute, bstack, ss$, once, ok)
+                        bstack.addlen = x1
+                        If Execute = 1 Then
+                        ElseIf Execute = 2 Then
+                            If Len(ss$) > 0 Then
+                                '
+                                b$ = ss$: Exit Function
+                            ElseIf ok Then
+                                '
+                                b$ = "BREAK": once = True
+                                Exit Function
+                            End If
+                        ElseIf Execute = 3 Then
+                            ok = False
+                        ElseIf Execute = 0 Then
+                            If bstack.ErrorOriginal <> 0 Then
+                                SwapStrings b$, ss$
+                            ElseIf Len(ss$) - 1 - x2 + Len(b$) * 2 > 0 Then
+                                b$ = space$(Len(ss$) - 1 - x2 + Len(b$) * 2)
+                            End If
+                            Exit Function
+                        ElseIf Execute <> 1 Then
                             Exit Function
                         End If
-                        
-                        Else
-                            ss$ = block(b$)
-                            If Not Left$(b$, 1) = "}" Then
-                                Execute = CheckBlock(once): Exit Function
-                            End If
-                            TraceStore bstack, x1, b$, 0
-                            y1 = bstack.addlen
-                            ec$ = ss$
-                            b$ = Mid$(b$, 2)
-contWhile1:
-                            sss = Len(b$)
-                            bb$ = W$
-                            Execute = 1
-                            ok = False
-                            sw$ = here$
-                            Set subs = Nothing
-                            Do
-                                st = True
-                                ss$ = ec$
-                                W$ = bb$
-                                bstack.addlen = y1
-                                If executeblock(Execute, bstack, subs, ss$, once, ok, , True) Then
-                                    SwapStrings sw$, here$
-                                    TraceRestore bstack, x1
-                                    If Execute = 2 Then
-                                    If ok And ss$ = "" Then b$ = "BREAK": Exit Function
-                                    b$ = ss$: Exit Function
-                                    End If
-                                    b$ = ss$ + b$
-                                    Exit Function
-                                Else
-                                    SwapStrings sw$, here$
-                                    TraceRestore bstack, x1
-                                    If Execute = 2 And ss$ <> "" And Not ok Then
-                                        b$ = ss$
-                                        Exit Function
-                                    ElseIf Execute = 12 Then
-                                        Execute = 2
-                                        b$ = ss$
-                                        Exit Function
-                                    End If
-                                End If
-                                If Execute = 3 Then ok = False
-                                If ok Or MOUT Or LastErNum <> 0 Then Exit Do
+                        If ok Or MOUT Or LastErNum <> 0 Then Exit Do
 another1:
-                                IsExp bstack, W$, p
-                                                           If Not bstack.lastobj Is Nothing Then
-                            If TypeOf bstack.lastobj Is mHandler Then
+                    IsExp bstack, W$, p, , , , True
+                    If Not bstack.lastobj Is Nothing Then
+                        If TypeOf bstack.lastobj Is mHandler Then
                             Set usehandler = bstack.lastobj
                             Set bstack.lastobj = Nothing
                             With usehandler
-                                            If .UseIterator Then
-                                                i = .indirect
-                                                If i < 0 Then
-                                                    Set myobject = .objref
-                                                    If TypeOf myobject Is mHandler Then
-                                                        Set usehandler1 = myobject
-                                                        Set myobject = usehandler1.objref
-                                                        Set usehandler1 = Nothing
-                                                    End If
-                                                Else
-                                                    InternalError
-                                                    b$ = vbNullString
-                                                    Exit Function
-                                                End If
-                                                p = .index_End <> -1 And Not myobject.IsEmpty
-                                                If p Then
-                                                    If .index_start <= .index_End Then v = 1 Else v = -1
-                                                    If v >= 0 Then
-                                                        p = .index_cursor < .index_End
-                                                    Else
-                                                        p = .index_cursor > .index_End
-                                                    End If
-                                                    If p Then myobject.index = .index_cursor + v: .index_cursor = .index_cursor + v
-                                                End If
-                                            ElseIf .IamEnum Then
-                                                p = .Iterate()
-                                            End If
+                                If .UseIterator Then
+                                    i = .indirect
+                                    If i < 0 Then
+                                        Set myobject = .objref
+                                        If TypeOf myobject Is mHandler Then
+                                            Set usehandler1 = myobject
+                                            Set myobject = usehandler1.objref
+                                            Set usehandler1 = Nothing
+                                        End If
+                                    Else
+                                        InternalError
+                                        b$ = vbNullString
+                                        Exit Function
+                                    End If
+                                    p = .index_End <> -1 And Not myobject.IsEmpty
+                                    If p Then
+                                        If .index_start <= .index_End Then v = 1 Else v = -1
+                                        If v >= 0 Then
+                                            p = .index_cursor < .index_End
+                                        Else
+                                            p = .index_cursor > .index_End
+                                        End If
+                                        If p Then myobject.index = .index_cursor + v: .index_cursor = .index_cursor + v
+                                    End If
+                                ElseIf .IamEnum Then
+                                    p = .Iterate()
+                                End If
                                         End With
                                         Set usehandler = Nothing
                                         End If
@@ -18886,7 +18952,7 @@ another1:
                                 st = st And CBool(p)
                                 If FastSymbol(W$, ",") Then GoTo another1
                             Loop Until st = 0 Or NOEXECUTION
-                 ' addition in 8.9 rev 33
+                            '
                             Set bstack.lastobj = Nothing
                             If MOUT Then Execute = 0: Exit Function
                     End If
@@ -18908,9 +18974,9 @@ contEvery:
             If once = True Then Execute = 0: Exit Function
             If linebyline Then
                 b$ = W$ + " " + b$
-                sw$ = here$
+                
                 Execute = Execute(bstack, b$, once, False)
-                SwapStrings sw$, here$
+                
                 Exit Do
             End If
             If IsExp(bstack, b$, p) Then
@@ -18926,15 +18992,18 @@ contEvery:
                         Exit Do
                     End If
                 Else
-                    sw$ = here$
+                    
                     If FastSymbol(b$, "{") Then
-                        ss$ = block(b$) '+ "}"
+                        y1 = Len(b$)
+                        ss$ = block(b$)
                         If Not Left$(b$, 1) = "}" Then
                             Execute = CheckBlock(once): Exit Function
                         End If
                         ec$ = ss$
-                        b$ = Mid$(b$, 2)
+                        If Len(b$) > 0 Then Mid$(b$, 1) = " "
+                        'b$ = Mid$(b$, 2)
                         sss = Len(b$)
+                        
                         Execute = 1
                         ok = False
                         ' GET A TICK HERE
@@ -18944,32 +19013,42 @@ contEvery:
                         y2 = Signed(p)
                         'sX = y2
                         'Call GetSystemTimeAsFileTime(basictimer)
-                        Set subs = Nothing
+                         
                         x2 = timeGetTime
                         Do
                             ss$ = ec$
                             'y2 = sX
                             Execute = 1
-                            Call executeblock(Execute, bstack, subs, ss$, once, ok, , True)
-                            If Execute = 0 Then   '''Execute(bstack, ss$, ok) = 0
+                            TraceStore bstack, nd&, b$, 0
+                            Call executeblock(Execute, bstack, ss$, False, ok)
+                                
+                             TraceRestore bstack, nd&
+                            If Execute = 1 Then
+                            ElseIf Execute = 2 Then
+                                If Len(ss$) > 0 Then
+                                    
+                                    b$ = ss$: Exit Function
+                                ElseIf ok Then
+                                    b$ = "BREAK": once = True
+                                    
+                                    Exit Function
+                                End If
+                            ElseIf Execute = 0 Then
                                 If NOEXECUTION Then
                                     b$ = "START"
                                     Execute = 1
                                     ok = True
                                     Exit Do
                                 End If
-                                b$ = ss$ + b$
-                                SwapStrings sw$, here$
-                                Execute = 0: Exit Function
-                            ElseIf Execute = 2 Then
-                                If Len(ss$) > 0 Then
-                                    SwapStrings sw$, here$
-                                    b$ = ss$: Exit Function
-                                ElseIf ok Then
-                                    b$ = "BREAK": once = True
-                                    SwapStrings sw$, here$
-                                    Exit Function
+                                If bstack.ErrorOriginal <> 0 Then
+                                    SwapStrings b$, ss$
+                                ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                    b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
                                 End If
+                                Exit Function
+                            
+                            Else
+                                b$ = ss$: Exit Function
                             End If
                             If ok Or MOUT Or LastErNum <> 0 Then Exit Do
                             If UnsignedSub(timeGetTime, x2) > y2 Then
@@ -18982,7 +19061,7 @@ contEvery:
                             Loop Until UnsignedSub(x1, x2) >= y2
                             x2 = x1
                         Loop
-                        SwapStrings sw$, here$
+                        
                         If NOEXECUTION Then
                             b$ = "START"
                             Execute = 1
@@ -19000,9 +19079,9 @@ contTask:
             If once = True Then Execute = 0: Exit Function
             If linebyline Then
                 b$ = W$ + " " + b$
-                sw$ = here$
+                
                 Execute = Execute(bstack, b$, once, False)
-                SwapStrings sw$, here$
+                
                 Exit Do
             End If
             ' only one task main
@@ -19121,16 +19200,19 @@ findEndif:
                 
                     If FastSymbol(b$, "{") Then
                         W$ = block(b$)
-                            If Not Left$(b$, 1) = "}" Then
-                                Execute = CheckBlock(once): Exit Function
-                            End If
-                        b$ = Mid$(b$, 2)
-                                    DropCommentOrLine b$, True
-                                    If Not CheckFreeExecute(b$) Then
-                                        SyntaxError
-                                        Execute = 0
-                                        Exit Function
-                                    End If
+                        If Not Left$(b$, 1) = "}" Then
+                            Execute = CheckBlock(once): Exit Function
+                        End If
+                        Mid$(b$, 1, 1) = " "
+                        
+                        
+                        
+                        DropCommentOrLine b$, True
+                        If Not CheckFreeExecute(b$) Then
+                            SyntaxError
+                            Execute = 0
+                            Exit Function
+                        End If
                     ElseIf lookB123(b$) Then
                         i = SetNextLineCLR(b$)
                         i = MyTrimLi(b$, i + 1)
@@ -19178,17 +19260,28 @@ findEndif:
                                 jump = False
                                 sss = Len(b$)
                                 If FastSymbol(b$, "{") Then
+                                    y1 = Len(b$)
                                     ss$ = block(b$)
                                     If Not Left$(b$, 1) = "}" Then
                                         Execute = CheckBlock(once): Exit Function
                                     End If
                                     TraceStore bstack, nd&, b$, 0
-                                    b$ = Mid$(b$, 2)
-                                    Call Module10.executeblock(Execute, bstack, ss$, False, ok, , True)
+                                    Mid$(b$, 1, 1) = " "
+                                    Call executeblock(Execute, bstack, ss$, False, ok)
                                     TraceRestore bstack, nd&
-                                    If Execute = 2 Then
+                                    If Execute = 1 Then
+                                    ElseIf Execute = 2 Then
                                         If Len(ss$) > 0 Then b$ = ss$: Exit Function
                                         If ok Then b$ = "BREAK": once = True: Exit Function
+                                    ElseIf Execute = 0 Then
+                                           If bstack.ErrorOriginal <> 0 Then
+                                                SwapStrings b$, ss$
+                                            ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                                b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                            End If
+                                        Exit Function
+                                    Else
+                                        b$ = ss$: Exit Function
                                     End If
                                     DropCommentOrLine b$, True
                                     If Not CheckFreeExecute(b$) Then
@@ -19242,11 +19335,11 @@ ContTry:
             If once = True Then Execute = 0: Exit Function
             If linebyline Then
                 b$ = W$ + " " + b$
-                sw$ = here$
+                
                 PushErrStage bstack
                 Execute = Execute(bstack, b$, once, False)
                 PopErrStage bstack
-                SwapStrings sw$, here$
+                
                 bstack.nokillvars = False
                 Exit Do
             End If
@@ -19426,64 +19519,54 @@ contThenElseIf:
                 SyntaxError
                 Execute = 0
                 Exit Function
-                
-            Else
+             Else
                 ' use of flags
                 If (Not jump) Or IFCTRL = 2 Then
-                ' LOOK AHEAD...DO NOT PLAY THE LOGICAL EXPRESSION
-                ' ALSO THROW ALL { } ELSE {} BECAUSE FOUND THAT IS AN EXPRESSION;;;
+                    ' LOOK AHEAD...DO NOT PLAY THE LOGICAL EXPRESSION
+                    ' ALSO THROW ALL { } ELSE {} BECAUSE FOUND THAT IS AN EXPRESSION;;;
                     IFCTRL = 1
                     W$ = vbNullString
                     aheadstatusIF b$, IFCTRL, Lang, W$
-                    
                     If Len(W$) = 0 Then SyntaxError: Execute = 0: Exit Function
                     If FastOperator(b$, vbCrLf, IFCTRL, 2) Then
-                    b$ = Mid$(b$, IFCTRL)
-                                            SetNextLine b$
-                          IFCTRL = 1
-                    aheadstatusANY b$, IFCTRL
-                    
-                    b$ = Mid$(b$, IFCTRL)
+                        b$ = Mid$(b$, IFCTRL)
+                        SetNextLine b$
+                        IFCTRL = 1
+                        aheadstatusANY b$, IFCTRL
+                        b$ = Mid$(b$, IFCTRL)
                     Else
-                    
-                   ' aheadstatusANY b$, IFCTRL
-                    
-                    b$ = Mid$(b$, IFCTRL)
-                    If FastSymbol(b$, "{") Then
-                       W$ = block(b$)
-                                If Not Left$(b$, 1) = "}" Then
-                                    Execute = CheckBlock(once): Exit Function
-                                End If
-
-
-                                        b$ = Mid$(b$, 2)
-                                         If FastSymbol(b$, ":") Then
-                                    sss = Len(b$)
-                                    
-                                    IFCTRL = 0: GoTo again1
-                                    End If
+                        b$ = Mid$(b$, IFCTRL)
+                        If FastSymbol(b$, "{") Then
+                            W$ = block(b$)
+                            If Not Left$(b$, 1) = "}" Then
+                                Execute = CheckBlock(once): Exit Function
+                            End If
+                            b$ = Mid$(b$, 2)
+                            If FastSymbol(b$, ":") Then
+                                sss = Len(b$)
+                                IFCTRL = 0: GoTo again1
+                            End If
+                        Else
+                            SetNextLine b$
+                        End If
+                    End If
+                    If bstack.RetStackTotal > 0 Then
+                        If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
+                        If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
+                        If bstack.RetStack.LookTopVal = -3 Then
+                            jump = False
+                            IFCTRL = 0
+                        End If
                     Else
-                    SetNextLine b$
+                        lbl = True
+                        IFCTRL = 1
+                        jump = False
+                        i = 1
+                        While FastOperator(b$, vbCrLf, i, 2)
+                        Wend
+                        If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
+                        If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
                     End If
-                    End If
-                     If bstack.RetStackTotal > 0 Then
-                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
-                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
-                                                    If bstack.RetStack.LookTopVal = -3 Then
-                                                        jump = False
-                                                        IFCTRL = 0
-                                                    End If
-                                                Else
-                    lbl = True
-                    IFCTRL = 1
-                    jump = False
-                    i = 1
-                    While FastOperator(b$, vbCrLf, i, 2)
-                    Wend
-                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
-                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
-                    End If
-              
                 Else   ' ONLY FOR NOT JUMP
                     If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
                         IFCTRL = 1
@@ -19550,9 +19633,11 @@ contThenElseIf:
                                         If MaybeIsSymbol(b$, "0123456789") Then GoTo ContGoto
                                         Set subs = Nothing
                                         i = 1
+                                        
                                         aheadstatusELSE b$, i, Lang, W$
                                         If Len(W$) > 2 Then
                                         ' #1
+                                            y1 = Len(b$)
                                             ss$ = Left$(b$, i - 1 - Len(W$)) '+ "}"
                                             
                                             If once Then
@@ -19560,56 +19645,67 @@ contThenElseIf:
                                                 once = False
                                                 b$ = Mid$(b$, Len(ss$) + 1)
                                                 TraceStore bstack, nd&, b$, 0
-                                                Call executeblock(Execute, bstack, subs, ss$, once, ok, , True, False)
+                                                Call executeblock(Execute, bstack, ss$, once, ok)
+                            
                                                 TraceRestore bstack, nd&
-                                                If Execute = 0 Then
-                                                   b$ = ss$ + b$
+                                                If Execute = 1 Then
+                                                
                                                 ElseIf Execute = 5 Then
-                                                 once = True
-                                                GoTo contLoop
+                                                    once = True
+                                                    GoTo contLoop
                                                 ElseIf Execute = 6 Then
-                                                b$ = vbNullString
-                                                Execute = 2
-                                                 once = True
-                                                Exit Function
+                                                    b$ = vbNullString
+                                                    Execute = 2
+                                                    once = True
+                                                    Exit Function
                                                 ElseIf Execute = 2 And once Then
                                                     b$ = ss$
                                                     Exit Function
-                                           ElseIf Execute = 3 Then
-                                            b$ = ss$
-                                            Exit Function
+                                                ElseIf Execute = 3 Then
+                                                    b$ = ss$
+                                                    Exit Function
+                                                ElseIf Execute = 0 Then
+                                                    If bstack.ErrorOriginal <> 0 Then
+                                                        SwapStrings b$, ss$
+                                                    ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                                        b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                                    End If
                                                 Else
                                                     SetNextLine b$
                                                 End If
-                                                 once = True
+                                                once = True
                                                 Exit Function
                                             Else
                                             ' else.if  then .... no block
                                                 b$ = Mid$(b$, Len(ss$) + 1)
                                                 ok = False
-                                                Set subs = Nothing
-                                                 TraceStore bstack, nd&, b$, 0
-                                                Call executeblock(Execute, bstack, subs, ss$, False, ok, , True, False)
-                                                 TraceRestore bstack, nd&
+                                                TraceStore bstack, nd&, b$, 0
+                                                Call executeblock(Execute, bstack, ss$, once, ok)
+                                                TraceRestore bstack, nd&
                                             End If
                                             If Execute = 1 Then
-                                            If ok Then Exit Function
-                                          
-                                            GoTo contif2
+                                                If ok Then Exit Function
+                                                GoTo contif2
                                             ElseIf Execute = 2 Then
                                                 b$ = ss$
                                                 once = False
                                                 
-                                            Exit Function
-                                        ElseIf Execute = 6 Then
-                                            GoTo ContRestart
-                                        ElseIf Execute = 5 Then
-                                            Execute = 2
-                                            loopthis = True
-                                            GoTo contif2
-                                        Else
-                                            If loopthis Then Execute = 2
-                                            GoTo CONTcontinue
+                                                Exit Function
+                                            ElseIf Execute = 6 Then
+                                                GoTo ContRestart
+                                            ElseIf Execute = 5 Then
+                                                Execute = 2
+                                                loopthis = True
+                                                GoTo contif2
+                                            ElseIf Execute = 0 Then
+                                               If bstack.ErrorOriginal <> 0 Then
+                                                    SwapStrings b$, ss$
+                                                ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                                    b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                                End If
+                                            Else
+                                                If loopthis Then Execute = 2
+                                                GoTo CONTcontinue
                                             End If
                                         Else
                                             IFCTRL = 2
@@ -19617,31 +19713,32 @@ contThenElseIf:
                                     Else
 contelseifpass:
                                         IFCTRL = 2
+                                        y1 = Len(b$)
                                         ss$ = block(b$)
-                                If Not Left$(b$, 1) = "}" Then
-                                    Execute = CheckBlock(once): Exit Function
-                                End If
-
-
-                                        TraceStore bstack, nd&, b$, 0
-                                        b$ = Mid$(b$, 2)
-                                        Set subs = Nothing
-                                        Call executeblock(Execute, bstack, subs, ss$, False, ok, , True)
-                                       TraceRestore bstack, nd&
-                                        If Execute = 1 Then
-                                       ' If once Then Exit Do
-                                        
-                                        If FastSymbol(b$, ":") Then
-                                        
-                                            sss = Len(b$)
-                                          IFCTRL = 0: GoTo again1
+                                        If Not Left$(b$, 1) = "}" Then
+                                            Execute = CheckBlock(once): Exit Function
                                         End If
-                                        If Not lookB123(b$) Then GoTo contif2
+                                        Mid$(b$, 1, 1) = " "
+                                        TraceStore bstack, nd&, b$, 0
+                                        Call executeblock(Execute, bstack, ss$, False, ok)
+                                        TraceRestore bstack, nd&
+                                        If Execute = 1 Then
+                                            If FastSymbol(b$, ":") Then
+                                            ss = Len(b$)
+                                            IFCTRL = 0: GoTo again1
+                                            End If
+                                            If Not lookB123(b$) Then GoTo contif2
+                                        ElseIf Execute = 0 Then
+                                           If bstack.ErrorOriginal <> 0 Then
+                                                SwapStrings b$, ss$
+                                            ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                                b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                            End If
                                         Else
-                                                  b$ = ss$
-                                                once = False
-                                                Execute = 2
-                                                Exit Function
+                                            b$ = ss$
+                                            once = False
+                                            Execute = 2
+                                            Exit Function
                                         End If
                                     End If
                                     
@@ -19653,9 +19750,9 @@ contelseifpass:
                                 If Not jump Then      ' JUMP FALSE SKIP ELSE
                                     If FastSymbol(b$, "{") Then
                                         W$ = block(b$)
-                                If Not Left$(b$, 1) = "}" Then
-                                    Execute = CheckBlock(once): Exit Function
-                                End If
+                                        If Not Left$(b$, 1) = "}" Then
+                                            Execute = CheckBlock(once): Exit Function
+                                        End If
 
                                         b$ = Mid$(b$, 2)
                                     Else
@@ -19694,100 +19791,109 @@ contelseifpass:
                                     jump = True
                                     IFCTRL = 1
                                 Else
-                                IFCTRL = 2
-                                If MaybeIsSymbol(b$, "0123456789") Then GoTo ContGoto
-                                i = 1
-                                aheadstatusELSE b$, i, Lang, W$
-                                If Len(W$) > 2 Then
+                                    IFCTRL = 2
+                                    If MaybeIsSymbol(b$, "0123456789") Then GoTo ContGoto
+                                    i = 1
+                                    aheadstatusELSE b$, i, Lang, W$
+                                    If Len(W$) > 2 Then
                                 ' #2
-                                    ss$ = Left$(b$, i - 1 - Len(W$))
-                                    If once Then
-                                          once = False
-                                                b$ = Mid$(b$, Len(ss$) + 1)
-                                                TraceStore bstack, nd&, b$, 0
-                                                Call Module10.executeblock(Execute, bstack, ss$, once, ok, , True, False)
-                                                TraceRestore bstack, nd&
-                                                
-                                                If Execute = 0 Then
-                                                   b$ = ss$ + b$
-                                                ElseIf Execute = 5 Then
-                                                once = True
-                                                GoTo contLoop
-                                                ElseIf Execute = 6 Then
-                                                b$ = vbNullString
-                                                Execute = 2
-                                                once = True
-                                                Exit Function
-                                              ElseIf Execute = 3 Then
-                                                    b$ = ss$
-                                                    Exit Function
-                                                ElseIf Execute = 2 And once Then
-                                                    b$ = ss$
-                                                    Exit Function
-                                                Else
-                                                    SetNextLine b$
-                                                End If
-                                                once = True
-                                                Exit Function
-                                Else
+                                        ss$ = Left$(b$, i - 1 - Len(W$))
+                                        If once Then
+                                            once = False
+                                            b$ = Mid$(b$, Len(ss$) + 1)
+                                            i = Len(ss$) + Len(b$)
+                                            TraceStore bstack, nd&, b$, 0
+                                            Call executeblock(Execute, bstack, ss$, once, ok)
+                                            TraceRestore bstack, nd&
+                                        If Execute = 1 Then
+                                        ElseIf Execute = 5 Then
+                                            once = True
+                                            GoTo contLoop
+                                        ElseIf Execute = 6 Then
+                                            b$ = vbNullString
+                                            Execute = 2
+                                            once = True
+                                            Exit Function
+                                        ElseIf Execute = 3 Then
+                                            b$ = ss$
+                                            Exit Function
+                                        ElseIf Execute = 2 And once Then
+                                            b$ = ss$
+                                            Exit Function
+                                        ElseIf Execute = 0 Then
+                                            If bstack.ErrorOriginal <> 0 Then
+                                                SwapStrings b$, ss$
+                                            ElseIf Len(ss$) - 1 - i + Len(b$) * 2 > 0 Then
+                                                b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                            End If
+                                            Exit Function
+                                        Else
+                                            SetNextLine b$
+                                        End If
+                                        once = True
+                                        Exit Function
+                                    Else
                                 ' else.if else ..... no block
-                                    b$ = Mid$(b$, Len(ss$) + 1)
-                                    TraceStore bstack, nd&, b$, 0
-                                    Call Module10.executeblock(Execute, bstack, ss$, False, ok, , True, False)
-                                    TraceRestore bstack, nd&
-                                    
-                                End If
-                                If Execute = 1 Then    ' else.if pass
-                                If ok Then Exit Function
+                                        y1 = Len(b$)
+                                        
+                                        b$ = Mid$(b$, Len(ss$) + 1)
+                                        TraceStore bstack, nd&, b$, 0
+                                        Call executeblock(Execute, bstack, ss$, once, ok)
+                                        TraceRestore bstack, nd&
+                                    End If
+                                    If Execute = 1 Then    ' else.if pass
+                                        If ok Then Exit Function
                                         If FastSymbol(b$, ":") Then
                                             sss = Len(b$)
-                                          IFCTRL = 0: GoTo again1
+                                            IFCTRL = 0: GoTo again1
                                         End If
                                         If Not lookB123(b$) Then GoTo contif2
-                                ElseIf Execute = 2 Then
-                                    If ok And Len(ss$) = 0 Then b$ = "BREAK" Else b$ = ss$
-                                    once = False
-                                    Exit Function
-                                ElseIf Execute = 6 Then
-                                    GoTo ContRestart
-                                ElseIf Execute = 5 Then
-                                loopthis = True
-                                Execute = 2
+                                    ElseIf Execute = 2 Then
+                                        If ok And Len(ss$) = 0 Then b$ = "BREAK" Else b$ = ss$
+                                        once = False
+                                        Exit Function
+                                    ElseIf Execute = 6 Then
+                                        GoTo ContRestart
+                                    ElseIf Execute = 5 Then
+                                        loopthis = True
+                                        Execute = 2
+                                    ElseIf Execute = 0 Then
+                                        If bstack.ErrorOriginal <> 0 Then
+                                            SwapStrings b$, ss$
+                                        ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                            b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                        End If
+                                    Else
+                                        If loopthis Then Execute = 2
+                                        GoTo CONTcontinue
+                                    End If
                                 Else
-                                    If loopthis Then Execute = 2
-                                    GoTo CONTcontinue
+                                    If FastSymbol(b$, "{") Then GoTo contelseifpass
                                 End If
-                                Else
-                                If FastSymbol(b$, "{") Then GoTo contelseifpass
-                                End If
-                              
-                                End If
-                            Case Else
-                                Execute = 0
-                                Exit Function
-                            End Select
-                             If bstack.RetStackTotal > 0 Then
-                                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
-                                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
-                                                    If bstack.RetStack.LookTopVal = -3 Then
-                                                        jump = False
-                                                        IFCTRL = 0
-                                                    End If
-                                                Else
-                           
-                            If jump Or IFCTRL = 2 Then
-                                i = 1
-                                If Not once Then
-                                If FastOperator(b$, vbCrLf, i, 2) Then
-                                While FastOperator(b$, vbCrLf, i, 2)
-                                Wend
-                                End If
-                                End If
-                                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
-                                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse1
-                                
-                            
                             End If
+                        Case Else
+                            Execute = 0
+                            Exit Function
+                        End Select
+                        If bstack.RetStackTotal > 0 Then
+                            If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
+                                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse
+                                If bstack.RetStack.LookTopVal = -3 Then
+                                    jump = False
+                                    IFCTRL = 0
+                                End If
+                            Else
+                                If jump Or IFCTRL = 2 Then
+                                    i = 1
+                                    If Not once Then
+                                        If FastOperator(b$, vbCrLf, i, 2) Then
+                                            While FastOperator(b$, vbCrLf, i, 2)
+                                            Wend
+                                        End If
+                                    End If
+                                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
+                                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse1
+                                End If
                             End If
                         Case Else
                             Execute = 0
@@ -19803,283 +19909,282 @@ contelseifpass:
         Case "IF", "ΑΝ"
 contif:
        
-       jump = 0
-       IFCTRL = 0
-        If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
-            x1 = 1           ' NEED THEN OR ELSE OR ELSE.IF
-            ok = (p = 0#)                    ' JUMP TRUE GOTO ELSE
-            i = 1
-            Select Case Abs(IsLabel(bstack, b$, W$))
-            Case 1
-            Select Case W$
-                Case "THEN", "ΤΟΤΕ"
-
-                    If ok Then
-                        If lookB123(b$) Then
-                            i = SetNextLineCLR(b$)
-                            MarkIf bstack, 1, ok
-                            bstack.UseofIf = bstack.UseofIf + 1
-                            x1 = 1
-                            aheadstatusELSEIF b$, i, Lang, ok, x1, (ok)
-                            DropMark bstack
-                            If x1 = 0 Then
-                                bstack.UseofIf = bstack.UseofIf - 1
-                            Else
-                                MarkIf bstack, 1, True
-                            End If
-                              
-                              b$ = Mid$(b$, i)
-         
-                              IFCTRL = 0
-                              jump = False
-                        lbl = False
-                        If Len(b$) > 0 Then
-                        If Left$(b$, 2) = vbCrLf Then lbl = True
-                        End If
-                        sss = Len(b$)
-                        GoTo loopcontinue
-                    ElseIf FastSymbol(b$, "{") Then
-                               '     If once = True Then Execute = 0: Exit Function
-                                    W$ = block(b$)
+            jump = 0
+            IFCTRL = 0
+                If IsExp(bstack, b$, p, flatobject:=True, nostring:=True) Then
+                    x1 = 1           ' NEED THEN OR ELSE OR ELSE.IF
+                    ok = (p = 0#)                    ' JUMP TRUE GOTO ELSE
+                    i = 1
+                    Select Case Abs(IsLabel(bstack, b$, W$))
+                    Case 1
+                        Select Case W$
+                        Case "THEN", "ΤΟΤΕ"
+                            If ok Then
+                                If lookB123(b$) Then
+                                    i = SetNextLineCLR(b$)
+                                    MarkIf bstack, 1, ok
+                                    bstack.UseofIf = bstack.UseofIf + 1
+                                    x1 = 1
+                                    aheadstatusELSEIF b$, i, Lang, ok, x1, (ok)
+                                    DropMark bstack
+                                    If x1 = 0 Then
+                                        bstack.UseofIf = bstack.UseofIf - 1
+                                    Else
+                                        MarkIf bstack, 1, True
+                                    End If
+                                    b$ = Mid$(b$, i)
+                                    IFCTRL = 0
+                                    jump = False
+                                    lbl = False
+                                    If Len(b$) > 0 Then
+                                        If Left$(b$, 2) = vbCrLf Then lbl = True
+                                    End If
+                                    sss = Len(b$)
+                                    GoTo loopcontinue
+                            ElseIf FastSymbol(b$, "{") Then
+                                W$ = block(b$)
                                 If Not Left$(b$, 1) = "}" Then
                                     Execute = CheckBlock(once): Exit Function
                                 End If
-
-                                    b$ = Mid$(b$, 2)
-                                    If FastSymbol(b$, ":") Then
+                                b$ = Mid$(b$, 2)
+                                If FastSymbol(b$, ":") Then
                                     sss = Len(b$)
-                                    
                                     IFCTRL = 0: GoTo again1
-                                    End If
-                                       i = 1
-                                        aheadstatusELSE b$, i, Lang, W$
-                                        If Len(W$) > 2 Then GoTo contif22
-                                        DropCommentOrLine b$, True
-                                        If Not CheckFreeExecute(b$) Then
-                                            SyntaxError
-                                            Execute = 0
-                                            Exit Function
-                                        End If
-                                        sss = Len(b$)
-                                        GoTo loopagain
-                                    
-                    Else
+                                End If
+                                i = 1
+                                aheadstatusELSE b$, i, Lang, W$
+                                If Len(W$) > 2 Then GoTo contif22
+                                DropCommentOrLine b$, True
+                                If Not CheckFreeExecute(b$) Then
+                                    SyntaxError
+                                    Execute = 0
+                                    Exit Function
+                                End If
+                                sss = Len(b$)
+                                GoTo loopagain
+                            Else
 contif2:
-                                        i = 1
-                                        aheadstatusELSE b$, i, Lang, W$
-                                        If Len(W$) > 2 Then
+                                i = 1
+                                aheadstatusELSE b$, i, Lang, W$
+                                If Len(W$) > 2 Then
 contif22:
-                                        jump = ok
-                                        If IFCTRL = 0 Then IFCTRL = 1
-                                            If Lang = 0 Then
-                                                Select Case W$
+                                    jump = ok
+                                    If IFCTRL = 0 Then IFCTRL = 1
+                                    If Lang = 0 Then
+                                        Select Case W$
 
-                                                Case "ΑΛΛΙΩΣ"
-                                                    b$ = Mid$(b$, i)
-                                                    GoTo ContElse1
-                                                Case "ΑΛΛΙΩΣ.ΑΝ"
-                                                     b$ = Mid$(b$, i)
-                                                    GoTo contElseIf
-                                                End Select
-                                            Else
-                                                Select Case W$
-                                                Case "ELSE"
-                                                    b$ = Mid$(b$, i)
-                                                    GoTo ContElse1
-                                                Case "ELSE.IF"
-                                                    b$ = Mid$(b$, i)
-                                                    GoTo contElseIf
-                                                End Select
-                                            End If
-                                            
-                                            sss = Len(b$)
-                                        Else
-                                            If once Then
-                                                W$ = GetStrUntil(vbCrLf, b$, False)
-                                                Exit Function
-                                            Else
+                                        Case "ΑΛΛΙΩΣ"
+                                            b$ = Mid$(b$, i)
+                                            GoTo ContElse1
+                                        Case "ΑΛΛΙΩΣ.ΑΝ"
+                                             b$ = Mid$(b$, i)
+                                            GoTo contElseIf
+                                        End Select
+                                    Else
+                                        Select Case W$
+                                        Case "ELSE"
+                                            b$ = Mid$(b$, i)
+                                            GoTo ContElse1
+                                        Case "ELSE.IF"
+                                            b$ = Mid$(b$, i)
+                                            GoTo contElseIf
+                                        End Select
+                                    End If
+                                    sss = Len(b$)
+                                Else
+                                    If once Then
+                                        W$ = GetStrUntil(vbCrLf, b$, False)
+                                        Exit Function
+                                    Else
                                         'if module2
                                         SetNextLine b$
-                                        
-                                        
-                                    End If
-                                 End If
-                                End If
-                                If bstack.RetStackTotal = 0 Then
-                                        jump = ok
-                                       If IFCTRL = 0 Then IFCTRL = 1
-                                Else
-                                    If Not bstack.RetStack.LookTopVal = -3 Then
-                                        jump = ok
-                                        If IFCTRL = 0 Then IFCTRL = 1
-                                     Else
-                                        IFCTRL = 0
                                     End If
                                 End If
-                    Else
-                        
-                    If lookB123(b$) Then
-                        i = SetNextLineCLR(b$)
-                        MarkIf bstack, 2, jump
-                        bstack.UseofIf = bstack.UseofIf + 1
-                        jump = False
-                        IFCTRL = 0
-                        lbl = True
-                        sss = Len(b$)
-                        GoTo loopcontinue
-                    Else
-                        IFCTRL = 1
-                        jump = True
-                        If MaybeIsSymbol(b$, "0123456789") Then GoTo ContGoto
-                         
-                        IFCTRL = 2 ' NONEED ANYTHING BUT NOT ERROR FOR IF.ELSE AND ELSE
-                        If Not FastSymbol(b$, "{") Then
-                            i = 1
-                            aheadstatusELSE b$, i, Lang, W$
-                            If Len(W$) > 2 Then
-                            ' #3
-                                ss$ = Left$(b$, i - 1 - Len(W$))
-                                b$ = Mid$(b$, i - Len(W$))
-                            If once Then
-                            TraceStore bstack, nd&, b$, 0
-                            once = False
-                                    Call Module10.executeblock(Execute, bstack, ss$, once, ok, , True, False)
-                                    TraceRestore bstack, nd
-                                    If Execute = 0 Then
-                                                   b$ = ss$ + b$
-                                            ElseIf Execute = 5 Then
-                                                once = True
-                                                GoTo contLoop
-                                            ElseIf Execute = 6 Then
-                                                b$ = vbNullString
-                                                Execute = 2
-                                                once = True
-                                                Exit Function
-                                            ElseIf Execute = 3 Then
-                                            b$ = ss$
-                                            Exit Function
-                                            ElseIf Execute = 2 And once Then
-                                                    b$ = ss$
-                                                    Exit Function
-                                        ElseIf Execute = 1 Then
-                                            If ok And Len(ss$) = 0 Then
-                                            b$ = vbNullString
-                                            Else
-                                            SetNextLineNL b$
-                                            End If
-                                        Else
-                                            If ok = True Then b$ = "BREAK" Else b$ = ss$
-                                            once = False
-                                           ' Execute = 2
-                                        Exit Function
-                                    End If
-                                    Exit Do
-                            Else
-                                ' if then ...   else or else.if, no block
-                                TraceStore bstack, nd&, b$, 0
-                                    Call Module10.executeblock(Execute, bstack, ss$, False, ok, , True, False)
-                                    TraceRestore bstack, nd&
                             End If
-                            If Execute = 1 Then
-                            
-                                SetNextLine b$
-                                lbl = True
-                                    If bstack.RetStackTotal > 0 Then
-                                        
-                                    If bstack.RetStack.LookTopVal = -3 Then
-                                        IFCTRL = 0
-                                    End If
-                                End If
-                                If ok Then once = True: b$ = vbNullString: Exit Function
-                            ElseIf Execute = 2 Then
-                                If ok And Len(ss$) = 0 Then b$ = "BREAK" Else b$ = ss$
-                                once = False
-                                Exit Function
-                            ElseIf Execute = 3 Then
-                                If loopthis Then Execute = 2
-                                GoTo CONTcontinue
-                            ElseIf Execute = 6 Then
-                                GoTo ContRestart
-                            ElseIf Execute = 5 Then
-                                loopthis = True
-                                ok = False
-                                SetNextLine b$
-                                Execute = 2
-                                If bstack.RetStackTotal > 0 Then
-                                    If bstack.RetStack.LookTopVal = -3 Then
-                                        IFCTRL = 0
-                                    End If
-                                End If
-                            ElseIf Execute = 0 Then
-                            Exit Do
+                            If bstack.RetStackTotal = 0 Then
+                                jump = ok
+                                If IFCTRL = 0 Then IFCTRL = 1
                             Else
-                                If loopthis Then Execute = 2
-                                GoTo CONTcontinue
+                                If Not bstack.RetStack.LookTopVal = -3 Then
+                                    jump = ok
+                                    If IFCTRL = 0 Then IFCTRL = 1
+                                Else
+                                    IFCTRL = 0
+                                End If
                             End If
                         Else
-                            If bstack.RetStack.LookTopVal = -3 Then
+                            If lookB123(b$) Then
+                                i = SetNextLineCLR(b$)
+                                MarkIf bstack, 2, jump
+                                bstack.UseofIf = bstack.UseofIf + 1
+                                jump = False
                                 IFCTRL = 0
-                            End If
-                        End If
-                    Else
-                       ' bstack.addlen = Len(b$)
-                        ss$ = block(b$)
-                        If Not Left$(b$, 1) = "}" Then
-                            Execute = CheckBlock(once): Exit Function
-                        End If
-                        ok = False
-                        TraceStore bstack, nd&, b$, 0
-                        Call Module10.executeblock(Execute, bstack, ss$, False, ok, , True)
-                        TraceRestore bstack, nd&
-                        b$ = Mid$(b$, 2)
-                        If Execute = 1 Then
-                            If FastSymbol(b$, ":") Then
+                                lbl = True
                                 sss = Len(b$)
-                                IFCTRL = 0
-                                GoTo again1
+                                GoTo loopcontinue
+                            Else
+                                IFCTRL = 1
+                                jump = True
+                                If MaybeIsSymbol(b$, "0123456789") Then GoTo ContGoto
+                                 
+                                IFCTRL = 2 ' NONEED ANYTHING BUT NOT ERROR FOR IF.ELSE AND ELSE
+                                If Not FastSymbol(b$, "{") Then
+                                    i = 1
+                                    aheadstatusELSE b$, i, Lang, W$
+                                    y1 = Len(b$)
+                                    If Len(W$) > 2 Then
+                                    ' #3
+                                        ss$ = Left$(b$, i - 1 - Len(W$))
+                                        b$ = Mid$(b$, i - Len(W$))
+                                        If once Then
+                                                TraceStore bstack, nd&, b$, 0
+                                                once = False
+                                                Call executeblock(Execute, bstack, ss$, once, ok)
+                                                TraceRestore bstack, nd
+                                                If Execute = 1 Then
+                                                    If ok And Len(ss$) = 0 Then
+                                                    b$ = vbNullString
+                                                    Else
+                                                    SetNextLineNL b$
+                                                    End If
+                                                ElseIf Execute = 5 Then
+                                                    once = True
+                                                    GoTo contLoop
+                                                ElseIf Execute = 6 Then
+                                                    b$ = vbNullString
+                                                    Execute = 2
+                                                    once = True
+                                                    Exit Function
+                                                ElseIf Execute = 3 Then
+                                                    b$ = ss$
+                                                    Exit Function
+                                                ElseIf Execute = 2 And once Then
+                                                    b$ = ss$
+                                                    Exit Function
+                                                ElseIf Execute = 0 Then
+                                                    If bstack.ErrorOriginal <> 0 Then
+                                                        SwapStrings b$, ss$
+                                                    ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                                        b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                                    End If
+                                                    Exit Function
+                                                Else
+                                                    If ok = True Then b$ = "BREAK" Else b$ = ss$
+                                                    once = False
+                                                   ' Execute = 2
+                                                Exit Function
+                                            End If
+                                            Exit Do
+                                    Else
+                                        ' if then ...   else or else.if, no block
+                                        TraceStore bstack, nd&, b$, 0
+                                        Call executeblock(Execute, bstack, ss$, False, ok)
+                                        TraceRestore bstack, nd&
+                                    End If
+                                    If Execute = 1 Then
+                                        SetNextLine b$
+                                        lbl = True
+                                        If bstack.RetStackTotal > 0 Then
+                                            If bstack.RetStack.LookTopVal = -3 Then
+                                                IFCTRL = 0
+                                            End If
+                                        End If
+                                        If ok Then once = True: b$ = vbNullString: Exit Function
+                                    ElseIf Execute = 2 Then
+                                        If ok And Len(ss$) = 0 Then b$ = "BREAK" Else b$ = ss$
+                                        once = False
+                                        Exit Function
+                                    ElseIf Execute = 3 Then
+                                        If loopthis Then Execute = 2
+                                        GoTo CONTcontinue
+                                    ElseIf Execute = 6 Then
+                                        GoTo ContRestart
+                                    ElseIf Execute = 5 Then
+                                        loopthis = True
+                                        ok = False
+                                        SetNextLine b$
+                                        Execute = 2
+                                        If bstack.RetStackTotal > 0 Then
+                                            If bstack.RetStack.LookTopVal = -3 Then
+                                                IFCTRL = 0
+                                            End If
+                                        End If
+                                    ElseIf Execute = 0 Then
+                                        If bstack.ErrorOriginal <> 0 Then
+                                            SwapStrings b$, ss$
+                                        ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                            b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                        End If
+                                        Exit Function
+                                    Else
+                                        If loopthis Then Execute = 2
+                                        GoTo CONTcontinue
+                                    End If
+                                Else
+                                    If bstack.RetStack.LookTopVal = -3 Then
+                                        IFCTRL = 0
+                                    End If
+                                End If
+                            Else
+                                y1 = Len(b$)
+                                ss$ = block(b$)
+                                If Not Left$(b$, 1) = "}" Then
+                                    Execute = CheckBlock(once): Exit Function
+                                End If
+                                ok = False
+                                Mid$(b$, 1, 1) = " "
+                                TraceStore bstack, nd&, b$, 0
+                                Call executeblock(Execute, bstack, ss$, False, ok)
+                                TraceRestore bstack, nd&
+                                If Execute = 1 Then
+                                    If FastSymbol(b$, ":") Then
+                                        sss = Len(b$)
+                                        IFCTRL = 0
+                                        GoTo again1
+                                    End If
+                                    If Not lookB123(b$) Then GoTo contif2
+                                    IFCTRL = 0
+                                ElseIf Execute = 2 Then
+                                    If ok Then b$ = "BREAK": once = True Else b$ = ss$
+                                    Exit Function
+                                ElseIf Execute = 0 Then
+                                    If bstack.ErrorOriginal <> 0 Then
+                                        SwapStrings b$, ss$
+                                    ElseIf Len(ss$) - 1 - y1 + Len(b$) * 2 > 0 Then
+                                        b$ = space$(Len(ss$) - 1 - y1 + Len(b$) * 2)
+                                    End If
+                                End If
                             End If
-                            If Not lookB123(b$) Then GoTo contif2
-                            IFCTRL = 0
-                        ElseIf Execute = 2 Then
-                        If ok Then b$ = "BREAK": once = True Else b$ = ss$
-                        Exit Function
-                        End If
-                        End If
                         End If
                     End If
                 Case "ELSE", "ΑΛΛΙΩΣ"
-                
                     If lookB123(b$) Then
-                    
-                    
-                    If Not ok Then
-                        ' find END IF
-                         MarkIf bstack, 1, ok
-                         bstack.UseofIf = bstack.UseofIf + 1
-                        GoTo findEndif
-                    Else
-                         MarkIf bstack, 0, ok
-                         bstack.UseofIf = bstack.UseofIf + 1
-                        jump = False
-                        IFCTRL = 0
-                        lbl = True
-                    End If
-                    i = SetNextLineCLR(b$)
+                        If Not ok Then
+                                ' find END IF
+                            MarkIf bstack, 1, ok
+                            bstack.UseofIf = bstack.UseofIf + 1
+                            GoTo findEndif
+                        Else
+                            MarkIf bstack, 0, ok
+                            bstack.UseofIf = bstack.UseofIf + 1
+                            jump = False
+                            IFCTRL = 0
+                            lbl = True
+                        End If
+                        i = SetNextLineCLR(b$)
                     ElseIf Not ok Then       ' JUMP FALSE SKIP ELSE
-                    
                         If FastSymbol(b$, "{") Then
                             If once = True Then Execute = 0: Exit Function
                             W$ = block(b$)
-                                If Not Left$(b$, 1) = "}" Then
-                                    Execute = CheckBlock(once): Exit Function
-                                End If
-
+                            If Not Left$(b$, 1) = "}" Then
+                                Execute = CheckBlock(once): Exit Function
+                            End If
                             b$ = Mid$(b$, 2)
                         Else
                             SetNextLine b$
                             lbl = True
-                             sss = Len(b$)
-                             GoTo again1
+                            sss = Len(b$)
+                            GoTo again1
                         End If
                         IFCTRL = 0 ' NONEED ANYTHING AND ERROR FOR IF.ELSE AND ELSE
                     Else
@@ -20097,31 +20202,30 @@ contif22:
                 Exit Function
             End Select
             If once Then
-            
-            sss = Len(b$)
-            GoTo again1
+                sss = Len(b$)
+                GoTo again1
             Else
-            If jump Or IFCTRL = 2 Then
-               ' lbl = True
-                i = 1
-                If FastOperator(b$, vbCrLf, i, 2) Then
-                While FastOperator(b$, vbCrLf, i, 2)
-                Wend
-                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
-                If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse1
+                If jump Or IFCTRL = 2 Then
+                   ' lbl = True
+                    i = 1
+                    If FastOperator(b$, vbCrLf, i, 2) Then
+                    While FastOperator(b$, vbCrLf, i, 2)
+                    Wend
+                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ.ΑΝ", "ELSE.IF", Lang) Then GoTo contElseIf
+                    If IsLabelSymbolNew(b$, "ΑΛΛΙΩΣ", "ELSE", Lang) Then GoTo ContElse1
                 End If
                 GoTo again1
             End If
+        End If
+        lbl = False
+        DropCommentOrLine b$, True
+        If Len(b$) > 0 Then
+            If Left$(b$, 2) <> vbCrLf Then
+                GoTo againExtra2
             End If
-                    lbl = False
-                    DropCommentOrLine b$, True
-                    If Len(b$) > 0 Then
-                        If Left$(b$, 2) <> vbCrLf Then
-                            GoTo againExtra2
-                        End If
-                    Else
-                        Exit Do
-                    End If
+        Else
+            Exit Do
+        End If
     Else
         ' error
         If LastErNum = -2 Then
@@ -21137,7 +21241,8 @@ v = 0
 Set bstack.lastpointer = Nothing
 Execute = SpeedGroup(bstack, ppppl, "", W$, b$, v)
 Set ppppl = Nothing  ' now group ref counting work fine
-If Execute = 0 Then
+If Execute = 1 Then
+ElseIf Execute = 0 Then
     Exit Function
 ElseIf Execute <> 1 And b$ <> "" Then
     once = False
@@ -21223,7 +21328,7 @@ Dim f As Long, it As Long, pa$
 Dim x1 As Long, par As Boolean, ohere$, W$, loopthis As Boolean
 Dim Vars As Long, Vname As Long, subs As Long, snames As Long
 Dim once As Boolean, RetStackSize As Long
-Dim subsfc As FastCollection
+Dim subsfc As FastCollection, namedArg As mStiva
 Dim c As Constant, myl As lambda
 Dim basestack As basetask
 Dim ok As Boolean, nokillvars As Boolean
@@ -21401,7 +21506,7 @@ If here$ <> ohere$ Or mystack.IamChild Or basestack.IamAnEvent Then
         RetStackSize = mystack.RetStackTotal
  If Not mystack.CallLocalLast Then
  If Not mystack.soros.NamedArguments Is Nothing Then
- Dim namedArg As mStiva
+ 
 Set namedArg = mystack.soros.NamedArguments
 Set mystack.soros.NamedArguments = Nothing
 Do While Not namedArg.IsEmpty
@@ -21430,6 +21535,8 @@ subsentry10:
                 Select Case Execute(mystack, bb$, ok, False, loopthis)   ' this is a major point
                 Case 0
 thh:
+                    If sbi > 0 Then bb$ = bb$ + space(sbi): sbi = 0
+
                     code$ = bb$
                     it = 0
                     Set mystack.lastobj = Nothing
@@ -21487,14 +21594,17 @@ fulty:
                                         mystack.PushSecondThird S3, sbi
                                         If searchsub(0, mystack.OriginalCode, small$, i, S3, bb$) Then
                                             mystack.callx1 = 0
-                                            Set vl = mystack.namedArg: Set mystack.namedArg = Nothing
-                                            If Len(small$) <> 0 Or Not vl Is Nothing Then If Not MyRead7(mystack, small$, 1, vl) Then GoTo thh
+                                            mystack.ErrorOriginal = S3
+                                            Set namedArg = mystack.namedArg: Set mystack.namedArg = Nothing
+                                            If Len(small$) <> 0 Or Not namedArg Is Nothing Then If Not MyRead7(mystack, small$, 1, namedArg) Then GoTo thh
+            
                                             GoTo contSub
                                         ElseIf mystack.IamChild Then
                                             mystack.callx1 = 0
                                             If searchsub(mystack.OriginalCode, FindPrevOriginal(mystack), small$, i, S3, bb$) Then
-                                                Set vl = mystack.namedArg: Set mystack.namedArg = Nothing
-                                                If Len(small$) <> 0 Or Not vl Is Nothing Then If Not MyRead7(mystack, small$, 1, vl) Then GoTo thh
+                                                Set namedArg = mystack.namedArg: Set mystack.namedArg = Nothing
+                                                mystack.ErrorOriginal = S3
+                                                If Len(small$) <> 0 Or Not namedArg Is Nothing Then If Not MyRead7(mystack, small$, 1, namedArg) Then GoTo thh
 contSub:
                                                 If Len(bb$) = 0 Then
                                                     If S3 < 0 Then
@@ -21705,11 +21815,55 @@ fastexit:
             mystack.ThrowThreads  ' always throw threads
             If Not NERR Then   ' Nerr = true from command ERROR 0 means Fatal Error, shows a message and act as a crash!
                 If Not myl Is Nothing Then
-                    MyErMacro rest$, Chr(0) + "Problem in lambda", Chr(0) + "Πρόβλημα στη λάμδα"
-                    FK$(13) = "EDIT " & GetName(sbf(myl.OriginalCode).goodname) & "," & (-myl.lastlen - Len(bb$))
+                    If Len(FK$(13)) > 0 Then
+                    ElseIf LastErNum1 = -2 And mystack.ErrorOriginal > 0 Then
+                        MyErMacro rest$, Chr(0) + "Problem in lambda", Chr(0) + "Πρόβλημα στη λάμδα"
+                        If Left$(sbf(mystack.ErrorOriginal).sb, 10) = "'11001EDIT" Then
+                      '  Debug.Print Mid$(GetNextLine((sbf(mystack.ErrorOriginal).sb)), 7), -3 - Len(bb$), "-" & 1 * (Right$(sbf(mystack.ErrorOriginal).goodname, 2) = "()")
+
+                        FK$(13) = Mid$(GetNextLine((sbf(mystack.ErrorOriginal).sb)), 7) & (-Len(bb$))  ' & "-" & 1 * (Right$(sbf(mystack.ErrorOriginal).goodname, 2) = "()"))
+
+                        Else
+                        FK$(13) = "EDIT " & GetName(sbf(mystack.ErrorOriginal).goodname) & "," & (-3 - Len(bb$))
+                        End If
+                    Else
+                        If mystack.ErrorOriginal > 0 Then
+                            If Left$(sbf(myl.OriginalCode).sb, 10) = "'11001EDIT" Then
+                            FK$(13) = Mid$(GetNextLine((sbf(mystack.ErrorOriginal).sb)), 7) & -Len(bb$)
+                        
+                            Else
+                            FK$(13) = "EDIT " & GetName(sbf(myl.OriginalCode).goodname) & "," & (1 - Len(bb$))
+                            End If
+                        ElseIf mystack.ErrorOriginal < 0 Then
+                        If Left$(sbf(myl.OriginalCode).sb, 10) = "'11001EDIT" Then
+                            'FK$(13) = Mid$(GetNextLine((sbf(myl.OriginalCode).sb)), 7) & (-myl.lastlen - Len(bb$))
+                            FK$(13) = Mid$(GetNextLine((sbf(myl.OriginalCode).sb)), 7) & " -" & var(Abs(mystack.ErrorOriginal)).lastlen & (-Len(bb$))
+                        
+                        Else
+                        FK$(13) = "EDIT " & GetName(sbf(myl.OriginalCode).goodname) & "," & (-var(Abs(mystack.ErrorOriginal)).lastlen - Len(bb$))
+                        End If
+                        Else
+                            If Left$(sbf(myl.OriginalCode).sb, 10) = "'11001EDIT" Then
+                                pa$ = Mid$(GetNextLine((sbf(myl.OriginalCode).sb)), 7)
+                                FK$(13) = pa$ & (-myl.lastlen - Len(bb$))
+                        
+                            Else
+                            FK$(13) = "EDIT " & GetName(sbf(myl.OriginalCode).goodname) & "," & (-myl.lastlen - Len(bb$))
+                            End If
+                            'FK$(13) = "EDIT " & GetName(sbf(myl.OriginalCode).goodname) & "," & (1 - myl.lastlen - (Len(myl.code) - Len(bb$)))
+                        
+                        End If
+                        MyErMacro rest$, Chr(0) + "Problem in lambda", Chr(0) + "Πρόβλημα στη λάμδα"
+                        
+                    End If
+                    mystack.ErrorOriginal = 0
                     GoTo there1234
+                
                 End If
-                If Len(mystack.UseGroupname) > 0 Then
+                If Len(FK$(13)) > 0 Then
+                
+                GoTo there1234
+                ElseIf Len(mystack.UseGroupname) > 0 Then
                     If InStr(mystack.UseGroupname, ChrW(&H1FFF)) > 0 Then
                         pa$ = GetNextLine((sbf(Abs(mystack.OriginalCode)).sb))
                         If InStr(pa$, ",") = 0 Then
@@ -21727,13 +21881,36 @@ fastexit:
                 pa$ = GetModuleName(mystack, here$)
                 If Right$(pa$, 1) = "(" Then pa$ = pa$ + ")"
                 pa$ = "EDIT " & pa$ & ", " & (Len(sbf(x1).sb) + 1)
-                If Left$(sbf(x1).sb, 10) = "'11001EDIT" Then
+                If mystack.ErrorOriginal < 0 And LastErNum1 = -2 Then
+                Set myl = var(-mystack.ErrorOriginal)
+                If Left$(sbf(myl.OriginalCode).sb, 10) = "'11001EDIT" Then
+                    FK$(13) = Mid$(GetNextLine((sbf(myl.OriginalCode).sb)), 7) & (-myl.lastlen - Len(bb$))
+                Else
+                    FK$(13) = "EDIT " + sbf(myl.OriginalCode).goodname + ", " & (-myl.lastlen - Len(bb$))
+                End If
+                GoTo there1234
+                ElseIf Left$(sbf(x1).sb, 10) = "'11001EDIT" Then
                     With sbf(x1)
                         pa$ = Mid$(GetNextLine(.sb), 7) ''+ "+1"
                         .sb = Mid$(.sb, 3) ' needed because we measure length...look the preparation of Shift F1 below
                         Set .subs = Nothing
                         Set .Pad = Nothing
                     End With
+                    If LastErNum1 = -2 And mystack.ErrorOriginal > 0 Then
+                        If mystack.ErrorOriginal <> x1 Then
+                        pa$ = Mid$(GetNextLine(sbf(mystack.ErrorOriginal).sb), 7) & (-Len(bb$))
+                        Else
+                        pa$ = pa$ & (-Len(bb$))
+                        End If
+                    ElseIf mystack.ErrorOriginal = x1 Then
+                    mystack.ErrorOriginal = 0
+                    ElseIf mystack.ErrorOriginal > 0 Then
+                    pa$ = Mid$(GetNextLine(sbf(mystack.ErrorOriginal).sb), 7) & (-Len(bb$))
+                    ElseIf mystack.ErrorOriginal < 0 Then
+                    Set myl = var(-mystack.ErrorOriginal)
+                    FK$(13) = Mid$(GetNextLine(sbf(myl.OriginalCode).sb), 7) & (-myl.lastlen - Len(bb$))
+                    GoTo there1234
+                    End If
                     If what$ <> "" Then
                         If InStrRev(here$, ".") > 0 Then
                             MyEr "in function " + Replace(GetName(what$), ChrW(&HFFBF), ""), "στη συνάρτηση " + Replace(GetName(what$), ChrW(&HFFBF), "") ' Mid$(what$, InStrRev(what$, ".") + 1)
@@ -21763,6 +21940,9 @@ fastexit:
                 Else  ' Or in Earth
                     If Len(pa$) > 0 Then
                     ' prepare Shift F1 for a jump to the point of interest..the faulty one
+                        If mystack.ErrorOriginal > 0 Then
+                        FK$(13) = pa$
+                        Else
                         If InStr(FK$(13), ",") > 0 Then
                             GoTo there1234
                             '' forget it
@@ -21773,7 +21953,13 @@ fastexit:
                         Else
                             DropLeft ",", FK$(13)
                             If FK$(13) <> "" Then FK$(13) = "+" + FK$(13)
-                            FK$(13) = pa$ & "-" & LTrim$(str(Len(code$) - 1)) + FK$(13)
+                            If Right$(what$, 2) = "()" Then
+                            FK$(13) = pa$ & "-" & str(Len(code$)) + FK$(13)
+                            
+                            Else
+                            FK$(13) = pa$ & "-" & str$(Len(code$)) + FK$(13)
+                            End If
+                        End If
                         End If
                     End If
                 End If
@@ -27955,7 +28141,6 @@ Do
                         If TypeOf var1(0) Is mHandler Then
                             Set var1(0) = bstack.lastobjIndirect(var())
                               If TypeOf var1(0) Is Enumeration Then
-                                'Stop
                                 Set usehandler = bstack.lastobj
                                 If usehandler.sign < 0 Then
                                 var1(0) = -usehandler.index_cursor
@@ -29453,8 +29638,18 @@ Dim ar As refArray
              If Not checkforglobal Then If wasAglobal Then GoTo there1
                     If Not ppppAny Is Nothing Then
                         If TypeOf myobject Is mHandler Then
+                        
                         If CheckAnyArray(myobject) Then
-                            If TypeOf myobject Is tuple Then
+                            If TypeOf ppppAny Is mArray Then
+                                If TypeOf myobject Is tuple Then
+                                Set ppppAny = New mArray
+                                myobject.CopyTuple2Array ppppAny
+                                Set myobject = ppppAny
+                                Else
+                                myobject.CopyArray ppppAny
+                                Set myobject = ppppAny
+                                End If
+                            ElseIf TypeOf myobject Is tuple Then
                                 Set pppp = ppppAny
                                 myobject.CopyTuple2Array pppp
                                 Set myobject = pppp
@@ -30963,12 +31158,13 @@ If .Busy Then
 End If
 End With
 If bypassST Then Form2.Busy = True: GoTo bb1
-If Form2.gList4.ListIndex = 1 Then
-Else
+'If Form2.gList4.ListIndex = 1 Then
+Form2.gList4.ListindexPrivateUse = 0
+'Else
 STq = False
 STEXIT = False
 STbyST = True
-End If
+'End If
 Form2.Show , Form1
 If Not ActForm Is Nothing Then
             Dim i As Long
@@ -30988,6 +31184,7 @@ End If
 Form2.Show , Form1
    Form2.Busy = True
     If here$ = vbNullString Then
+  
        TestShowSub = vbNullString
        TestShowStart = 0
        Form2.testpad.Text = vbNullString
@@ -31412,17 +31609,17 @@ If Not TaskMaster Is Nothing Then
     End If
 End If
 
-    Call Module10.executeblock(it, basestack, rest$, False, once, , True)
-    If it = 2 Then
-        If rest$ = "" Then
-            If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
-        Else
-            rest$ = ": Goto " + rest$
-            If trace Then WaitShow = 2: TestShowSub = rest$
-        End If
-        
-                it = 1
-        End If
+    Call Module10.executeblock(it, basestack, rest$, False, once)
+    
+If it = 2 Then
+    If rest$ = "" Then
+        If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
+    Else
+        rest$ = ": Goto " + rest$
+        If trace Then WaitShow = 2: TestShowSub = rest$
+    End If
+    it = 1
+End If
    
 
     players(mDC.prive) = Zero
@@ -31803,7 +32000,7 @@ jump11:
                 i = 1
                 If IsExp(basestack, rest$, p) Then
                     i = Int(p)
-                    If i < 0 Then i = Len(sbf(x1).sb) + i
+                    If i < 0 Then i = Len(sbf(x1).sb) + i + 1
                     If i < 0 Then i = 0
                     If i > Len(sbf(x1).sb) Then i = Len(sbf(x1).sb) + 1
                 End If
@@ -31897,7 +32094,7 @@ Dim bs As basetask, loopthis As Boolean
 Dim subs As Long, snames As Long, Vname As Long
 Dim i As Long, p As Long, S3 As Long, bb$, pa$, small$, sbi As Long
 Dim EXITNOW As Boolean, namedArg As mStiva
-Dim restart As Boolean
+Dim restart As Boolean, QWE As lambda
 Dim backup$, TSHB As Boolean
 If trace Then SwapStrings backup$, TestShowSub: TSHB = TestShowBypass
 TestShowBypass = False
@@ -32008,7 +32205,11 @@ againmod:
     Select Case Execute(bs, bb$, EXITNOW, False, loopthis, , restart)
     Case 0
 myerror1:
-        If bs.ErrorOriginal = 0 Then If sbi > 0 Then bb$ = bb$ + space$(sbi)
+        If bs.ErrorOriginal = 0 Then
+        If sbi > 0 Then
+        bb$ = bb$ + space$(sbi)
+        End If
+        End If
         If MOUT And Not NOEXECUTION Then
             MOUT = False
             rest$ = vbNullString: MyEr "", ""
@@ -32024,20 +32225,76 @@ myerror1:
                     GoTo thh1
                 End If
             End If
-            If bs.ErrorOriginal > 0 Then
-            If bs.ErrorOriginal <> bs.OriginalCode Then
-            If Left$(bb$, 10) <> ": Error -1" Then bb$ = ": Error -1 " + bb$
-            If bs.IamChild Then If bs.Parent.OriginalCode <> bs.ErrorOriginal Then bs.Parent.ErrorOriginal = bs.ErrorOriginal
-            rest$ = bb$: ProcModuleEntry = False
-            GoTo th0
-            End If
+            'If bs.ErrorOriginal > 0 Then
+            'If bs.ErrorOriginal <> bs.OriginalCode Then
+            'If Left$(bb$, 10) <> ": Error -1" Then bb$ = ": Error -1 " + bb$
+            'If bs.IamChild Then If bs.Parent.OriginalCode <> bs.ErrorOriginal Then bs.Parent.ErrorOriginal = bs.ErrorOriginal
+            'rest$ = bb$: ProcModuleEntry = False
+            'FK$(13) = GetNextLine((sbf(bs.ErrorOriginal).sb)) & (-Len(bb$))
+            ''GoTo th0
+            'End If
+            'End If
+            If Len(FK$(13)) > 0 Then
+                
+                
+                GoTo th0
             End If
             
+        If LastErNum1 = -2 Then
+        If bs.ErrorOriginal < 0 Then
+            Set QWE = var(-bs.ErrorOriginal)
+            bs.ErrorOriginal = 0
+            If Left$(sbf(QWE.OriginalCode).sb, 10) = "'11001EDIT" Then
+            FK$(13) = Mid$(GetNextLine((sbf(QWE.OriginalCode).sb)), 7) & (-QWE.lastlen - Len(bb$))
+            Else
+            FK$(13) = "EDIT " + sbf(QWE.OriginalCode).goodname + ", " & (-QWE.lastlen - Len(bb$))
+            End If
+        Else
+            If Left$(sbf(bs.ErrorOriginal).sb, 10) = "'11001EDIT" Then
+               FK$(13) = Mid$(GetNextLine((sbf(bs.ErrorOriginal).sb)), 7) & (-Len(bb$))
+            Else
+                FK$(13) = "EDIT " + sbf(bs.ErrorOriginal).goodname + ", " & (-Len(bb$))
+            
+            End If
+        
+        End If
+            GoTo th0
+        
+        ElseIf S3 <> 0 Then
+        
+        
+        If S3 < 0 Then
+            Set QWE = var(-S3)
+            If Left$(sbf(QWE.OriginalCode).sb, 10) = "'11001EDIT" Then
+            FK$(13) = Mid$(GetNextLine((sbf(QWE.OriginalCode).sb)), 7) & (-QWE.lastlen - Len(bb$))
+            Else
+            FK$(13) = "EDIT " + sbf(QWE.OriginalCode).goodname + ", " & (-QWE.lastlen - Len(bb$))
+            End If
+        Else
+            If Left$(sbf(S3).sb, 10) = "'11001EDIT" Then
+                FK$(13) = Mid$(GetNextLine((sbf(S3).sb)), 7) & (-Len(bb$))
+            Else
+                FK$(13) = "EDIT " + sbf(S3).goodname + ", " & (-Len(bb$))
+            End If
+        End If
+            GoTo th0
+        Else
             pa$ = "EDIT " + GetModuleName(bs, here$) + "," + str$(Len(sbf(x1).sb) + 1)
             If ohere$ <> "" Then
                 With sbf(x1)
                 If Left$(.sb, 10) = "'11001EDIT" Then
-                    pa$ = Mid$(GetNextLine(.sb), 7)
+                
+                    If bs.ErrorOriginal <> bs.OriginalCode And bs.ErrorOriginal > 0 Then
+                        If bs.ErrorOriginal < 0 Then
+                        pa$ = Mid$(GetNextLine(.sb), 7)
+                        Else
+                        pa$ = Mid$(GetNextLine((sbf(bs.ErrorOriginal).sb)), 7)
+                        End If
+                        bs.ErrorOriginal = 0
+
+                    Else
+                       pa$ = Mid$(GetNextLine(.sb), 7)
+                    End If
                     .sb = Mid$(.sb, 3)
                     Set .subs = Nothing
                     Set .Pad = Nothing
@@ -32065,8 +32322,9 @@ myerror1:
             Else
                 DropLeft ",", FK$(13)
                 If FK$(13) <> "" Then FK$(13) = "+" + FK$(13)
-                FK$(13) = pa$ + str$(-Len(bb$)) + FK$(13)
+                FK$(13) = pa$ & str$(-Len(bb$)) + FK$(13)
             End If
+        End If
         Else
             If sb2used > 0 Then
                 MyEr "in module " + GetName(here$), "στο τμημα " + GetName(here$)
@@ -33163,14 +33421,572 @@ sitethere:
 End If
 End Function
 
-Private Function executeblock(Exec As Long, bstack As basetask, subs As FastCollection, b$, once As Boolean, kolpo As Boolean, Optional ByVal stepbystep As Boolean = False, Optional skipblock As Boolean = False, Optional noblock As Boolean = True) As Boolean
+Private Function executeblock(Exec As Long, bstack As basetask, b$, once As Boolean, kolpo As Boolean, Optional ByVal stepbystep As Boolean = False) As Boolean
 executeblock = True
+Dim i As Long, LL As Long, oldLL As Long, p As Long, namedArg
+Dim x2 As Long, y2 As Long, monce As Long, w3 As Long
+Dim myLevel As Long, oldexec As Long, loopthis As Boolean, RetStackSize As Long
+Dim subs As FastCollection
+Dim oldjump As Long, oldifctrl As Long, olduseofif As Long
+Dim S3 As Long, bb$, small$, ex2 As Long, sbi As Long
+' save state in execution stack
+oldjump = bstack.jump: oldifctrl = bstack.IFCTRL: olduseofif = bstack.UseofIf
+RetStackSize = bstack.RetStackTotal
+If Exec = 0 Then Exec = 1
+oldexec = Exec: myLevel = bstack.SubLevel: i = 1
+monce = once
+If bstack.addlen <> 0 Then
+    LL = bstack.addlen + Len(b$) + 1
+Else
+    LL = Len(b$) + 1
+End If
+oldLL = bstack.addlen
+ex2 = Len(b$)
+sbi = ex2
+Do
+    bb$ = Mid$(b$, i)
+fromfirst0:
+    kolpo = once: once = False
+    bstack.addlen = oldLL
+   
+    w3 = Execute(bstack, bb$, kolpo, stepbystep, loopthis)
+
+    
+    bstack.addlen = oldLL
+cont111:
+    Select Case w3
+    Case 1, 50, 51
+ALFA12:
+        If LastErNum = -2 Then
+            If NocharsInLine(bb$) Then
+                b$ = vbNullString
+            Else
+                If Left$(bb$, 12) = " : ERROR -2" Then
+                    b$ = bb$
+                ElseIf ex2 < Len(bb$) Then
+                    b$ = vbNullString
+                Else
+                    b$ = Mid$(b$, ex2 - Len(bb$) + 1)
+                End If
+            End If
+            Exec = 0
+            Exit Function
+        End If
+        
+            
+            Exec = oldexec
+        
+        If kolpo And monce And Exec = 1 Then
+            SwapStrings b$, bb$
+            once = True
+            Exit Function
+        ElseIf w3 > 49 Then
+        
+       If w3 = 50 Then
+            Exec = w3
+            DropMarkSel bstack
+            SwapStrings b$, bb$
+            once = True
+            Exit Function
+        ElseIf w3 = 51 Then
+            Exec = 51
+            SwapStrings b$, bb$
+            once = kolpo
+            Exit Function
+        End If
+        ElseIf kolpo And NocharsInLine(bb$) Then
+            If RetStackSize < bstack.RetStackTotal Then PopStagePart bstack, bstack.RetStackTotal - RetStackSize
+            Exec = w3
+            Exit Do
+        
+        
+        End If
+        If stepbystep Then
+            b$ = bb$
+        Else
+            b$ = Right$(b$, Len(b$) - ex2)
+        End If
+
+        Exit Do
+    Case 2
+        If bb$ = "BREAK" Then
+            Exec = 2
+            b$ = vbNullString
+            once = True
+            kolpo = True
+            Exit Function
+        ElseIf bb$ = "NEXT" Then
+            SwapStrings b$, bb$
+            If RetStackSize < bstack.RetStackTotal Then
+                Exec = 2
+                PopStagePartContinue bstack, bstack.RetStackTotal - RetStackSize
+            Else
+                Exec = 2
+            End If
+            Exit Do
+        End If
+        
+        If Not kolpo Then
+            If Len(bb$) > 0 Then
+                If bb$ = ChrW$(0) Then
+                    'bstack.addlen = 0
+                    If trace Then TestShowBypass = False
+                    If RetStackSize >= bstack.RetStackTotal Then
+                        If bstack.IsDecimal Then
+                            ' this is a return form other block
+                            Exec = 2
+                            b$ = bb$
+                            Exit Function
+                        End If
+                    ElseIf Not bstack.IsDecimal Then
+                        If RetStackSize < bstack.RetStackTotal Then PopStagePartContinue bstack, bstack.RetStackTotal - RetStackSize
+                    End If
+                    i = 1
+from123:
+                    If Not bstack.IsInRetStackString(small$) Then
+                        p = bstack.Pop3Long(S3, sbi)
+                        If p < 0 Then
+                            Exec = 0
+                            If RetStackSize <> bstack.RetStackTotal Then
+                                MyEr "Problem in return stack", "Πρόβλημα στο σωρό επιστροφής"
+                            End If
+                            bstack.Flush
+                            b$ = vbNullString
+                            Exit Function
+                        End If
+                        If LastErNum = -1 Then
+                            bstack.RetStack.PushLong p
+                            Exec = 0
+                            Exit Function
+                        End If
+jumphere1:
+                        If S3 = 0 And sbi > 0 Then
+                        
+                        End If
+                        Exec = 1
+                        i = ex2 - p + 1
+                        PopStage bstack
+                        If loopthis Or stepbystep Or x2 = 2 Then
+                            bb$ = Mid$(b$, i, ex2 - i + 1)
+                            
+                            
+                            bstack.addlen = oldLL
+                            If x2 = 2 Or stepbystep Then
+                                If bb$ = vbCrLf Then bb$ = vbNullString: w3 = 1: GoTo cont111
+                                If bb$ = " " Then bb$ = vbNullString: w3 = 1: GoTo cont111
+                            End If
+                            GoTo fromfirst0
+                        Else
+                            bb$ = Mid$(b$, p + 1, ex2 - p)
+                        End If
+                        If bb$ = vbCrLf Then Exit Do
+                    Else
+findelsesub0:
+                        If InStr(small$, " ") > 0 Then
+                            bstack.PushSecondThird S3, sbi
+                            S3 = bstack.OriginalCode
+                            If searchsub(0&, S3, small$, i, S3, bb$) Then
+                                bstack.callx1 = 0
+                                If Len(small$) <> 0 Or Not bstack.namedArg Is Nothing Then
+                                    Set namedArg = bstack.namedArg: Set bstack.namedArg = Nothing
+                                    If Not MyRead7(bstack, small$, 1, namedArg) Then
+                                        Exec = 0
+                                        Exit Function
+                                    End If
+                                End If
+                                GoTo contSub
+                            ElseIf bstack.IamChild Then
+                                If searchsub(bstack.OriginalCode, FindPrevOriginal(bstack), small$, i, S3, bb$) Then
+                                bstack.callx1 = 0
+                                If Len(small$) <> 0 Or Not bstack.namedArg Is Nothing Then
+                                    Set namedArg = bstack.namedArg: Set bstack.namedArg = Nothing
+                                    If Not MyRead7(bstack, small$, 1, namedArg) Then
+                                        Exec = 0
+                                        Exit Function
+                                    End If
+                                End If
+contSub:
+                                If Len(bb$) = 0 Then
+                                    If S3 < 0 Then
+                                        bb$ = Mid$(var(-S3).code, i)
+                                    Else
+                                        bb$ = Mid$(sbf(S3).sb, i)
+                                    End If
+                                    sbi = 0
+                                Else
+                                    If S3 < 0 Then
+                                        sbi = Len(var(-S3).code) - i - Len(bb$) + 1
+                                    Else
+                                        sbi = Len(sbf(S3).sb) - i - Len(bb$) + 1
+                                    End If
+                                End If
+                                kolpo = False
+                                
+                                If trace Then
+                                    TestShowBypass = True
+                                    If TestShowBypass Then
+                                    If S3 < 0 Then
+                                        TestShowSub = var(-S3).code
+                                    Else
+                                        TestShowSub = sbf(S3).sb
+                                    End If
+                                    End If
+                                    bstack.addlen = Len(TestShowSub) - i + 1 - Len(bb$)
+                                End If
+                                
+                                y2 = y2 + 1
+subsub02:
+                                Exec = 0
+                                x2 = Execute(bstack, bb$, kolpo)
+                                If x2 = 2 Then
+                                    If bb$ = Chr$(0) Then
+                                        If trace Then TestShowBypass = False
+                                        If bstack.IsInRetStackString(small$) Then GoTo findelsesub0
+                                        y2 = y2 - 1
+                                        If y2 = 0 Then GoTo from123  'normal level
+                                            p = bstack.isPop3Long(S3, sbi)
+                                            If p > 0 Then
+                                                If S3 > 0 Then
+                                    
+                                                    bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                                ElseIf S3 = 0 Then
+                                                    GoTo jumphere1
+                                                Else
+                                                    bb$ = Mid$(var(-S3).code$, Len(var(-S3).code$) - p - sbi + 1, p)
+                                                End If
+                                                If trace Then
+                                                    TestShowBypass = True
+                                                    If TestShowBypass Then
+                                                        If S3 < 0 Then
+                                                            TestShowSub = var(-S3).code
+                                                        Else
+                                                            TestShowSub = sbf(S3).sb
+                                                        End If
+                                                    End If
+                                                    bstack.addlen = sbi
+                                                End If
+                                                
+                                                PopStage bstack
+                                                Exec = 1
+                                                GoTo subsub02
+                                            Else
+                                                Exit Do
+                                            End If
+                                        ElseIf InStr(bb$, " ") > 0 Then
+                                            GoTo findelsesub0
+                                        Else
+                                             If subs Is Nothing Then Set subs = New FastCollection
+                                             If subs.ExistKey(bb$) Then
+                                                i = subs.Value
+                                                If subs.sValue = 0 Then
+                                                    If i = 0 Or i > ex2 Then
+                                                        b$ = bb$
+                                                        Exec = 2
+                                                        Exit Do
+                                                    Else
+                                                        bb$ = Mid$(b$, i, ex2 - i + 1)
+                                                    End If
+                                                Else
+                                                    S3 = subs.sValue
+                                                    If S3 < 0 Then
+                                                        If i = 0 Or i > Len(var(-S3).code$) Then
+                                                            b$ = bb$
+                                                            Exec = 2
+                                                            Exit Do
+                                                        End If
+                                                        GoTo AGAINGOTOLAMBDA
+                                                    Else
+                                                        If i = 0 Or i > Len(sbf(S3).sb) Then
+                                                            b$ = bb$
+                                                            Exec = 2
+                                                            Exit Do
+                                                        End If
+                                                        GoTo AGAINGOTO
+                                                    End If
+                                                    
+                                                End If
+                                                GoTo subsub02
+                                            Else
+                                                If S3 = 0 Then
+                                                ' priority in the code
+                                                    i = PosLabel(bb$, b$, ex2)
+                                                    If i = 0 Or i > ex2 Then
+                                                        GoTo checkother
+                                                    Else
+                                                        subs.ItemCreator2 bb$, i, 0
+                                                        bb$ = Mid$(b$, i, ex2 - i + 1)
+                                                        GoTo subsub02
+                                                    End If
+                                                    
+                                                End If
+                                                
+checkother:
+                                                If S3 < 0 Then
+                                                    i = PosLabel(bb$, var(-S3).code$)
+                                                    If i = 0 Or i > Len(var(-S3).code$) Then
+                                                        b$ = bb$
+                                                        Exec = 2
+                                                        Exit Do
+                                                    End If
+AGAINGOTOLAMBDA:
+                                                    subs.ItemCreator2 bb$, i, S3
+                                                    If Len(var(-S3).code$) - i > sbi Then
+                                                    bb$ = Mid$(var(-S3).code$, i, Len(var(-S3).code$) - i - sbi)
+                                                    Else
+                                                    bb$ = Mid$(var(-S3).code$, i)
+                                                    sbi = 0
+                                                    End If
+                                                ElseIf S3 > 0 Then
+                                                    i = PosLabel(bb$, sbf(S3).sb)
+                                                    If i = 0 Or i > Len(sbf(S3).sb) Then
+                                                        b$ = bb$
+                                                        Exec = 2
+                                                        Exit Do
+                                                    End If
+                                                    subs.ItemCreator2 bb$, i, S3
+AGAINGOTO:
+                                                    If Len(sbf(S3).sb) - i > sbi Then
+                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
+                                                    Else
+                                                    bb$ = Mid$(sbf(S3).sb, i)
+                                                    sbi = 0
+                                                    End If
+                                                Else ' cascade to upper level
+                                                    b$ = bb$
+                                                    Exec = 2
+                                                    Exit Do
+                                                End If
+                                                GoTo subsub02
+                                            End If
+                                        End If
+                                    ElseIf x2 = 1 Then
+                                        If LastErNum <> -2 Then
+                                        ' not good, we have to find which blocks
+                                        ' 7 to 5 reduced
+                                            bstack.RetStackDrop 5 * bstack.SubLevel - myLevel
+                                            ' b$ = ec$  ' why??
+                                            Exec = oldexec
+                                            Exit Function
+                                        End If
+                                        ' NO RETURN...DROP STACK
+                                        bstack.RetStackDrop 2
+                                        Exit Do
+                                    ElseIf x2 = 0 Then
+                                        If bstack.ErrorOriginal <> 0 Then
+                                        b$ = bb$
+                                        ElseIf S3 <> 0 Then
+                                            bstack.ErrorOriginal = S3
+                                            b$ = bb$ + space(sbi)  'Mid$(sbf(S3).sb, Len(sbf(S3).sb) - sbi - Len(bb$))
+                                        Else
+                                            bstack.ErrorOriginal = 0
+                                            b$ = bb$ + space(sbi)
+                                        End If
+                                        Exec = 0
+                                        Exit Function
+                                    End If
+                                Else
+                                
+                                    If bstack.callx1 < 0 Then
+                                        bstack.callx1 = 0
+                                        small$ = Split(small$, " ")(1)
+                                        small$ = Left$(small$, Len(small$) - 1)
+                                        If Not bstack.IsDecimal Then
+                                        b$ = Right(b$, bstack.LastIdpos - 1 - Len(small$))
+                                        End If
+                                        unknownModule b$, small$
+                                    Else
+                                        If Len(Split(small$, " ")(0)) = 1 Then
+                                            small$ = Split(small$, " ")(1)
+                                            unknownLabel b$, small$
+                                        Else
+                                            small$ = Split(small$, " ")(1)
+                                            unknownSub b$, Left$(small$, Len(small$) - 1)
+                                        End If
+                                    End If
+                                    'SwapStrings bb$, b$
+                                    Exec = 0
+                                    If bstack.IsDecimal Then
+                                         p = bstack.Pop3Long(S3, sbi)
+                                         If bstack.LastIdpos > 0 And S3 = 0 Then
+                                         bb$ = Right$(b$, bstack.LastIdpos)
+                                         
+                                         ElseIf S3 > 0 Then
+                                             bb$ = Mid$(sbf(S3).sb, Len(sbf(S3).sb) - p - sbi + 1, p)
+                                          ElseIf S3 = 0 Then
+                                            bb$ = Mid$(b$, p + 1, ex2 - p)
+                                         Else
+                                             bb$ = Mid$(var(-S3).code$, Len(var(-S3).code$) - p - sbi + 1, p)
+                                         End If
+                                    End If
+                                    bstack.LastIdpos = 0
+                                    bstack.RetStackDrop 3 '5
+                                    bstack.SubLevel = bstack.SubLevel - 1
+                                    GoTo Error1
+                                End If
+                            Else
+                                bstack.RetStackDrop 3 '5
+                                Exit Do
+                            End If
+                        Else
+                            bstack.RetStackDrop 1
+                            b$ = Chr$(0)
+                            Exec = 2
+                            Exit Function
+                        End If
+                    End If
+                ElseIf lookOne(bb$, "}") Or NocharsInLine(bb$) Then
+                    i = 1
+                    bb$ = Left$(b$, ex2)
+                Else
+                    If monce = True Then
+                        b$ = bb$
+                        Exec = w3
+                        Exit Do
+                    End If
+                    If subs Is Nothing Then Set subs = New FastCollection
+                    If subs.ExistKey(bb$) Then
+                        i = subs.Value
+                        If i = 0 Or i > ex2 Then
+                            b$ = bb$
+                            Exec = 2
+                            Exit Do
+                        Else
+                            bb$ = Mid$(b$, i, ex2 - i + 1)
+                            GoTo fromfirst0
+                        End If
+                    Else
+                        i = PosLabel(bb$, b$, ex2)
+                        If i = 0 Or i > ex2 Then
+                            'If skipblock Then
+                            'bstack.LastIdpos = bstack.LastIdpos + oldLL
+                            'Else
+                            bstack.LastIdpos = bstack.LastIdpos + LL - oldLL
+                            
+                            'End If
+                            b$ = bb$
+                            Exec = 2
+                            Exit Do
+                        ElseIf HaveMarkSel(bstack) Then
+                        If RetStackSize < bstack.RetStackTotal Then
+                            DropMarkSel bstack
+                        End If
+                            b$ = bb$
+                            Exec = 2
+                            Exit Do
+                        Else
+                        
+                            subs.ItemCreator2 bb$, i, 0
+                            bb$ = Mid$(b$, i, ex2 - i + 1)
+                            GoTo fromfirst0
+                        End If
+                    End If
+                End If
+            ElseIf loopthis And w3 = 2 Then
+                oldexec = 2
+                If Len(NLtrim$(bb$)) > 0 Then
+                    GoTo fromfirst0
+                End If
+                loopthis = False
+                i = 1
+                oldexec = 1
+            Else
+                i = 1
+            End If
+                
+        Else
+            If monce Then
+                If loopthis And kolpo Then Exec = 5: b$ = bb$: Exit Function
+                kolpo = False
+            Else
+                once = kolpo
+            End If
+            'If checkbreakEsc(bstack) Then Exec = oldexec: Exit Do
+            Exec = 2: b$ = bb$: Exit Function
+        End If
+    Case 100
+        SwapStrings b$, bb$
+        once = loopthis  ' TRUE IF i HAVE CASE ELSE ' FALSE IF I HAVE STANDARD ELSE
+        Exec = w3
+        Exit Function
+    Case 0
+Error1:
+                
+        If bstack.RetStackTotal - RetStackSize > 0 Then
+            bstack.UseofIf = olduseofif
+            bstack.RetStackDrop bstack.RetStackTotal - RetStackSize
+        End If
+        If myLevel <> bstack.SubLevel Then
+            b$ = bb$
+            Exec = 0
+            Exit Function
+        End If
+        If LastErNum = -2 Or LastErNum1 = -2 Then
+            SwapStrings b$, bb$
+        ElseIf LL >= oldLL Then
+            b$ = bb$ + space$(LL - oldLL)
+        Else
+            b$ = vbNullString$
+        End If
+        Exec = 0
+        Exit Function
+    Case Else
+        If w3 = 12 Then
+            b$ = bb$
+            Exec = 12
+            Exit Do
+        ElseIf w3 = 3 And bb$ = "CONTINUE" Then
+            b$ = vbNullString
+            If RetStackSize < bstack.RetStackTotal Then PopStagePartContinue bstack, bstack.RetStackTotal - RetStackSize
+           ' If checkbreakEsc(bstack) Then Exec = oldexec: Exit Do
+            Exec = 3: Exit Do
+        ElseIf w3 = 3 And NocharsInLine(bb$) Then
+        'If Not skipblock Then
+        bb$ = "}"
+          ' bb$ = Mid$(b$, ex2 + 1)
+            If Exec = 2 Then Exec = 1: loopthis = False
+            oldexec = 1
+            w3 = 1
+            If RetStackSize < bstack.RetStackTotal Then PopStagePart bstack, bstack.RetStackTotal - RetStackSize
+
+            GoTo ALFA12   ' FROM REVISION 121
+        ElseIf w3 = 5 Then
+            oldexec = 5
+            If Len(NLtrim$(bb$)) > 0 Then GoTo fromfirst0
+            Exec = 5
+            Exit Function
+        End If
+        If IsSymbol(b$, "}") Then
+            Exec = 1: Exit Do
+            If once Then Exit Do
+        Else
+            b$ = Right$(b$, Len(b$) - Len(bb$))
+        End If
+        Exit Do
+    End Select
+   
+    'If checkbreakEsc(bstack) Then Exec = oldexec: Exit Do
+    If monce Then Exit Do
+Loop
+If Exec > 1 Then
+    If bstack.RetStackTotal - RetStackSize > 0 Then
+        bstack.UseofIf = olduseofif
+        bstack.RetStackDrop bstack.RetStackTotal - RetStackSize
+    End If
+End If
+bstack.jump = oldjump
+bstack.IFCTRL = oldifctrl
+
+executeblock = False
+
+End Function
+Private Function executeblock1(Exec As Long, bstack As basetask, subs As FastCollection, b$, once As Boolean, kolpo As Boolean, Optional ByVal stepbystep As Boolean = False, Optional skipblock As Boolean = False, Optional noblock As Boolean = True) As Boolean
+executeblock1 = True
 Dim i As Long, LL As Long, oldLL As Long, p As Long
 Dim x2 As Long, y2 As Long, monce As Long, w3 As Long
 Dim myLevel As Long, oldexec As Long, loopthis As Boolean, RetStackSize As Long
 
 Dim oldjump As Long, oldifctrl As Long, olduseofif As Long
-Dim S3 As Long, bb$, small$, ex2 As Long, sbi As Long
+Dim S3 As Long, bb$, small$, ex2 As Long, sbi As Long, LLL As Long
 ' save state in execution stack
 
 oldjump = bstack.jump: oldifctrl = bstack.IFCTRL: olduseofif = bstack.UseofIf
@@ -33190,13 +34006,21 @@ Else
     LL = bstack.addlen
 End If
 oldLL = bstack.addlen
-If ex2 > 0 Then ex2 = ex2 - 1 Else ex2 = Len(b$)
+LLL = LL
+oldLL = bstack.addlen
+If ex2 > 0 Then
+ex2 = ex2 - 1
+Else
+    ex2 = Len(b$)
+    LLL = bstack.addlen
+End If
+
 sbi = ex2
 Do
     bb$ = Mid$(b$, i, ex2 - i + 1)
 fromfirst0:
     kolpo = once: once = False
-    bstack.addlen = LL
+    bstack.addlen = LLL
    
     w3 = Execute(bstack, bb$, kolpo, stepbystep, loopthis, noblock)
     
@@ -33215,16 +34039,38 @@ Error1:
             Exec = 0
             Exit Function
         End If
-        If NocharsInLine(bb$) Then
+        If NocharsInLine(bb$) And LastErNum = 0 Then
             b$ = vbNullString
         Else
-            If LastErNum = -2 Then
+   
+            If LastErNum = -2 Or LastErNum1 = -2 Then
                 SwapStrings b$, bb$
+            
+            ElseIf noblock And skipblock Then
+                bstack.addlen = 0
+                b$ = bb$ + space$(oldLL)
             ElseIf LL >= oldLL Then
                 b$ = bb$ + space$(LL - oldLL)
             Else
                 b$ = vbNullString$
             End If
+        End If
+        
+        If False Then
+        If NocharsInLine(bb$) Then
+            b$ = vbNullString
+        Else
+        
+            If LastErNum = -2 Then
+                SwapStrings b$, bb$
+            ElseIf skipblock Then
+            b$ = bb$ + space$(LL)
+            ElseIf LL >= oldLL Then
+                b$ = bb$ + space$(LL - oldLL)
+            Else
+                b$ = vbNullString$
+            End If
+        End If
         End If
         Exec = 0
         Exit Function
@@ -33543,7 +34389,7 @@ AGAINGOTO:
                                                 'If S3 < 0 Then
                                                 '    b$ = Mid$(var(-S3).code, Len(var(-S3).code) - sbi - Len(bb$))
                                                 'Else
-                                                b$ = bb$ + space(sbi + 1) 'Mid$(sbf(S3).sb, Len(sbf(S3).sb) - sbi - Len(bb$))
+                                                b$ = bb$ + space(sbi) 'Mid$(sbf(S3).sb, Len(sbf(S3).sb) - sbi - Len(bb$))
                                                 'End If
                                             'Else
                                             'b$ = bb$  '+ space(sbi)
@@ -33722,7 +34568,7 @@ End If
 bstack.jump = oldjump
 bstack.IFCTRL = oldifctrl
 
-executeblock = False
+executeblock1 = False
 End Function
 
 
@@ -35448,6 +36294,7 @@ reenter2:
                     Call GoFunc(bs, "", rest$, vvl, , x1)
                     If LastErNum Then
                         MyEr "at " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), "στο " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
+                        'MyEr "-> " + Replace(what$, ChrW(&HFFBF), ""), "-> " + Replace(what$, ChrW(&HFFBF), "")
                         resp = False
                         GoTo ExitHere
                     End If
@@ -39505,12 +40352,14 @@ Dim x1 As Long, pa$, what$, i As Long, pppp As iBoxArray, f As Long, myobject As
 ProcStack = True
    If IsLabelSymbolNew(rest$, "ΝΕΟΣ", "NEW", Lang) Then
    If FastSymbol(rest$, "{") Then
+        i = Len(rest$)
         ss$ = block(rest$)
         Set ps = bstack.soros
         Set bstack.Sorosref = NewmStiva
         TraceStore bstack, nd&, rest$, 0
-        rest$ = Mid$(rest$, 2)
-        Call Module10.executeblock(it, bstack, ss$, False, once, , True)
+        Mid$(rest$, 1, 1) = " "
+        
+        Call executeblock(it, bstack, ss$, False, once)
         bstack.addlen = nd&
         Set bstack.Sorosref = ps
         Set ps = Nothing
@@ -39523,7 +40372,18 @@ ProcStack = True
             End If
             it = 1
         End If
-        If it <> 1 Then ProcStack = False: rest$ = ss$ + rest$
+        If it <> 1 Then
+            If it = 0 Then
+                If bstack.ErrorOriginal <> 0 Then
+                    SwapStrings rest$, ss$
+                ElseIf Len(ss$) - 1 - i + Len(rest$) * 2 > 0 Then
+                    rest$ = space$(Len(ss$) - 1 - i + Len(rest$) * 2)
+                End If
+            Else
+                SwapStrings rest$, ss$
+            End If
+            ProcStack = False
+        End If
     Else
     ProcStack = False
     MissingBlockCode
@@ -39813,30 +40673,42 @@ isAnobject2:
         If CheckDeepAny(myobject) Then
             If Not TypeOf myobject Is mStiva Then MyEr "Not a stack", "Δεν είναι σωρός": Exit Function
             If FastSymbol(rest$, "{") Then
+                i = Len(rest$)
                 ss$ = block(rest$)
                 TraceStore bstack, nd&, rest$, 0
-                If FastSymbol(rest$, "}") Then
+                If Mid$(rest$, 1, 1) = "}" Then
+                    Mid$(rest$, 1, 1) = " "
                     Set ps = bstack.soros
                     Set bstack.Sorosref = myobject
                     it = 0
-                    Call Module10.executeblock(it, bstack, ss$, False, once, , True, True)
-                    
+                    TraceStore bstack, nd&, rest$, 0
+                    Call executeblock(it, bstack, ss$, False, once)
+                    bstack.addlen = nd&
                     Set bstack.Sorosref = ps
                     Set ps = Nothing
                     If it = 2 Then
                         If ss$ = "" Then
-                        If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
+                            If once Then rest$ = ": Break": If trace Then WaitShow = 2: TestShowSub = vbNullString
                         Else
-                        rest$ = ": Goto " + ss$
-                        If trace Then WaitShow = 2: TestShowSub = rest$
+                            rest$ = ": Goto " + ss$
+                            If trace Then WaitShow = 2: TestShowSub = rest$
                         End If
-                        
                         it = 1
+                    End If
+                    If it <> 1 Then
+                        If it = 0 Then
+                            If bstack.ErrorOriginal <> 0 Then
+                                SwapStrings rest$, ss$
+                            ElseIf Len(ss$) - 1 - i + Len(rest$) * 2 > 0 Then
+                                rest$ = space$(Len(ss$) - 1 - i + Len(rest$) * 2)
+                            End If
+                        Else
+                                SwapStrings rest$, ss$
                         End If
-                    If it <> 1 Then ProcStack = False: rest$ = ss$ + rest$
-            
+                        ProcStack = False
+                    End If
                 End If
-                bstack.addlen = nd&
+                
             Else
             bstack.soros.MergeBottom myobject
                 'MyEr "No Block {}", "Δεν υπάρχει μπλοκ εντολών { }"
@@ -40675,7 +41547,7 @@ CONTcontinue:
                 prepareGroup basestack, what$, y1, flag, HasStrName
                 var(y1).IamGlobal = flag
                 If ExecuteGroupStruct(basestack, basestack.GroupName + what$, y1, ss$, 0, Lang, flag) = 0 Then
-                    rest$ = ss$ + rest$
+                   SwapStrings rest$, ss$ ' rest$ = ss$ + rest$
                 Else
                     ProcGroup = FastSymbol(rest$, "}")
                 End If
@@ -41019,19 +41891,29 @@ jumpheretoo:
             ss$ = blockString(rest$, Asc("}"))
         End If
         i = Len(rest$)
-        If Left$(sbf(Abs(basestack.OriginalCode)).sb, 10) = "'11001EDIT" Then
+        If basestack.OriginalCode < 0 Then
+        
+        Dim QWE As lambda
+        Set QWE = var(Abs(basestack.OriginalCode))
+        If Left$(sbf(QWE.OriginalCode).sb, 10) = "'11001EDIT" Then
+        s$ = GetNextLine((sbf(QWE.OriginalCode).sb)) & " -" & (i + QWE.lastlen) & vbCrLf
+
+        Else
+        s$ = "'11001EDIT " & sbf(QWE.OriginalCode).goodname & ", -" & (i + QWE.lastlen) & vbCrLf
+        End If
+        ElseIf Left$(sbf(basestack.OriginalCode).sb, 10) = "'11001EDIT" Then
             If InStr(here$, ChrW(&H1FFF)) > 0 Then
                 s$ = vbNullString
             Else
-                pa$ = sbf(Abs(basestack.OriginalCode)).sb
+                pa$ = sbf(basestack.OriginalCode).sb
                 If Not Left$(ss$, 10) = "'11001EDIT" Then
                     s$ = GetNextLine(pa$) + "-" + CStr(i) + vbCrLf
                 End If
             End If
         ElseIf Not basestack.LoadOnly Then
             If Left$(ss$, 10) <> "'11001EDIT" Then
-                If addlen = 0 Then addlen = -1
-                s$ = "'11001EDIT " + GetModuleName(basestack, ohere$) + "," + str(-(i + addlen)) + vbCrLf
+                'If addlen = 0 Then addlen = -1
+                s$ = "'11001EDIT " & GetModuleName(basestack, ohere$) & "," & -i & vbCrLf
             End If
         End If
         If frm$ <> "" Then
@@ -44396,7 +45278,7 @@ ElseIf IsExp(bstack, a$, r, , True) Then
 End Function
 Private Function IsArrayCopy(bstack As basetask, a$, r As Variant) As Boolean
 Dim s$, w1 As Long, pppp As iBoxArray, anything As Object, p As Variant, ms As mStiva, usehandler As mHandler, RF As refArray
-Dim myGroup As Group, emp As ExtArray
+Dim myGroup As Group, emp As ExtArray, pppp1 As iBoxArray
 
     If IsExp(bstack, a$, p) Then
         If MemInt(VarPtr(p)) = vbString Then
@@ -44422,6 +45304,7 @@ Dim myGroup As Group, emp As ExtArray
                         Set usehandler = Nothing
                         IsArrayCopy = FastSymbol(a$, ")", True)
                         Exit Function
+                    
                     End If
                     Set pppp = usehandler.objref
                     GoTo check123678
@@ -44438,13 +45321,14 @@ Dim myGroup As Group, emp As ExtArray
                     NotArray
                 End If
             ElseIf IsobjArray(bstack.lastobj) Then
-                If FastSymbol(a$, ")") Then
-                IsArrayCopy = True
-                Exit Function
-                End If
+                Set usehandler = New mHandler
                 Set pppp = bstack.lastobj
+                pppp.CopyArray pppp1
+                Set usehandler.objref = pppp1
+                usehandler.t1 = 3
+                Set bstack.lastobj = usehandler
+                IsArrayCopy = FastSymbol(a$, ")", True)
                 
-                GoTo check123678
             ElseIf TypeOf bstack.lastobj Is refArray Then
                 Dim pppp0 As mArray
                 Set pppp0 = New mArray
@@ -44510,7 +45394,7 @@ check123678:
                 If Not usehandler Is Nothing Then
                     If Not usehandler.UseIterator Then
                         usehandler.CopyTo usehandler1
-                        Dim pppp1 As iBoxArray
+                        
                         pppp.CopyArray pppp1
                         Set usehandler1.objref = pppp1
                     Else
@@ -49220,7 +50104,12 @@ isanumber:
         .lastprint = False
         RevisionPrint = LastErNum = -2
         Set Scr = Nothing
+        If LastErNum1 = -2 Then
+        SwapStrings rest$, rest1$
+        Exit Function
+        Else
         GoTo exit2
+        End If
     ElseIf IsStrExp(basestack, rest$, s$, False) Then    ' was Len(basestack.tmpstr) = 0
         If Not basestack.lastobj Is Nothing Then
             If IsobjArray(basestack.lastobj) Then
@@ -49932,7 +50821,7 @@ End If
 If Len(rest1$) > 0 Then
     ' unhandled symbols  ??
     ' accepted
-    
+    If Not RevisionPrint Then Exit Function
     If Not MaybeIsSymbol3lot(rest1$, b12345, i) Then
     If i > Len(rest1$) Then
         rest1$ = vbNullString
@@ -50178,7 +51067,7 @@ Public Function exeSelect(ExecuteLong, once As Boolean, bstack As basetask, b$, 
 Dim ok As Boolean, x1 As Long, y1 As Long, sp As Variant, st As Variant, sw$, slct As Long, ss$
 Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, usehandler As mHandler
 Dim checkenum As Boolean, enumindex As Long, EnumName As String, that As BigInteger, ifcount As Long
-Dim Pos As Long, sPos As Long, comments As Long
+Dim Pos As Long, sPos As Long, comments As Long, nn&
                 
 exeSelect = True
 x1 = 0 ' mode numbers using p, sp and st
@@ -50487,12 +51376,13 @@ selslct0:
 conthere:
                             If FastSymbol(b$, "{") Then  ' block
 haveblock:
+                                nn& = Len(b$)
                                 ss$ = block(b$)
                                 dum = False
                                 i = 1
                                 ' #3 call a block
                                 TraceStore bstack, nd&, b$, 0
-                                Call Module10.executeblock(i, bstack, ss$, False, dum, , True)
+                                Call executeblock(i, bstack, ss$, False, dum)
                                 TraceRestore bstack, nd&
                                 If i = 1 Then
                                     FastSymbol b$, "}"
@@ -50505,7 +51395,13 @@ haveblock:
                                     Pos = -100
                                 Else
                                     If i = 0 Then
-                                        b$ = ss$ + b$
+                                        If bstack.ErrorOriginal <> 0 Then
+                                            SwapStrings b$, ss$
+                                        Else
+                                            If Len(ss$) - 1 - nn& + Len(b$) * 2 > 0 Then
+                                                b$ = space$(Len(ss$) - 1 - nn& + Len(b$) * 2)
+                                            End If
+                                        End If
                                         ExecuteLong = 0: Exit Function
                                     ElseIf i = 2 Then
                                         If Len(ss$) > 0 Then b$ = ss$
@@ -50542,9 +51438,11 @@ checknext:
 Process:
                                 once = False 'Len(b$) = 0
                                 i = 50
-
-                               Call Module10.executeblock(i, bstack, b$, once, dum, , True)
-                               If i = 0 Then
+                               
+                                Call Module10.executeblock(i, bstack, b$, once, dum, , True)
+                                
+                                If i = 0 Then
+                                
                                     ExecuteLong = 0: Exit Function
                                 ElseIf i = 50 Then ' we have TO EXIT
                                         ExecuteLong = 1
@@ -50661,12 +51559,13 @@ er100:
                         ss$ = block(b$) + "}"
                         b$ = NLtrim$(Mid$(b$, 2))
                     Else
+                        nn& = Len(b$)
                         ss$ = block(b$)
                         dum = False
                         i = 1
                         ' #7 call block inside Case (Break) ok
                         TraceStore bstack, nd&, b$, 0
-                        Call Module10.executeblock(i, bstack, ss$, False, dum, , True)
+                        Call executeblock(i, bstack, ss$, False, dum)
                         TraceRestore bstack, nd&
                         If i = 1 Then
                             FastSymbol b$, "}"
@@ -50678,7 +51577,13 @@ er100:
                             End If
                         Else
                             If i = 0 Then
-                                b$ = ss$ + b$
+                                If bstack.ErrorOriginal <> 0 Then
+                                    SwapStrings b$, ss$
+                                Else
+                                    If Len(ss$) - 1 - nn& + Len(b$) * 2 > 0 Then
+                                        b$ = space$(Len(ss$) - 1 - nn& + Len(b$) * 2)
+                                    End If
+                                End If
                                 ExecuteLong = 0: Exit Function
                             ElseIf i = 2 Then
                                 If Len(ss$) > 0 Then b$ = ss$
@@ -50903,13 +51808,14 @@ case2:
                            ' Exit Do
                         End If
                         If FastSymbol(b$, "{") Then
+                            nn& = Len(b$)
                             ss$ = block(b$)
                             If slct > 0 Then
                                 dum = False
                                 i = 1
                                 ' #9 call block inside Else
                                 TraceStore bstack, nd&, b$, 0
-                                Call Module10.executeblock(i, bstack, ss$, False, dum, , True)
+                                Call executeblock(i, bstack, ss$, False, dum)
                                 TraceRestore bstack, nd&
                                 If i = 1 Then
                                     FastSymbol b$, "}"
@@ -50921,7 +51827,14 @@ case2:
                                     End If
                                 Else
                                     If i = 0 Then
-                                        b$ = ss$ + b$
+                                        If bstack.ErrorOriginal <> 0 Then
+                                            SwapStrings b$, ss$
+                                        Else
+                                            If Len(ss$) - 1 - nn& + Len(b$) * 2 > 0 Then
+                                                b$ = space$(Len(ss$) - 1 - nn& + Len(b$) * 2)
+                                            End If
+                                            
+                                        End If
                                         ExecuteLong = 0: Exit Function
                                     ElseIf i = 2 Then
                                         If Len(ss$) > 0 Then b$ = ss$
@@ -50950,7 +51863,7 @@ again1123:
                                 ' #10 call one command inside ELSE
                                once = False
                                 Call Module10.executeblock(i, bstack, b$, once, dum, , True)
-                                'TraceRestore bstack, nd&
+                             
                                 If i = 0 Then
                                     ExecuteLong = 0: Exit Function
                                 ElseIf i = 51 Then
