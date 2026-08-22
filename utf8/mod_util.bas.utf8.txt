@@ -1001,8 +1001,10 @@ Else
 LastErNum = val(" " + Mid$(er$, rinstr(er$, " ")) + ".0")
 End If
 If LastErNum = 0 Then LastErNum = -1
+If LastErNum1 = -2 Then
+Else
 LastErNum1 = LastErNum
-
+End If
 If InStr("*" + LastErName, NLtrim$(er$)) = 0 Then
 LastErName = RTrim$(LastErName) + " " + NLtrim$(er$)
 LastErNameGR = RTrim$(LastErNameGR) + " " + NLtrim$(ergr$)
@@ -22480,7 +22482,7 @@ End Function
 Function RemoveGuiArray(bstack As basetask, where As Long, what$) As Boolean
     Dim ppppl As iBoxArray, pppp As mArray
     'what$ = Left$(what$, Len(what$) - 1)
-    If neoGetArray(bstack, what$, ppppl, here$ <> "") Then
+    If neoGetArray(bstack, myUcase(what$, True), ppppl, here$ <> "") Then
         If TypeOf ppppl Is mArray Then
             Set pppp = ppppl
             Set ppppl = Nothing
@@ -22544,7 +22546,7 @@ Dim pppp As mArray, aVar As Variant, H$
  Dim i As Long
 '' add new GuiItems but not visible
 what$ = Left$(what$, Len(what$) - 1)
- If neoGetArray(bstack, oName$, pppp, here$ <> "") Then
+ If neoGetArray(bstack, myUcase(oName$, True), pppp, here$ <> "") Then
  
  If Not (pppp.IHaveGui Or pppp.comevents) Then
  MyEr "Only for Gui controls or Com objects with events", "Μόνο για στοιχεία διεπαφής ή για αντικείμενα COM με γεγονότα"
@@ -22725,7 +22727,7 @@ Case "GuiImage"
     End Select
     If pppp.comevents Then
     Dim pppp1 As mArray
-    If neoGetArray(bstack, ChrW(&HFFBF) + "_" + what$ + "(", pppp1, True) Then
+    If neoGetArray(bstack, ChrW(&HFFBF) + "_" + myUcase(what$, True) + "(", pppp1, True) Then
      i = pppp1.UpperMonoLimit + 1
     pppp1.SerialItem 0, i + 2, 9
     GetShinkArr2 pppp, pppp1, what$, (pppp1.Count - 1), (pppp1.Count)
@@ -23623,36 +23625,34 @@ Dim pppp As mArray, mmmm As mEvent
             Else
                 Set mmmm = New mEvent
 contEvArray:
-                'If neoGetArray(bstack, oName$ + "(", pppp, , CBool(glob)) Then
-                    Set pppp = var(ArrPos)
-                    what$ = Left$(what$, Len(oName$))
-                    If y1 = 0 Then
-                        With mmmm
-                            .BypassInit 10
-                            .VarIndex = i * 1000 + varhash.Count
-                            .enabled = True
-                            .ParamBlock "@Read Index, msg$, &obj", 3
-                            .GenItemCreator LTrim$(str(i * 3456)), "{ Module " + here$ + vbCrLf + "try { call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
-                        End With
-                    End If
-                    For i = 0 To ar - 1
-                        CreateFormObject aVar, 1
-                        Set pppp.item(i) = aVar
-                        Dim aaa As GuiM2000, safe As LongHash2
-                        Set safe = getSafeFormList()
-                        Set aaa = aVar
-                        With aaa
-                            Set .safe = safe
-                            Set .EventObj = mmmm
-                            .myname = what$
-                            .ModuleName = here$
-                            .ByPass = bp
-                            .TempTitle = what$ & "(" & (i) & ")"
-                            .index = i
-                        End With
-                    Next i
-                    Set aaa = Nothing
-                'End If
+                Set pppp = var(ArrPos)
+                what$ = Left$(what$, Len(oName$))
+                If y1 = 0 Then
+                    With mmmm
+                        .BypassInit 10
+                        .VarIndex = i * 1000 + varhash.Count
+                        .enabled = True
+                        .ParamBlock "@Read Index, msg$, &obj", 3
+                        .GenItemCreator LTrim$(str(i * 3456)), "{ Module " + here$ + vbCrLf + "try { call local " + here$ + "." + bstack.GroupName + what$ + "() } }" + here$ + "." + bstack.GroupName
+                    End With
+                End If
+                For i = 0 To ar - 1
+                    CreateFormObject aVar, 1
+                    Set pppp.item(i) = aVar
+                    Dim aaa As GuiM2000, safe As LongHash2
+                    Set safe = getSafeFormList()
+                    Set aaa = aVar
+                    With aaa
+                        Set .safe = safe
+                        Set .EventObj = mmmm
+                        .myname = what$
+                        .ModuleName = here$
+                        .ByPass = bp
+                        .TempTitle = what$ & "(" & (i) & ")"
+                        .index = i
+                    End With
+                Next i
+                Set aaa = Nothing
                 pppp.IHaveGui = True
                 Set mmmm = Nothing
             End If

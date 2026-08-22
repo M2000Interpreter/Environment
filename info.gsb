@@ -33753,7 +33753,12 @@ Else
 	}
 End If
 }
-MODULE TSTTIMER {// Erase all threads
+MODULE TSTTIMER {Report {
+Look upper right corner. That is a sprite with a value from a timer
+Press one time space to hold time for 15 seconds
+Press second time space to finish
+}
+// Erase all threads
 Threads Erase
 // Erase all players
 Player 0
@@ -53305,13 +53310,16 @@ print
 Πένα 11 {Ελληνικά_Τετραδόνιο1}
 locale oldlocale
 }
-MODULE SUPERSCRIPT {Module SupSub_Script_Example (locale1=1033) {
+MODULE SUPERSCRIPT {oldfont=fontname$
+font "Verdana"
+mode mode
+Module SupSub_Script_Example (locale1=1033) {
   Static Function SubScript, SupScript
   OldLocale=Locale
   Locale Locale1 ' works for 1032 too
   Print Part "A";SupScript(-12345.06789e-100)
   Print
-  N=12
+  N=2
   Print Part "C";SubScript(N);"H";SubScript(2*N+2)
   Print
   Print Part "Rational = ";SupScript(123);"/";SubScript(456)
@@ -53321,7 +53329,8 @@ MODULE SUPERSCRIPT {Module SupSub_Script_Example (locale1=1033) {
   Locale OldLocale
   Function SubScript(x)
     local string r
-    local s=""+x, i
+    local s="", i, n
+    s=x
     for i=1 to len(s)
       n=val(mid$(s,i,1))
       select case mid$(s,i,1)
@@ -53343,7 +53352,7 @@ MODULE SUPERSCRIPT {Module SupSub_Script_Example (locale1=1033) {
   End Function
   Function SupScript(x)
     local string r
-    local s=""+x, i
+    local s=""+x, i, n
     for i=1 to len(s)
       n=val(mid$(s,i,1))
       select case mid$(s,i,1)
@@ -53368,7 +53377,6 @@ MODULE SUPERSCRIPT {Module SupSub_Script_Example (locale1=1033) {
     =r
   End Function
 }
-If Mode<>14 then font "Arial New": Mode 14
 Report 2, "Using comma for decimal separator - Locale 1032"
 SupSub_Script_Example 1032
 Print
@@ -53386,6 +53394,10 @@ Print
 Report 2, "Using  dot for decimal separator - Locale 1033"
 SupSub_Script_Example 1033
 Normal
+print "fontname: "; fontname$
+print "press any key":push Key$:drop
+font oldfont
+mode mode
 If module(Infobasic) then Pen 15 {Report 2, "Press F3"}
 }
 MODULE BABY {? "Sleep Baby..."

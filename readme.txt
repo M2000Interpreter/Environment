@@ -2,54 +2,8 @@ M2000 Interpreter and Environment
 Not Finish: Version 15 Revision 27
 
 August 23.
-Not finish 27
-1. I do some changes so when I press Shift F1 after an error stop e program automatic open the fault module at the point of error.
-I have a little job to finish this (Works 95% of situations)
-
-2. Upgrade Control Form with Step Over/Step In/Step out (for one level for this revision). Also Control Form Title change background color to dark gray when form missing focus. Also, pressing ctrl F1 or Shift F1 a sheet of functions keys displayed in help form, Using StepOver F9 in a module then F5 step on that module statements and not going in functions or modules which called from that module. Using StepIn F10 you can go in and pressing F11 (Step Out) quick executed code and stop and wait for f5 returning to module which we press the F9 (step Over).  I am thinking about make this functionallity with more than one level..
-
-3. Fix a problem with arrays when we feed them from stack of values, from tuples
-' first using poiners to arrays (with no parenthesis) - no problem on old revisions
-push (1,2)
-read z
-m=z  ' point to z
-push (3,4)
-read z ' z point to (3,4)
-print m ' m point to (1,2)
-print m#str$()="1 2"
-
-' second we get a pointer from array. -  has problem on old revisions
-clear ' erase variables for this module
-dim z() 
-push (1,2)
-read z() 
-print type(z())="mArray"
-m=z() ' m points to (1,2)
-push (3,4)
-read z() ' z() get a new object
-print type(z()) = "mArray"
-' here was the fault: m points to new z() value
-print m ' show 1 2 m points to old one - this was by design and restored
-z(0)+=100  ' fault show 103 2 on m
-print m ' right value show 1 2 m, points to old one - this was by design and restored
-
-print m#str$()="1 2"  ' this show 
-' third - we make a link (a reference) to an array()  - no problem on old revisions 
-clear '
-dim z() 
-push (1,2)
-read z() 
-link z() to m  ' now m is z()
-push (3,4)
-read z() ' z() get a new object
-print m  ' now m show 3, 4
-print type(z()) = "mArray"
-print m#str$()="3 4"
-z(0)+=100  '  show 103 2
-print m#str$()="103 4"
-
-
-No binaries yet fot Revision 27
+1. Fixed a mistake from some revisions before which prevent release items from array of gui elements. See BUTTONSONFRAME module in INFO
+2. End of Revision 27. Uploading binaries.
 
 
 

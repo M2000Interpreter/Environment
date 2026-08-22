@@ -18373,9 +18373,9 @@ contBinary:
                 If FastSymbol(b$, "{") Then
                     ss$ = block(b$)
                     
-                                If Not Left$(b$, 1) = "}" Then
-                                    Execute = CheckBlock(once): Exit Function
-                                End If
+                    If Not Left$(b$, 1) = "}" Then
+                        Execute = CheckBlock(once): Exit Function
+                    End If
                     b$ = Mid$(b$, 2)
                     If Not GetRes(bstack, b$, Lang, ss$) Then
                         Execute = 0: Exit Function
@@ -21871,9 +21871,9 @@ fastexit:
                         End If
                         FK$(13) = Mid$(pa$, 7) + "-" + LTrim$(str(Len(NLtrim$(code$))))
                         If Right$(GetName(sbf(x1).goodname), 2) = "()" Then
-                            MyErMacro rest$, "Problem in class in function " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), "Πρόβλημα στη κλάση στη συνάρτηση " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
+                            MyErMacro rest$, "Problem in class in function " + GetNameClean(sbf(x1).goodname), "Πρόβλημα στη κλάση στη συνάρτηση " + GetNameClean(sbf(x1).goodname)
                         Else
-                            MyErMacro rest$, "Problem in class in module " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), "Πρόβλημα στη κλάση στο τμήμα " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
+                            MyErMacro rest$, "Problem in class in module " + GetNameClean(sbf(x1).goodname), "Πρόβλημα στη κλάση στο τμήμα " + GetNameClean(sbf(x1).goodname)
                         End If
                         GoTo there1234
                     End If
@@ -21913,7 +21913,7 @@ fastexit:
                     End If
                     If what$ <> "" Then
                         If InStrRev(here$, ".") > 0 Then
-                            MyEr "in function " + Replace(GetName(what$), ChrW(&HFFBF), ""), "στη συνάρτηση " + Replace(GetName(what$), ChrW(&HFFBF), "") ' Mid$(what$, InStrRev(what$, ".") + 1)
+                            MyEr "in function " + GetNameClean(what$), "στη συνάρτηση " + GetNameClean(what$)
                         Else
                             MyEr "in function " + what$, "στη συνάρτηση " + what$
                         End If
@@ -21927,7 +21927,7 @@ fastexit:
                 Else
                     If Right$(here$, 1) = ")" Then
                         If what$ <> "" Then
-                            MyEr "in function " + Replace(GetName(what$), ChrW(&HFFBF), ""), "στη συνάρτηση " + Replace(GetName(what$), ChrW(&HFFBF), "") 'Mid$(what$, InStrRev(what$, ".") + 1)
+                            MyEr "in function " + GetNameClean(what$), "στη συνάρτηση " + GetNameClean(what$)
                         Else
                             MyEr "in function ", "στη συνάρτηση "
                         End If
@@ -31608,8 +31608,15 @@ If Not TaskMaster Is Nothing Then
      TaskMaster.StopProcess
     End If
 End If
-
-    Call Module10.executeblock(it, basestack, rest$, False, once)
+    Dim i As Long, ss$
+    i = Len(rest$)
+    ss$ = block(rest$)
+    If Not Left$(rest$, 1) = "}" Then
+        it = CheckBlock(once): Exit Function
+    End If
+    'Mid$(rest$, 1, 1) = " "
+    TraceStore basestack, nd&, rest$, 0
+    Call executeblock(it, basestack, ss$, False, once)
     
 If it = 2 Then
     If rest$ = "" Then
@@ -31627,8 +31634,17 @@ End If
     
     Set basestack.Owner = Scr
 
-    If it = 0 Then
-    MyEr "Problem in drawing", "Πρόβλημα στο σχέδιο"
+    If it <> 1 Then
+            If it = 0 Then
+                If basestack.ErrorOriginal <> 0 Then
+                    SwapStrings rest$, ss$
+                ElseIf Len(ss$) - 1 - i + Len(rest$) * 2 > 0 Then
+                    rest$ = space$(Len(ss$) - 1 - i + Len(rest$) * 2)
+                End If
+            Else
+                SwapStrings rest$, ss$
+            End If
+            MyEr "Problem in drawing", "Πρόβλημα στο σχέδιο"
     
     End If
         Set ExecuteEmfBlock = mDC.getEmfObj(type1)
@@ -32298,20 +32314,17 @@ myerror1:
                     .sb = Mid$(.sb, 3)
                     Set .subs = Nothing
                     Set .Pad = Nothing
-                    If SecureNames Then
-                        MyEr "in module " + Replace(GetModuleName(bs, here$), ChrW(&HFFBF), ""), "στο τμήμα " + Replace(GetModuleName(bs, here$), ChrW(&HFFBF), "")
-                    Else
-                        MyEr "in module " + Replace(GetName(ohere$) + "." + GetName(here$), ChrW(&HFFBF), ""), "στο τμήμα " + Replace(GetName(ohere$) + "." + GetName(here$), ChrW(&HFFBF), "")
-                    End If
+                    MyEr "in module " + GetModuleNameClean(bs, here$), "στο τμήμα " + GetModuleNameClean(bs, here$)
+                    
                 Else
-                    MyEr "in module " + Replace(GetName(.goodname), ChrW(&HFFBF), ""), "στο τμήμα " + Replace(GetName(.goodname), ChrW(&HFFBF), "")
+                    MyEr "in module " + GetNameClean(.goodname), "στο τμήμα " + GetNameClean(.goodname)
                 End If
                 End With
             Else
                 If here$ = vbNullString Then
                     MyEr "in command prompt", "στην εισαγωγή εντολών"
                 Else
-                    MyEr "in module " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), "στο τμήμα " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
+                    MyEr "in module " + GetNameClean(sbf(x1).goodname), "στο τμήμα " + GetNameClean(sbf(x1).goodname)
                 End If
             End If
             If InStr(FK$(13), ",") > 0 Then
@@ -35633,7 +35646,7 @@ Public Function CallEventFromGuiOne(gui As GuiM2000, a As mEvent, aString$) As B
         If F1$ = vbNullString Then
             MyEr "Problem in Event " + aString$, "Πρόβλημα στο γεγονός " + aString$
         Else
-            MyEr "Problem in Event " + aString$ + " in module " + F1$, "Πρόβλημα στο γεγονός " + aString$ + " στο τμήμα " + F1$
+            MyEr "Problem in Event " + aString$ + " in module " + GetName(F1$), "Πρόβλημα στο γεγονός " + aString$ + " στο τμήμα " + GetName(F1$)
         End If
     Else
         CallEventFromGuiOne = True
@@ -36278,7 +36291,7 @@ reenter2:
                     Set basestack.FuncObj = bs.lastobj
                     
                     If LastErNum Then
-                        MyEr Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
+                        MyEr GetNameClean(sbf(x1).goodname), GetNameClean(sbf(x1).goodname)
                         resp = False
                         GoTo ExitHere
                     End If
@@ -36293,8 +36306,7 @@ reenter2:
                     bs.StaticInUse = what$
                     Call GoFunc(bs, "", rest$, vvl, , x1)
                     If LastErNum Then
-                        MyEr "at " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), ""), "στο " + Replace(GetName(sbf(x1).goodname), ChrW(&HFFBF), "")
-                        'MyEr "-> " + Replace(what$, ChrW(&HFFBF), ""), "-> " + Replace(what$, ChrW(&HFFBF), "")
+                        MyEr "at " + GetNameClean(sbf(x1).goodname), "στο " + GetNameClean(sbf(x1).goodname)
                         resp = False
                         GoTo ExitHere
                     End If
@@ -44826,6 +44838,9 @@ myHwnd = bstack.Owner.hWnd
 End If
 End If
 End Function
+Function GetNameClean(part$) As String
+GetNameClean = Replace(GetName(part$), ChrW(&HFFBF), "")
+End Function
 Function GetName(ByVal part$) As String
 Dim s$
 again:
@@ -44990,6 +45005,10 @@ On Error GoTo there
 repeatme
 there:
 End Function
+Function GetModuleNameClean(b As basetask, where$) As String
+GetModuleNameClean = Replace(GetModuleName(b, where$), ChrW(&HFFBF), "")
+End Function
+
 Function GetModuleName(b As basetask, where$) As String
 If SecureNames Then
 If b.OriginalCode < 0 Then
