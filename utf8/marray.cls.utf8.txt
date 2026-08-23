@@ -54,10 +54,10 @@ Private Type SAFEArrayPart
    cLocks                       As Long
    pvData                       As Long
    End Type
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
 Private Declare Function VarPtrArray Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any) As Long
   Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" _
       (hpvDest As Any, hpvSource As Any, ByVal cbCopy As Long)
@@ -88,7 +88,7 @@ End Type
 Private sortmult As Long, sortoff As Long, upart As Long, part As Long, Col(), Piv, piv1()
 Public index As Long, Final As Boolean, refgroup As Object, grouperror As Boolean
 Public refArray As Variant, StrArray As Boolean, IsByValue As Boolean
-Public Sub Compute0(p As Variant, ss$)
+Public Sub Compute0(P As Variant, ss$)
 If Final Then CantAssignValue: Exit Sub
 Dim v As Long, sp As Variant, ii As Variant
 Dim n As Byte
@@ -104,14 +104,14 @@ Do While v <= Me.UpperMonoLimit
             item(v) = ii
             GoTo conthere
         Case "+"
-            item(v) = ii + p
+            item(v) = ii + P
         Case "*"
-            item(v) = p * ii
+            item(v) = P * ii
         Case "-"
-            item(v) = ii - p
+            item(v) = ii - P
         Case "/"
-            If p = 0 Then Exit Do
-            item(v) = ii / p
+            If P = 0 Then Exit Do
+            item(v) = ii / P
         Case "~", "!!"
             item(v) = -1 - (ii <> 0)
             GoTo conthere
@@ -125,45 +125,45 @@ Do While v <= Me.UpperMonoLimit
             item(v) = -ii
             GoTo conthere
         Case "+="
-            item(v) = ii + p
+            item(v) = ii + P
         Case "*="
-            item(v) = p * ii
+            item(v) = P * ii
         Case "-="
-            item(v) = ii - p
+            item(v) = ii - P
         Case "/="
-            If p = 0 Then DevZero: Exit Do
-            item(v) = ii / p
+            If P = 0 Then DevZero: Exit Do
+            item(v) = ii / P
         Case "DIV", "ΔΙΑ"
-            If p = 0 Then
+            If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            item(v) = Fix(ii / p)
+            item(v) = Fix(ii / P)
         Case "DIV#", "ΔΙΑ#"
-            If p = 0 Then
+            If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            If p < 0 Then
-                item(v) = Int((ii - Abs(ii - Abs(p) * Int(ii / Abs(p)))) / p)
+            If P < 0 Then
+                item(v) = Int((ii - Abs(ii - Abs(P) * Int(ii / Abs(P)))) / P)
             Else
-                item(v) = Int(ii / p)
+                item(v) = Int(ii / P)
             End If
         Case "MOD", "ΥΠΟΛ", "ΥΠΟΛΟΙΠΟ"
-            If p = 0 Then
+            If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = ii - Fix(ii / p) * p
-            If Abs(sp) >= Abs(p) Then sp = sp - sp
+            sp = ii - Fix(ii / P) * P
+            If Abs(sp) >= Abs(P) Then sp = sp - sp
             actualData(v) = sp
         Case "MOD#", "ΥΠΟΛ#", "ΥΠΟΛΟΙΠΟ#"
-             If p = 0 Then
+             If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = Abs(ii - Abs(p) * Int(ii / Abs(p)))
-            If Abs(sp) >= Abs(p) Then sp = sp - sp
+            sp = Abs(ii - Abs(P) * Int(ii / Abs(P)))
+            If Abs(sp) >= Abs(P) Then sp = sp - sp
             actualData(v) = sp
         Case Else
             WrongOperator
@@ -173,17 +173,17 @@ Do While v <= Me.UpperMonoLimit
     ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
         Select Case ss$
         Case "=", "g"
-            actualData(v) = p
+            actualData(v) = P
             GoTo conthere
         Case "+"
-            actualData(v) = p + actualData(v)
+            actualData(v) = P + actualData(v)
         Case "*"
-            actualData(v) = p * actualData(v)
+            actualData(v) = P * actualData(v)
         Case "-"
-            actualData(v) = actualData(v) - p
+            actualData(v) = actualData(v) - P
         Case "/"
-            If p = 0 Then Exit Do
-            actualData(v) = actualData(v) / p
+            If P = 0 Then Exit Do
+            actualData(v) = actualData(v) / P
         Case "~", "!!"
             actualData(v) = -1 - (actualData(v) <> 0)
         Case "++"
@@ -194,45 +194,45 @@ Do While v <= Me.UpperMonoLimit
             actualData(v) = -actualData(v)
             GoTo conthere
         Case "+="
-            actualData(v) = actualData(v) + p
+            actualData(v) = actualData(v) + P
         Case "*="
-            actualData(v) = p * actualData(v)
+            actualData(v) = P * actualData(v)
         Case "-="
-            actualData(v) = actualData(v) - p
+            actualData(v) = actualData(v) - P
         Case "/="
-            If p = 0 Then DevZero: Exit Do
-            actualData(v) = actualData(v) / p
+            If P = 0 Then DevZero: Exit Do
+            actualData(v) = actualData(v) / P
         Case "DIV", "ΔΙΑ"
-            If p = 0 Then
+            If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            actualData(v) = Fix(actualData(v) / p)
+            actualData(v) = Fix(actualData(v) / P)
         Case "DIV#", "ΔΙΑ#"
-            If p = 0 Then
+            If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            If p < 0 Then
-                actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))) / p)
+            If P < 0 Then
+                actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))) / P)
             Else
-                actualData(v) = Int(actualData(v) / p)
+                actualData(v) = Int(actualData(v) / P)
             End If
         Case "MOD", "ΥΠΟΛ", "ΥΠΟΛΟΙΠΟ"
-            If p = 0 Then
+            If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = actualData(v) - Fix(actualData(v) / p) * p
-            If Abs(sp) >= Abs(p) Then sp = sp - sp
+            sp = actualData(v) - Fix(actualData(v) / P) * P
+            If Abs(sp) >= Abs(P) Then sp = sp - sp
             actualData(v) = sp
         Case "MOD#", "ΥΠΟΛ#", "ΥΠΟΛΟΙΠΟ#"
-             If p = 0 Then
+             If P = 0 Then
                 DevZero
                 Exit Do
             End If
-            sp = Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))
-            If Abs(sp) >= Abs(p) Then sp = sp - sp
+            sp = Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))
+            If Abs(sp) >= Abs(P) Then sp = sp - sp
             actualData(v) = sp
         Case Else
             WrongOperator
@@ -246,7 +246,7 @@ conthere:
 Loop
 
 End Sub
-Public Sub Compute(p As Double, ss$)
+Public Sub Compute(P As Double, ss$)
 If Final Then CantAssignValue: Exit Sub
 Dim v As Long, ii As Variant
 Dim n As Byte
@@ -262,14 +262,14 @@ Do While v <= Me.UpperMonoLimit
             item(v) = ii
             GoTo conthere
         Case "+"
-            item(v) = ii + p
+            item(v) = ii + P
         Case "*"
-            item(v) = p * ii
+            item(v) = P * ii
         Case "-"
-            item(v) = ii - p
+            item(v) = ii - P
         Case "/"
-            If p = 0 Then Exit Do
-            actualData(v) = actualData(v) / p
+            If P = 0 Then Exit Do
+            actualData(v) = actualData(v) / P
         Case "~", "!!"
             item(v) = -1 - (ii <> 0)
             GoTo conthere
@@ -287,18 +287,18 @@ Do While v <= Me.UpperMonoLimit
     ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
         Select Case ss$
         Case "=", "g"
-            actualData(v) = p
+            actualData(v) = P
             GoTo conthere
         Case "+"
-            actualData(v) = p + actualData(v)
+            actualData(v) = P + actualData(v)
         Case "*"
-            actualData(v) = p * actualData(v)
+            actualData(v) = P * actualData(v)
         Case "-"
-        actualData(v) = actualData(v) - p
+        actualData(v) = actualData(v) - P
         If RoundDouble Then If VarType(actualData(v)) = vbDouble Then actualData(v) = MyRound(actualData(v), 13)
         Case "/"
-            If p = 0 Then Exit Do
-            actualData(v) = actualData(v) / p
+            If P = 0 Then Exit Do
+            actualData(v) = actualData(v) / P
         Case "~", "!!"
             actualData(v) = -1 - (actualData(v) <> 0)
             GoTo conthere
@@ -320,7 +320,7 @@ conthere:
 Loop
 
 End Sub
-Public Function CompareItem(v As Long, p As Variant, ss$, ret As Boolean) As Boolean
+Public Function CompareItem(v As Long, P As Variant, ss$, ret As Boolean) As Boolean
 ret = False
 On Error GoTo there
 Dim ii As Variant
@@ -331,73 +331,73 @@ If n = 20 Then
     PutMem2 VarPtr(ii), 20
     Select Case ss$
     Case ">"
-    ret = ii > p
+    ret = ii > P
     Case ">="
-    ret = ii >= p
+    ret = ii >= P
     Case "<"
-    ret = ii < p
+    ret = ii < P
     Case "<="
-    ret = ii <= p
+    ret = ii <= P
     Case "<>"
-    ret = ii <> p
+    ret = ii <> P
     Case "="
-    ret = ii = p
+    ret = ii = P
     End Select
     ii = Empty
 ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
     Select Case ss$
     Case ">"
-    ret = actualData(v) > p
+    ret = actualData(v) > P
     Case ">="
-    ret = actualData(v) >= p
+    ret = actualData(v) >= P
     Case "<"
-    ret = actualData(v) < p
+    ret = actualData(v) < P
     Case "<="
-    ret = actualData(v) <= p
+    ret = actualData(v) <= P
     Case "<>"
-    ret = actualData(v) <> p
+    ret = actualData(v) <> P
     Case "="
-    ret = actualData(v) = p
+    ret = actualData(v) = P
     End Select
 
 Else
 Select Case UCase(ss$)
 Case ">"
-ret = actualData(v) > p
+ret = actualData(v) > P
 Case ">="
-ret = actualData(v) >= p
+ret = actualData(v) >= P
 Case "<"
-ret = actualData(v) < p
+ret = actualData(v) < P
 Case "<="
-ret = actualData(v) <= p
+ret = actualData(v) <= P
 Case "<>"
-ret = actualData(v) <> p
+ret = actualData(v) <> P
 Case "="
-ret = actualData(v) = p
+ret = actualData(v) = P
 Case "LIKE"
-ret = actualData(v) Like Replace$(CStr(p), "%", "*")
+ret = actualData(v) Like Replace$(CStr(P), "%", "*")
 
 End Select
 End If
 CompareItem = True
 there:
 End Function
-Public Sub Compute2(p As Variant, ss$)
+Public Sub Compute2(P As Variant, ss$)
 If Final Then CantAssignValue: Exit Sub
 Dim v As Long, sp As Variant, ii As Variant
 Dim n As Byte, BI As BigInteger, BI2 As BigInteger, rd As Boolean, ctype As Boolean
 rd = RoundDouble
 On Error Resume Next
 ctype = myVarType(actualData, vbObject)
-If MemInt(VarPtr(p)) = 9 Then
-    If TypeOf p Is BigInteger Then
-    Set BI2 = p
-    p = CDec(BI2.ToString)
+If MemInt(VarPtr(P)) = 9 Then
+    If TypeOf P Is BigInteger Then
+    Set BI2 = P
+    P = CDec(BI2.ToString)
     If Err.Number > 0 Then
-        p = Infinity()
+        P = Infinity()
     End If
     Else
-        p = 0
+        P = 0
     End If
 End If
 
@@ -408,7 +408,7 @@ Do While v <= Me.UpperMonoLimit
         If TypeOf actualData(v) Is BigInteger Then
             Set BI = actualData(v)
             If BI2 Is Nothing Then
-                Set BI2 = Module13.CreateBi(p)
+                Set BI2 = Module13.CreateBi(P)
             End If
             bigintOperations CVar(BI2), BI, ss$
             If ctype Then
@@ -427,45 +427,45 @@ Do While v <= Me.UpperMonoLimit
                 item(v) = ii
                 GoTo conthere
             Case "+="
-                item(v) = ii + p
+                item(v) = ii + P
             Case "*="
-                item(v) = p * ii
+                item(v) = P * ii
             Case "-="
-                item(v) = ii - p
+                item(v) = ii - P
             Case "/="
-                If p = 0 Then DevZero: Exit Do
-                item(v) = ii / p
+                If P = 0 Then DevZero: Exit Do
+                item(v) = ii / P
             Case "DIV", "ΔΙΑ"
-                If p = 0 Then
+                If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                item(v) = Fix(ii / p)
+                item(v) = Fix(ii / P)
             Case "DIV#", "ΔΙΑ#"
-                If p = 0 Then
+                If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                If p < 0 Then
-                    item(v) = Int((ii - Abs(ii - Abs(p) * Int(ii / Abs(p)))) / p)
+                If P < 0 Then
+                    item(v) = Int((ii - Abs(ii - Abs(P) * Int(ii / Abs(P)))) / P)
                 Else
-                    item(v) = Int(ii / p)
+                    item(v) = Int(ii / P)
                 End If
             Case "MOD", "ΥΠΟΛ", "ΥΠΟΛΟΙΠΟ"
-                If p = 0 Then
+                If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = ii - Fix(ii / p) * p
-                If Abs(sp) >= Abs(p) Then sp = sp - sp
+                sp = ii - Fix(ii / P) * P
+                If Abs(sp) >= Abs(P) Then sp = sp - sp
                 item(v) = sp
              Case "MOD#", "ΥΠΟΛ#", "ΥΠΟΛΟΙΠΟ#"
-                 If p = 0 Then
+                 If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = Abs(ii - Abs(p) * Int(ii / Abs(p)))
-                If Abs(sp) >= Abs(p) Then sp = sp - sp
+                sp = Abs(ii - Abs(P) * Int(ii / Abs(P)))
+                If Abs(sp) >= Abs(P) Then sp = sp - sp
                 item(v) = sp
             Case Else
                 WrongOperator
@@ -475,63 +475,63 @@ Do While v <= Me.UpperMonoLimit
     ElseIf (n < 8) Or (n = 11) Or (n = 17) Or (n = 14) Then
         Select Case ss$
             Case "="
-                actualData(v) = p
+                actualData(v) = P
                 GoTo conthere
             Case "+="
-                actualData(v) = actualData(v) + p
+                actualData(v) = actualData(v) + P
             Case "*="
-                actualData(v) = p * actualData(v)
+                actualData(v) = P * actualData(v)
             Case "-="
-                actualData(v) = actualData(v) - p
+                actualData(v) = actualData(v) - P
             Case "/="
-                If p = 0 Then DevZero: Exit Do
-                 actualData(v) = actualData(v) / p
+                If P = 0 Then DevZero: Exit Do
+                 actualData(v) = actualData(v) / P
             Case "DIV", "ΔΙΑ"
-                If p = 0 Then
+                If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                actualData(v) = Fix(actualData(v) / p)
+                actualData(v) = Fix(actualData(v) / P)
             Case "DIV#", "ΔΙΑ#"
-                If p = 0 Then
+                If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                If p < 0 Then
-                    actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))) / p)
+                If P < 0 Then
+                    actualData(v) = Int((actualData(v) - Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))) / P)
                 Else
-                    actualData(v) = Int(actualData(v) / p)
+                    actualData(v) = Int(actualData(v) / P)
                 End If
             Case "MOD", "ΥΠΟΛ", "ΥΠΟΛΟΙΠΟ"
-                If p = 0 Then
+                If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = actualData(v) - Fix(actualData(v) / p) * p
-                If Abs(sp) >= Abs(p) Then sp = sp - sp
+                sp = actualData(v) - Fix(actualData(v) / P) * P
+                If Abs(sp) >= Abs(P) Then sp = sp - sp
                 actualData(v) = sp
              Case "MOD#", "ΥΠΟΛ#", "ΥΠΟΛΟΙΠΟ#"
-                 If p = 0 Then
+                 If P = 0 Then
                     DevZero
                     Exit Do
                 End If
-                sp = Abs(actualData(v) - Abs(p) * Int(actualData(v) / Abs(p)))
-                If Abs(sp) >= Abs(p) Then sp = sp - sp
+                sp = Abs(actualData(v) - Abs(P) * Int(actualData(v) / Abs(P)))
+                If Abs(sp) >= Abs(P) Then sp = sp - sp
                 actualData(v) = sp
             Case Else
                 WrongOperator
                 Exit Do
             End Select
         ElseIf n = vbString Then
-            If MemInt(VarPtr(p)) <> vbString Then
-                p = fixthis(p)
+            If MemInt(VarPtr(P)) <> vbString Then
+                P = fixthis(P)
             End If
             Select Case ss$
                 Case "="
-                    actualData(v) = p
+                    actualData(v) = P
                     GoTo conthere
                 Case "+="
-                    actualData(v) = actualData(v) + p
+                    actualData(v) = actualData(v) + P
             End Select
         End If
     If rd Then If n = vbDouble Then actualData(v) = MyRound(actualData(v), 13)
@@ -646,7 +646,7 @@ Private Sub Make1dArrayIntoNdArray(addr_out As Long)
     MemLong(addr_out + 8&) = pSaNew
 End Sub
 
-Public Sub Neg(v As Long)
+Public Sub neg(v As Long)
 Select Case VarType(itemnumeric(v))
 Case vbBoolean
     item(v) = Not CBool(itemnumeric(v))
@@ -669,9 +669,9 @@ Case Else
     item(v) = CDbl(Not CBool(itemnumeric(v)))
 End Select
 End Sub
-Public Function PlaceValue2UDTArray(ByVal p As Long, Name$, v, index As Long) As Boolean
+Public Function PlaceValue2UDTArray(ByVal P As Long, Name$, v, index As Long) As Boolean
 On Error Resume Next
-Module10.PlaceValue2UDTArray actualData(p), Name$, v, index
+Module10.PlaceValue2UDTArray actualData(P), Name$, v, index
 
 If Err Then
     MyEr Err.Description, Err.Description
@@ -680,9 +680,9 @@ If Err Then
 End If
 PlaceValue2UDTArray = True
 End Function
-Public Function PlaceValue2UDT(ByVal p As Long, Name$, v) As Boolean
+Public Function PlaceValue2UDT(ByVal P As Long, Name$, v) As Boolean
 On Error Resume Next
-Module10.PlaceValue2UDT actualData(p), Name$, v
+Module10.PlaceValue2UDT actualData(P), Name$, v
 If Err Then
     MyEr Err.Description, Err.Description
     Err.Clear
@@ -690,12 +690,12 @@ If Err Then
 End If
 PlaceValue2UDT = True
 End Function
-Public Function GetUDTValue(p As Long, Name$, Optional nDx)
+Public Function GetUDTValue(P As Long, Name$, Optional nDx)
 On Error Resume Next
 If IsMissing(nDx) Then
-GetUDTValue = Module10.GetUDTValue(actualData(p), Name$)
+GetUDTValue = Module10.GetUDTValue(actualData(P), Name$)
 Else
-GetUDTValue = Module10.GetUDTValueArray(actualData(p), Name$, CLng(nDx))
+GetUDTValue = Module10.GetUDTValueArray(actualData(P), Name$, CLng(nDx))
 End If
 End Function
 Property Get Value() As Variant
@@ -721,9 +721,11 @@ Else
                     Value = actualData(index)
                 ElseIf VarType(actualData(index)) = 20 Then
                 ' MEMLONG(MEMLONG(VARPTR(ACTUALDATA)+8)+12)
+                    If myVarArrType(actualData, vbLongLong) Then
                     MemCopy VarPtr(Value) + 8, MemLong(MemLong(VarPtr(actualData) + 8) + 12) + index * 8, 8
-                   
-                   ' CopyMemory ByVal VarPtr(Value) + 8, ByVal VarPtr(actualData(index)) + 8, 8
+                    Else
+                    CopyMemory ByVal VarPtr(Value) + 8, ByVal VarPtr(actualData(index)) + 8, 8
+                    End If
                     PutMem2 VarPtr(Value), 20
                 Else
                     Value = actualData(index)
@@ -1086,11 +1088,11 @@ Make1dArrayIntoNdArray VarPtr(VariantArray)
 End If
 End Sub
 Friend Sub ExportAndDestroy(addr_v As Long)
-    Dim rA As refArray, p
+    Dim rA As refArray, P
     If Count = 0 Then
     actualData = LibMemory.EmptyArray(1, MyTypeToBe)
     MemCopy addr_v, VarPtr(actualData), 16
-    MemCopy VarPtr(actualData), VarPtr(p), 16
+    MemCopy VarPtr(actualData), VarPtr(P), 16
     
     Else
     If MyIsObject(actualData) Then
@@ -1099,7 +1101,7 @@ Friend Sub ExportAndDestroy(addr_v As Long)
     End If
     Make1dArrayIntoNdArray VarPtr(actualData)
     MemCopy addr_v, VarPtr(actualData), 16
-    MemCopy VarPtr(actualData), VarPtr(p), 16
+    MemCopy VarPtr(actualData), VarPtr(P), 16
     End If
     
 End Sub
@@ -1927,11 +1929,11 @@ Friend Sub CopyVariantArray(ByRef a As Variant, ByRef b As Variant)
     CopyMemory ByVal VarPtr(a), ByVal VarPtr(b), 16
 End Sub
 Public Sub SwapItem(curitem As Long, thisvariant)
-Static p
+Static P
 If myVarType(actualData, vbObject) Then
-p = actualData(curitem)
+P = actualData(curitem)
 actualData(curitem) = thisvariant
-thisvariant = p
+thisvariant = P
 Else
 SwapVariant actualData(curitem), thisvariant
 End If
@@ -2012,9 +2014,9 @@ End If
         If usehandler.objref.IsObj Then
             ItemType = Typename(usehandler.objref.ValueObj)
         Else
-            Dim p
-            p = usehandler.objref.Value
-            ItemType = VarTypeName(p)
+            Dim P
+            P = usehandler.objref.Value
+            ItemType = VarTypeName(P)
         End If
     Else
         ItemType = Typename(usehandler)
@@ -2054,9 +2056,9 @@ End If
         If usehandler.objref.IsObj Then
             ItemTypeNum = 9
         Else
-            Dim p
-            p = usehandler.objref.Value
-            ItemTypeNum = MemInt(VarPtr(p))
+            Dim P
+            P = usehandler.objref.Value
+            ItemTypeNum = MemInt(VarPtr(P))
         End If
     Else
         ItemTypeNum = 9
@@ -2100,9 +2102,11 @@ If arr Then
                         item = actualData(curitem)
                     End If
                 ElseIf VarType(actualData(curitem)) = 20 Then
-                    MemCopy VarPtr(item) + 8, MemLong(MemLong(VarPtr(actualData) + 8) + 12) + curitem * 8, 8
-                   
-                 '   CopyMemory ByVal VarPtr(item) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
+                    If myVarArrType(actualData, vbLongLong) Then
+                        MemCopy VarPtr(item) + 8, MemLong(MemLong(VarPtr(actualData) + 8) + 12) + curitem * 8, 8
+                    Else
+                        CopyMemory ByVal VarPtr(item) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
+                    End If
                     PutMem2 VarPtr(item), 20
                 Else
                     item = actualData(curitem)
@@ -2603,7 +2607,7 @@ If arr Then
                 If myVarType(actualData, vbObject) Then
                     peekvalue = actualData(curitem)
                 ElseIf VarType(actualData(curitem)) = 20 Then
-                
+                    
                     CopyMemory ByVal VarPtr(peekvalue) + 8, ByVal VarPtr(actualData(curitem)) + 8, 8
                     PutMem2 VarPtr(peekvalue), 20
                 Else
@@ -2640,7 +2644,7 @@ End If
 End If
 there1:
 End Function
-Function IsEnum(p As Variant) As Boolean
+Function IsEnum(P As Variant) As Boolean
 Dim usehandler As mHandler
 If index >= 0 And index <= maxitems1 Then
 If IsObject(actualData(index)) Then
@@ -2649,16 +2653,16 @@ If Typename(actualData(index)) = mHdlr Then
     IsEnum = usehandler.t1 = 4
      If IsEnum Then
         If myVarType(usehandler.index_cursor, vbString) Then
-            p = usehandler.index_cursor
+            P = usehandler.index_cursor
         Else
-            p = usehandler.index_cursor * usehandler.sign
+            P = usehandler.index_cursor * usehandler.sign
         End If
      End If
 End If
 End If
 End If
 End Function
-Function IsEnum2(curitem As Long, p As Variant) As Boolean
+Function IsEnum2(curitem As Long, P As Variant) As Boolean
 Dim usehandler As mHandler
 If curitem >= 0 And curitem <= maxitems1 Then
 If IsObject(actualData(curitem)) Then
@@ -2667,9 +2671,9 @@ If Typename(actualData(curitem)) = mHdlr Then
     IsEnum2 = usehandler.t1 = 4
      If IsEnum2 Then
         If myVarType(usehandler.index_cursor, vbString) Then
-            p = usehandler.index_cursor
+            P = usehandler.index_cursor
         Else
-            p = usehandler.index_cursor * usehandler.sign
+            P = usehandler.index_cursor * usehandler.sign
         End If
      End If
 End If
@@ -3576,16 +3580,16 @@ End Property
 
 Private Function iBoxArray_bareteamgroup() As Object
 '
-Dim p
+Dim P
 If Me.GroupRef Is Nothing Then
-Set p = NullGroup
-If Not p.GroupName = "NULL" Then
-p.BeginFloat 2
+Set P = NullGroup
+If Not P.GroupName = "NULL" Then
+P.BeginFloat 2
 NullGroup.GroupName = "NULL"
 NullGroup.PutIs = "NULL"
 NullGroup.PutIs = "ΜΗΔΕΝΙΚΟΣ"
 End If
-Set iBoxArray_bareteamgroup = MakeGroupPointerObj(Basestack1, p)
+Set iBoxArray_bareteamgroup = MakeGroupPointerObj(Basestack1, P)
 Else
 CopyGroupObj Me.GroupRef, iBoxArray_bareteamgroup, True
 
@@ -3668,11 +3672,11 @@ Private Sub iBoxArray_GetPorp(aProp As PropReference, curitem As Long)
     GetPorp aProp, curitem
 End Sub
 
-Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional nDx As Variant) As Variant
+Private Function iBoxArray_GetUDTValue(ByVal P As Long, Name As String, Optional nDx As Variant) As Variant
 If IsMissing(nDx) Then
-    iBoxArray_GetUDTValue = GetUDTValue(p, Name)
+    iBoxArray_GetUDTValue = GetUDTValue(P, Name)
 Else
-    iBoxArray_GetUDTValue = GetUDTValue(p, Name, nDx)
+    iBoxArray_GetUDTValue = GetUDTValue(P, Name, nDx)
 End If
 End Function
 
@@ -3704,12 +3708,12 @@ Private Property Get iBoxArray_IsEmpty() As Variant
     iBoxArray_IsEmpty = IsEmpty
 End Property
 
-Private Function iBoxArray_IsEnum(p As Variant) As Boolean
-    iBoxArray_IsEnum = IsEnum(p)
+Private Function iBoxArray_IsEnum(P As Variant) As Boolean
+    iBoxArray_IsEnum = IsEnum(P)
 End Function
 
-Private Function iBoxArray_IsEnum2(curitem As Long, p As Variant) As Boolean
-iBoxArray_IsEnum2 = IsEnum2(curitem, p)
+Private Function iBoxArray_IsEnum2(curitem As Long, P As Variant) As Boolean
+iBoxArray_IsEnum2 = IsEnum2(curitem, P)
 End Function
 
 Private Function iBoxArray_IsObj() As Boolean
@@ -3787,16 +3791,16 @@ Private Property Get iBoxArray_MyTypeToBe() As Integer
 End Property
 
 Private Sub iBoxArray_Neg(v As Long)
-    Neg v
+    neg v
 End Sub
 
-Private Function iBoxArray_PlaceValue2UDT(p As Long, Name As String, v As Variant) As Boolean
-iBoxArray_PlaceValue2UDT = PlaceValue2UDT(p, Name, v)
+Private Function iBoxArray_PlaceValue2UDT(P As Long, Name As String, v As Variant) As Boolean
+iBoxArray_PlaceValue2UDT = PlaceValue2UDT(P, Name, v)
 End Function
 
 
-Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As Variant, index As Long) As Boolean
-iBoxArray_PlaceValue2UDTArray = PlaceValue2UDTArray(p, Name, v, index)
+Private Function iBoxArray_PlaceValue2UDTArray(P As Long, Name As String, v As Variant, index As Long) As Boolean
+iBoxArray_PlaceValue2UDTArray = PlaceValue2UDTArray(P, Name, v, index)
 End Function
 
 Private Sub iBoxArray_processAppend(M As Object)

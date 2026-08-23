@@ -57,7 +57,7 @@ Dim v(), HRes As Long, i As Long
         stdCallW = vbEmpty
  End If
 End Function
-Public Function Fast_stdCallW(ByVal Addr As Long, ByVal RetType As Variant, P() As Variant, j As Long)
+Public Function Fast_stdCallW(ByVal addr As Long, ByVal RetType As Variant, P() As Variant, j As Long)
 Dim v(), HRes As Long, i As Long
  
   v = P 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -73,16 +73,23 @@ Dim v(), HRes As Long, i As Long
     
   Next i
 
-  HRes = DispCallFunc(0, Addr, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_stdCallW)
+  HRes = DispCallFunc(0, addr, CC_STDCALL, CInt(RetType), j, vType(0), vPtr(0), Fast_stdCallW)
   If HRes Then Err.Raise HRes
 
  If VarType(Fast_stdCallW) = vbNull Then
     Fast_stdCallW = vbEmpty
  End If
 End Function
+Public Function CastObject(Varobj, enumpad As Enumeration, retobj As Object) As Boolean
+Dim v(2), obj As Object
+Set obj = Varobj
+v(0) = enumpad.GuidAddr
+v(1) = VarPtr(retobj)
+    CastObject = Fast_obj_stdCallW(obj, 0&, vbLong, v, 2) = 0
+End Function
+
 Public Function Fast_obj_stdCallW(obj As stdole.IUnknown, ByVal addroffset As Long, ByVal RetType As Variant, P() As Variant, j As Long)
 Dim v(), HRes As Long, i As Long
- 
   v = P 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
   For i = 0 To j - 1 ''UBound(V)
     If VarType(P(i)) = vbString Then
@@ -124,7 +131,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
   End If
 End Function
 
-Public Function Fast_cdeclCallW(ByVal Addr, ByVal RetType As Variant, P() As Variant, j As Long)
+Public Function Fast_cdeclCallW(ByVal addr, ByVal RetType As Variant, P() As Variant, j As Long)
 Dim i As Long, pFunc As Long, v(), HRes As Long
  
   v = P 'make a copy of the params, to prevent problems with VT_Byref-Members in the ParamArray
@@ -134,7 +141,7 @@ Dim i As Long, pFunc As Long, v(), HRes As Long
     vPtr(i) = VarPtr(v(i))
   Next i
 
-  HRes = DispCallFunc(0, Addr, CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), Fast_cdeclCallW)
+  HRes = DispCallFunc(0, addr, CC_CDECL, CInt(RetType), j, vType(0), vPtr(0), Fast_cdeclCallW)
 
   If HRes Then Err.Raise HRes
   If VarType(Fast_cdeclCallW) = vbNull Then

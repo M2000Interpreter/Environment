@@ -5826,7 +5826,7 @@ If Module(Info) Then
 	Title "Info"
 end if
 }
-MODULE INFOBASIC { \Italic 0
+MODULE INFOBASIC {  \Italic 0
 Bold 1
 if val(piece$(os$+" 1"," ")(1))>9 then
 	Font "Segoe UI"
@@ -54367,10 +54367,10 @@ MODULE SNAKE2 {MODULE SNAKE_AND_LADDER {
 	NORMAL
 	IF PLAYER1=101 THEN	
 		MOVE SCALE.X/2, SCALE.Y/2
-		LEGEND "PLAYER WIN","ARIAL", HH/10,0,2 
+		PEN #CCAAFF {LEGEND "PLAYER WIN","ARIAL", HH/10,0,2} 
 	ELSE.IF COMPUTER=101 THEN	
 		MOVE SCALE.X/2, SCALE.Y/2
-		LEGEND "COMPUTER WIN","ARIAL", HH/10,0,2 
+		PEN #FFAACC {LEGEND "COMPUTER WIN","ARIAL", HH/10,0,2} 
 	ELSE
 		WHILE KEYPRESS(27) {WAIT 10}
 	END IF
@@ -55170,6 +55170,7 @@ module babylonian_spiral (max=40) {
 			circle fill 1, 30
 		end while
 	} as drw
+	move 0,0
 	image drw
 	clipboard drw as "emf"
 	document doc$
@@ -55237,5 +55238,130 @@ module chekcit {
 	' ["ahwiueshaiu","ajxxfioaaf","ajrdsfroiwr"] = [2:5:"awies",1:5:"ajfio",0:9:"ajrdsfoiw"]
 }
 chekcit
+}
+MODULE INTERFACE2 {Rem title "object works"
+peekLong=lambda -> {
+	buffer ptr as long 'used only for peekInt32
+	=lambda ptr ->ptr=>peekInt32(number)
+}() 'execute now
+declare CLSIDFromString Lib "ole32.CLSIDFromString" {lpszCLSID$, Long Clsid}
+buffer clsid as byte*16 ' clsid(0) is address of first byte
+call CLSIDFromString("{00020400-0000-0000-c000-000000000046}", clsid(0))
+dictionary=getobject("","scripting.dictionary")
+hex "type:";type(dictionary), "Address of pointer holder: ";varptr(dictionary)
+long ObjPtr=PeekLong(varptr(dictionary))
+hex "Address of Object: "; Objptr
+Long Vtable=PeekLong(ObjPtr)
+hex "Address of Vtable: "; Vtable
+Queryinterface=PeekLong(Vtable)
+hex "Address of Queryinterface function: "; Queryinterface
+S_OK=0&
+' now we make the function
+declare dictionary.Queryinterface code Queryinterface {
+	long ObjPtr, ' need a valid pointer
+	long riid,   ' need address of first byte of 16 bytes 
+	long &myptr  ' return object if we get S_OK 
+} as long
+object ret
+If dictionary.queryinterface(ObjPtr, clsid(0), &ret)=S_OK then
+	Print type$(ret)="Dictionary"
+end if
+interface IUnknown, "{00000000-0000-0000-C000-000000000046}" {
+	QueryInterface : {long riid,long &myptr}
+	AddRef
+	Release
+}
+object ret2, emptyobject
+? type(ret2)="Nothing"
+ret2=emptyobject ' same type is ok
+Print IUnknown.QueryInterface(dictionary, clsid(0), &ret2)=S_OK
+Print type$(ret2)="Dictionary"
+try {ret2=emptyobject} Print Error$  ' Wrong Object Type
+declare ret2 nothing ' you have to use this
+? type(ret2)="Nothing"
+Print IUnknown.QueryInterface(dictionary, clsid(0), &ret2)=S_OK
+? type(ret2)="Dictionary"
+
+Report  {Play with Dictionary
+We can put a long long but not as key.
+}
+
+ret2("George")=345_67890_12345_67879&&:  Print "Key George value 1000"
+ret2("Boss")="Other": Print "Key Boss value Other"
+ret2(100&)="ok": Print "Key 100 Value ok"
+ret2(101)=871297391279983798713212973897189371287378127u
+let array1()=array(ret2=>items)
+let array2()=array(ret2=>keys)
+for i=0 to len(array1())-1:Print (i, "key:"+array2(i),"value:"+array1(i))#str$(", "): next
+Method ret2, "_NewEnum" as key  ' we cant use key=ret2=>_NewEnum because _ can't be first letter.
+while key
+	print  eval(key), @(10),":", @(12), ret2(eval(key)), type(ret2(eval(key)))
+end while
+}
+MODULE ACTOR {' from https://rosettacode.org/wiki/Window_management#M2000_Interpreter
+Module WindowManagment{
+	Declare Form1 Form
+	Print "Watch the Window Drama. A Window (user form) as an actor..."
+	With Form1, "UseIcon", True, "UseReverse", True
+	With Form1, "Title" As Caption$, "Visible" As Visible,"TitleHeight" As tHeight
+	With Form1, "Sizable", True, "Height" as WHeight, "Width" as WWidth
+	Print "First Window Caption: ";Caption$
+	Print "Title Height: ";tHeight
+	Print "Window Width: ";WWidth
+	Print "Window Height: ";WHeight
+	NotNow=true
+	Function Form1.Unload {
+	      Read New &Ok
+	      if NotNow Else visible=false
+	      Ok=true
+	}
+	Caption$="Window Managment"
+	Print "Show - no modal"
+	Method Form1,"Show"   ' , 1 for modal opening
+	Wait 3000
+	Print "Show on TaskBar also"
+	Method Form1,"ShowTaskBar"
+	Wait 5000 ' 10 second
+	Print "Minimize Window"
+	Method form1,"Minimize"
+	Wait 2000
+	Print "Show again"
+	Method Form1, "Show"
+	Wait 3000
+	Print "Maximize Window"
+	Method Form1, "Maximize", true as res
+	print res
+	Wait 5000
+	Print "Restore to normal"
+	Method Form1, "Maximize", false as res
+	print res
+	Wait 5000
+	Print "Move Window to 0,0"
+	Method Form1, "Show"
+	Method Form1, "move", 0,0 ', 6000, Wheight*2
+	Wait 5000
+	Print "Resize Window"
+	NotNow=false
+	Method Form1, "move", 0,0 , WWidth*1.5, Wheight*2
+	Print "Click Unload (is a fake unload)"
+	profiler ' hires timer
+	do
+		Wait 10
+	Until timecount>5000 or not visible
+	visible=false
+	Wait 3000
+	Print "Modal view - Wait user to close window - you can use Ctrl+F4 or click the square area at the conrer"
+	Print "Click Unload - isn't fake now"
+	' We have an event to stop unloading
+	' Modal show just release inner loop when we press unload
+	Method Form1,"Show", 1 'for modal opening
+	wait 5000
+	' to prove it lets show window again
+	print "ho ho ho - last time...Click Unload"
+	Method Form1,"Show", 1 'for modal opening
+	' So here we unload the Form1 by software
+	Declare Form1 Nothing
+}
+WindowManagment
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

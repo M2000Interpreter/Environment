@@ -78,12 +78,12 @@ Public Function GetInterface(myobject As stdole.IUnknown, ByRef retobject As std
     GetInterface = True
 End Function
 
-Public Sub CallThis(ByVal vNewValue As String, ParamList As String, Lang As Long, Optional ByVal address As Long = 0)
+Public Sub CallThis(ByVal vNewValue As String, ParamList As String, Lang As Long, Optional ByVal Address As Long = 0)
 Dim l As Long, check$, M As Long
 If vNewValue = vbNullString Then
 mLib = vbNullString
 mFunction = vbNullString
-CallAddr = address
+CallAddr = Address
 ElseIf Not Me.IsInterfaceCall Then
     l = InStr(vNewValue, ".")
     If l <> 0 Then
@@ -231,18 +231,20 @@ End If
 End Sub
 Public Function GetAddress() As Long
 If IsInterfaceCall Then
+    GetAddress = Funcoffset
+    Exit Function
     MyEr "Not for Interfaces", "Όχι για διεπαφές"
     Exit Function
-End If
-If Me.CallAddr = 0 Then
-If Left$(func, 1) = "#" Then
-    CallAddr = Fcall.GetFuncPtrOrd(LIB, func)
 Else
-    CallAddr = Fcall.GetFuncPtr(LIB, func)
+If Me.CallAddr = 0 Then
+    If Left$(func, 1) = "#" Then
+        CallAddr = Fcall.GetFuncPtrOrd(LIB, func)
+    Else
+        CallAddr = Fcall.GetFuncPtr(LIB, func)
     
-End If
+    End If
 End If
 
     GetAddress = CallAddr
-
+End If
 End Function

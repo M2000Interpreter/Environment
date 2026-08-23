@@ -156,6 +156,11 @@ passhere:
                 If myIsNull(pArgs(lngLoop)) Then
                     SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
                 ElseIf Not MyIsNumericPointer(pArgs(lngLoop)) Then
+                    If (fixnamearg + items - 1 - lngLoop) = 0 Then
+                        If MyIsObject(pArgs(lngLoop)) Then
+                            CallType = VbSet
+                        End If
+                        End If
                     If TypeOf pArgs(lngLoop) Is refArray Then
                         Dim rA As refArray
                         Set rA = pArgs(lngLoop)
@@ -172,6 +177,7 @@ passhere:
                         varArr2(fixnamearg + items - 1 - lngLoop) = pArgs(lngLoop).ExportToByte
                         VarByRef VarPtr(varArr(fixnamearg + items - 1 - lngLoop)), varArr2(fixnamearg + items - 1 - lngLoop)
                     Else
+
                         SwapVariant varArr(fixnamearg + items - 1 - lngLoop), pArgs(lngLoop)
                     End If
                 ElseIf VarType(pArgs(lngLoop)) = 8200 Then
@@ -211,6 +217,11 @@ passhere:
         ' Invoke method/property
         If LastErNum = 0 Then
             lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+            If lngRet <> 0 And CallType = VbSet Then
+            CallType = VbLet
+            lngRet = IDsp.Invoke(dispid, riid, 0, CallType, params, VarRet, Excep, lngArgErr)
+            
+            End If
          '   If lngRet = -2147352562 Then
          '       lngRet = IDsp.Invoke(dispid, riid, 0, 2, params, VarRet, Excep, lngArgErr)
          '   End If
