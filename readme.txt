@@ -1,7 +1,7 @@
 M2000 Interpreter and Environment
 Version 15 Revision 29
 
-August 24
+Athens, August 24, 2026
 
 ' The Bomb Situation, or you need a lifetime or more to understand how VB6 works
 ' I think this error can't be found from AI
@@ -28,7 +28,7 @@ if version<15 or (version=15 and revision<29) then "do not this - program hang":
 ' why ? old one hang? Who knows..
 ' how overcame this problem?
 ' This problem was for the ExtControl class (see ExtControl.cls), the real class behind external controls.
-' Type() didn't return RxtControl but go deeper and get the value property.
+' Type() didn't return ExtControl but go deeper and get the value property.
 ' This value property is the ctxninebutton (the usectxninebutton.ctl)
 ' So when we use Type(a) M2000 get the value of object and return ctxninebutton
 ' When we get the iUnkown interface, we get different Vbtable.
