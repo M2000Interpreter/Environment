@@ -41152,6 +41152,7 @@ zArray.SwapBuffers &z5   // swap data only
 print zArray.Ubound=0, z5.Ubound=9, z5(5).toString$="(3-75i)"
 }
 MODULE SPEEDTST {CLS,0
+? $("#.0000") 
 PRINT "SPEED TEST"
 PRINT "You can use Ctrl+C or Esc (not in Fast !)"
 MODULE TESTA {
@@ -41210,6 +41211,7 @@ TESTC
 TESTD
 	PRINT "LOOP 100000":REFRESH
 SET FAST
+? $("")
 }
 MODULE JENKINS {// https://en.wikipedia.org/wiki/Jenkins_hash_function
 rem {
