@@ -210,8 +210,8 @@ Public LastErName As String
 Public LastErNameGR As String
 Public LastErNum As Long
 Public LastErNum1 As Long, LastErNum2 As Long
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
 
 Type POINTAPI
         X As Long
@@ -305,7 +305,7 @@ Public Type target
     ' THIS IS POINTS AT CHARACTER RESOLUTION
     SZ As Single
     ' SO WE NEED SZ
-    Lx As Long
+    lX As Long
     lY As Long
     tx As Long
     ty As Long
@@ -13537,7 +13537,7 @@ With BoxTarget
 .comm = COM$
 .id = id&
 .Tag = Tag$
-.Lx = X&
+.lX = X&
 .lY = Y&
 .tx = xl& - 1
 .ty = yl&
@@ -13590,7 +13590,7 @@ If id& < 100 Then
     D.currentY = D.currentY + prive.Yt \ 2
     End If
     PlainBaSket D, prive, Tag$, True, True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
+    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
     End If
     End If
 Else
@@ -13622,7 +13622,7 @@ Else
     D.currentY = D.currentY + prive.Yt \ 2
     End If
     wwPlain2 DSTACK, prive, Tag$, xl& - X&, 10000, , True, f, , , True
-    LCTbasket D, prive, BoxTarget.lY, BoxTarget.Lx
+    LCTbasket D, prive, BoxTarget.lY, BoxTarget.lX
     End If
 End If
     
@@ -25132,6 +25132,9 @@ MissNumExpr
 End If
 
 If it = 1 Then
+    If once Then
+        p = block$(rest$)
+    End If
     FastSymbol rest$, "}", True
 ElseIf it = 2 Then
     If rest$ = "" Then
@@ -31126,7 +31129,7 @@ With j(i&)
 If .Enable And .layer = myl Then
 XX& = X \ .Xt
 YY& = Y \ .Yt
-If .Lx <= XX& And .tx >= XX& And .lY <= YY& And .ty >= YY& Then
+If .lX <= XX& And .tx >= XX& And .lY <= YY& And .ty >= YY& Then
 ScanTarget = i&
 Exit For
 End If
@@ -36194,6 +36197,9 @@ conthere:
             players(y1).mypentrans = z1
             TextColor Scr, x1
                 If it = 1 Then
+                If once Then
+                    p = block(rest$)
+                End If
                 FastSymbol rest$, "}", True
                 ElseIf it = 2 Then
                 If rest$ = "" Then

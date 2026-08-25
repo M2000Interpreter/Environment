@@ -41,16 +41,16 @@ Private Declare Function ShowCursor Lib "user32" (ByVal bShow As Long) As Long
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Private Declare Function timeGetTime1 Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Public Declare Function IsValidCodePage Lib "kernel32" (ByVal CodePage As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
-Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal addr As Long, RetVal As Long)
-Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal addr As Long, RetVal As Single)
-Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal addr As Long, RetVal As Double)
-Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Byte)
-Public Declare Sub PutMem2 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Integer)
-Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Long)
-Private Declare Sub PutMemS Lib "msvbvm60" Alias "PutMem4" (ByVal addr As Long, ByVal NewVal As Single)
-Private Declare Sub PutMem8 Lib "msvbvm60" (ByVal addr As Long, ByVal NewVal As Double)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
+Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal Addr As Long, retval As Single)
+Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal Addr As Long, retval As Double)
+Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
+Public Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
+Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
+Private Declare Sub PutMemS Lib "msvbvm60" Alias "PutMem4" (ByVal Addr As Long, ByVal NewVal As Single)
+Private Declare Sub PutMem8 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Double)
 Private Declare Function CopyBytes Lib "msvbvm60.dll" Alias "__vbaCopyBytes" (ByVal ByteLen As Long, ByVal Destination As Long, ByVal Source As Long) As Long
 Private Declare Function ObjSetAddRef Lib "msvbvm60.dll" Alias "__vbaObjSetAddref" (ByRef objDest As Object, ByVal pObject As Long) As Long
 Public Declare Function IsBadCodePtr Lib "kernel32" (ByVal lpfn As Long) As Long
@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 30
+Global Const Revision = 31
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -2876,7 +2876,7 @@ Pos = lenA + 2
 
 End Sub
 Function ChangeValuesMem(bstack As basetask, rest$, Lang As Long) As Boolean
-Dim aa As mHandler, ah As String, p As Variant, s$, addr As Long, pp As Variant, what$, r As Double
+Dim aa As mHandler, ah As String, p As Variant, s$, Addr As Long, pp As Variant, what$, r As Double
 Dim bb1 As MemBlock, w2 As Variant, rs As Single, itisSingle As Boolean, itisInt64 As Boolean, itisCur As Boolean
 Set aa = bstack.lastobj
 Set bstack.lastobj = Nothing
@@ -2961,7 +2961,7 @@ Set bb1 = aa.objref
                         
                           GoTo err30
                     End If
-                    addr = CLng(Fix(p))
+                    Addr = CLng(Fix(p))
                 
                     
                 Else
@@ -2980,13 +2980,13 @@ Set bb1 = aa.objref
                             s$ = p
                             GoTo q1239877
                         End If
-                        If addr = 0 Then
+                        If Addr = 0 Then
                             
                 
                             GoTo err30
                         Else
                                 ' this ia a part to poke some data to buffer
-                            If addr = 0 Then
+                            If Addr = 0 Then
                                 
                         
                                 GoTo err30
@@ -3022,38 +3022,38 @@ Set bb1 = aa.objref
                                 Select Case Abs(pp)
                                 Case 1
                                     ChangeValuesMem = True
-                                    PutMem1 addr, CByte(LowWord(signlong(p)) And &HFF)
+                                    PutMem1 Addr, CByte(LowWord(signlong(p)) And &HFF)
                                Case 2
-                                   If bb1.ValidArea(addr, 2) Then
+                                   If bb1.ValidArea(Addr, 2) Then
                                         ChangeValuesMem = True
-                                        PutMem2 addr, cUint(LowWord(signlong(p)))
+                                        PutMem2 Addr, cUint(LowWord(signlong(p)))
                                     Else
                                         GoTo err10
                                         
                                     End If
                                 Case 4
-                                    If bb1.ValidArea(addr, 4) Then
+                                    If bb1.ValidArea(Addr, 4) Then
                                         ChangeValuesMem = True
                                         If itisSingle Then
                                             rs = CSng(p)
-                                            PutMemS addr, rs
+                                            PutMemS Addr, rs
                                         Else
-                                            PutMem4 addr, signlong(p)
+                                            PutMem4 Addr, signlong(p)
                                         End If
                                     Else
                                         GoTo err10
                                         
                                    End If
                                 Case 8
-                                   If bb1.ValidArea(addr, 8) Then
+                                   If bb1.ValidArea(Addr, 8) Then
                                         ChangeValuesMem = True
                                         If itisCur Then
-                                        MemCur(addr) = CCur(p)
+                                        MemCur(Addr) = CCur(p)
                                         ElseIf itisInt64 Or pp < 0 Then
                                         p = cInt64(p)
-                                        CopyMemory ByVal addr, ByVal VarPtr(p) + 8, 8
+                                        CopyMemory ByVal Addr, ByVal VarPtr(p) + 8, 8
                                         Else
-                                        PutMem8 addr, p
+                                        PutMem8 Addr, p
                                         End If
                                    Else
                                         GoTo err10
@@ -3087,7 +3087,7 @@ q1239877:
                             GoTo there
                             
                         Else
-                                If addr = 0 Then
+                                If Addr = 0 Then
                                     
                                     GoTo err30
                                 Else
@@ -3095,15 +3095,15 @@ q1239877:
                             Err.Clear
                             On Error Resume Next
                           If pp < 0 Or bb1.WhatIsBasicItem = vbString Then
-                          If bb1.ValidArea(addr, 4) Then
+                          If bb1.ValidArea(Addr, 4) Then
                           ChangeValuesMem = True
-                            PutMem4 addr, CLng(bb1.PutStringAtOffset(addr, s$))
+                            PutMem4 Addr, CLng(bb1.PutStringAtOffset(Addr, s$))
                           End If
                           Else
                       
-                           If bb1.ValidArea(addr, LenB(s$)) Then
+                           If bb1.ValidArea(Addr, LenB(s$)) Then
                            ChangeValuesMem = True
-                           CopyBytes LenB(s$), addr, StrPtr(s$)
+                           CopyBytes LenB(s$), Addr, StrPtr(s$)
                      
                            Else
                             GoTo err10
@@ -9254,7 +9254,7 @@ fun10: ' "INKEY(", "емйол(" ok
     Exit Function
 fun11: ' "тлгла(", "MODULE("
     If FastSymbol(a$, ")") Then
-        r = uintnew1(addr(AddressOf Module2.ExtCall))
+        r = uintnew1(Addr(AddressOf Module2.ExtCall))
         IsNumberNew = True
     Else
         MakeThisSub1 bstack, a$
@@ -26444,7 +26444,7 @@ prive = players(GetCode(D))
 With tar
 id& = .id
 Tag$ = .Tag
-X& = .Lx
+X& = .lX
 Y& = .lY
 xl& = .tx + 1
 yl& = .ty
@@ -51508,8 +51508,11 @@ Process:
                                 ElseIf i = 51 Then
                                     DropMarkSel bstack
                                     ExecuteLong = 1
-                                    'once = True
-                                    exeSelect = False
+                                    If once And Len(b$) = 0 Then
+                                        exeSelect = True ' IS EXIT
+                                    Else
+                                        exeSelect = False
+                                    End If
                                     Exit Function
                                 ElseIf i = 100 Then ' we have a case
                                         If NOEXECUTION Then
@@ -51935,7 +51938,11 @@ again1123:
                                 If i = 51 Then
                                     DropMarkSel bstack
                                     ExecuteLong = 1
-                                    exeSelect = False
+                                    If once And Len(b$) = 0 Then
+                                        exeSelect = True ' IS EXIT
+                                    Else
+                                        exeSelect = False
+                                    End If
                                     Exit Function
                                 ElseIf i = 50 Then
                                     ExecuteLong = 1
@@ -53184,11 +53191,11 @@ Sub StaticWork(basestack As basetask, mystack As basetask, ByVal where$)
         If MyIsObject(vvv) Then Set mystack.StaticCollection = vvv
     End If
 End Sub
-Private Function addr(ByVal p As Long) As Long
+Private Function Addr(ByVal p As Long) As Long
     'If m_bInIDE Then
     '    addr = CLNG(add32(uintnew1(p), 12@))
     'Else
-        addr = p
+        Addr = p
     'End If
 End Function
 
