@@ -1,14 +1,19 @@
 VERSION 5.00
 Begin VB.Form Form1 
+   BorderStyle     =   1  'Fixed Single
    Caption         =   "Form1"
    ClientHeight    =   3030
-   ClientLeft      =   120
-   ClientTop       =   450
+   ClientLeft      =   105
+   ClientTop       =   435
    ClientWidth     =   4560
+   Icon            =   "testme.frx":0000
    LinkTopic       =   "Form1"
+   MaxButton       =   0   'False
+   MinButton       =   0   'False
    ScaleHeight     =   3030
    ScaleWidth      =   4560
    StartUpPosition =   3  'Windows Default
+   Visible         =   0   'False
    Begin VB.CommandButton Command1 
       Caption         =   "Command1"
       Height          =   720
@@ -23,7 +28,22 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Private Sub Command1_Click()
 Dim m As New M2000.callback
-Debug.Print m.Eval("100")
+Form1.Visible = False
+m.Reset
+m.ShowGui = True
+m.Show
+m.Run "cls 5,0:pen 14:form 80,32:dir appdir$:load {info}", False
+m.Cli ""
+Debug.Print m.Eval("Error$")
+
+'m.Run " cls 5: pen 14"
+'m.Run "module alfa {show:print {ok}:}:alfa"
+'m.Run "push ask({ok...},{M2000}):drop"
+m.Hide
+m.ShowGui = False
+Form1.Visible = True
+m.Shutdown 0
 End Sub

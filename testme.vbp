@@ -1,11 +1,13 @@
 Type=Exe
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\Windows\system32\stdole2.tlb#OLE Automation
-Reference=*\G{778FACA7-C845-4169-9E9D-A67B895D2D82}#1.0#0#m2000.exe#M2000
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
+Reference=*\G{9999EB60-9FA6-4153-9E88-9CAC6F6983FB}#1.0#0#M2000.dll#M2000
+Module=Module1; testmodule.bas
 Form=testme.frm
 IconForm="Form1"
-Startup="Form1"
+Startup="Sub Main"
 HelpFile=""
 Title="testme"
+ExeName32="testme.exe"
 Command32=""
 Name="Project1"
 HelpContextID="0"
@@ -31,3 +33,6 @@ Unattended=0
 Retained=0
 ThreadPerObject=0
 MaxNumberOfThreads=1
+
+[VBCompiler]
+LinkSwitches=/STACK:32180000

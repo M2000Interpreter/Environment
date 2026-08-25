@@ -1,41 +1,76 @@
 M2000 Interpreter and Environment
-Version 15 Revision 29
+Version 15 Revision 30
 
-Athens, August 24, 2026
+Athens, August 25, 2026
 
-' The Bomb Situation, or you need a lifetime or more to understand how VB6 works
-' I think this error can't be found from AI
+1. FIX #HAVE(), #NOTHAVE() AND #POS() FOR ARRAYS AND LISTS/QUEUES (WHICH ARE ARRAYS WITH HASH TABLE FOR KEYS)
+	' QUEUE CAN GET SAME KEYS
+	' KEYS ARE VALUES IF WE DIDN'T PROVIDE VALUES
+	A=QUEUE:="2":=100,"3","3","4","3","1","1":="VALUE","2"
+	' USING APPEND WE CAN APPEND MORE SAME KEYS OR KEY/VALUES
+	APPEND A,"2":=500,"3":=1000
+	' SERIAL SEARCH  - THIS FIXED
+	PRINT A#POS(5->"2","3")=8
+	FINDTHIS(A, "2")
+	
+	' SORTING QUEUE LIST KEEP THE ORDER OF SAME KEYS.
+	' USE INSERTION SORT ' WE CAN CHANGE IT ALTERING PROPERTY STABLE
+	' LIST USE QUICKSORT
+	B=A=>COPY() ' COPY OF QUEUE
+	PRINT B=>ISQUEUE = TRUE
+	PRINT B=>STABLE = TRUE
+	PRINT COPY.ARR(B!)#STR$(",") 'KEYS
+	PRINT COPY.ARR(B)#STR$(",") 'VALUES
+	
+	SORT A AS NUMBER
+	PRINT "A STABLE SORT"
+	PRINT COPY.ARR(A!)#STR$(",")
+	FINDTHIS(A, "2")
+	B=>STABLE=FALSE
+	SORT B AS NUMBER
+	PRINT "B NOT STABLE SORT"
+	PRINT COPY.ARR(B!)#STR$(",")
+	FINDTHIS(B, "2")
+	
+	
+	
+	SUB FINDTHIS(A AS QUEUE, S AS STRING)
+		' USING HASH FUNCTION
+		IF EXIST(A, S) THEN
+			PRINT "SEARCH FOR "+S
+			' USING HASH FUNCTION
+			' SAME KEYS ARE IN SAME LINKED LIST	
+			LOCAL TIMES=EXIST(A, S, 0), I
+			FOR I=1 TO TIMES
+				' VERY FAST HASH FOR FIRST ITEM AND
+				' SERIAL SEARCH FOR KEYS WITH SAME HASH
+				IF EXIST(A, S, I) THEN
+					PRINT "POSITION:";EVAL(A!), "VALUE:";EVAL(A)
+				END IF 
+			NEXT
+		END IF
+	END SUB
+2. FIX ASM2 EXAMPLE IN INFO FILE (USING GEMINI AI)
+2.1 A FAULT USE OF STACK CORRUPTED IT. NOW IS OK.
+2.2 NOW THE EXE PROGRAM CLOSED NICE, BECAUSE PROCESS THE DESTROY MESSAGE IN WINDOWPROC.
 
-Cast =lambda (that$)->{
-	Interface that, that$ {dummy}
-	=lambda that (t as *that)->t
-}
-get_iUnknown = Cast("{00000000-0000-0000-C000-000000000046}")
-' buffer object has functions to read memory everywhere;
-' (checking for bad address first)
-buffer inspect as long
+3. FIX THE M2000.DLL SO WE CAN OPEN THE M2000 INTERPRETER WITH MINIMUM CODE:
+' THIS IS FOR VB6 BUT WORK WITH OTHER LANGUAGES TOO
+' NEED A REFERENCE TO M2000.DLL
+Sub Main()
+    Dim m As New M2000.callback
+    m.Reset
+    m.ShowGui = True
+    m.Show  ' WE CAN USE LOAD {OURPROGRAM}, (THISKEY)  TO DECRYPT AT LOADING.
+    m.Run "cls 5,0:pen 14:form 80,32:dir appdir$:load {info}", False
+    m.Cli "" ' SO NOW OPEN THE IMMEDIATE MODE - NOT NEED FOR A PROGRAM
+    m.Hide
+    m.ShowGui = False
+    m.Shutdown 0
+End Sub
 
-declare form1 form
-declare a type "ctxninebutton" form form1
-testme = get_iUnknown(a)
-? "These have different VTables"
-vtable_a=inspect=>peekint32(varptr(a))
-vtable_testme=inspect=>peekint32(varptr(testme))
-? "Same Objects: ";testme is a 
-? "Different VTables: "; vtable_a<>vtable_testme
-if version<15 or (version=15 and revision<29) then "do not this - program hang": exit
-? type(testme)
-' why ? old one hang? Who knows..
-' how overcame this problem?
-' This problem was for the ExtControl class (see ExtControl.cls), the real class behind external controls.
-' Type() didn't return ExtControl but go deeper and get the value property.
-' This value property is the ctxninebutton (the usectxninebutton.ctl)
-' So when we use Type(a) M2000 get the value of object and return ctxninebutton
-' When we get the iUnkown interface, we get different Vbtable.
-' That is not bad as idea, but for this control the use of value property hang the program.
-' The solution was to get the iDispatch interface and then use on that the value property. 
+USING M2000.EXE IS WAY BETTER, BUT THIS TINY CODE TO THE JOB FOR 98% OF PROGRAMS.
 
-declare form1 nothing
 
 
 George Karras, Kallithea Attikis, Greece.

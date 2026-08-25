@@ -61,9 +61,9 @@ NewVector.X = X
 NewVector.Y = Y
 NewVector.z = z
 End Function
-Public Function NewLineType(p1 As VecType, p2 As VecType) As LineType
-NewLineType.point1 = p1
-NewLineType.point2 = p2
+Public Function NewLineType(P1 As VecType, P2 As VecType) As LineType
+NewLineType.point1 = P1
+NewLineType.point2 = P2
 End Function
 Public Function NewSegType(o As VecType, af As VecType, AL As VecType, AU As VecType) As SegType
 NewSegType.Origin = o

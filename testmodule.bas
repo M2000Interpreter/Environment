@@ -1,0 +1,17 @@
+Attribute VB_Name = "Module1"
+Sub Main()
+Dim m As New M2000.callback
+m.Reset
+m.ShowGui = True
+m.Show
+m.Run "cls 5,0:pen 14:form 80,32:dir appdir$:load {info}", False
+m.Cli ""
+'Debug.Print m.Eval("Error$")
+'m.Run " cls 5: pen 14"
+'m.Run "module alfa {show:print {ok}:}:alfa"
+'m.Run "push ask({ok...},{M2000}):drop"
+m.Hide
+m.ShowGui = False
+m.Shutdown 0
+End Sub
+

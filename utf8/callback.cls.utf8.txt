@@ -364,41 +364,41 @@ If Not (Forms.Count > 5) Then Form1.Visible = False
 End If
 End If
 End Property
-Public Sub ExecuteStatement(ByVal Code$)
+Public Sub ExecuteStatement(ByVal code$)
 Dim what$, Pos As Long, func As Boolean, param$, drop$
-If IsLabelOnly(Code$, what$) > 4 Then
+If IsLabelOnly(code$, what$) > 4 Then
     func = True
 ElseIf what$ = vbNullString Then
     Exit Sub
-ElseIf LTrim$(Code$) = vbNullString Then
+ElseIf LTrim$(code$) = vbNullString Then
 ' one call
 Call Run(what$)
 Exit Sub
 End If
 Do
  Pos = 1
-  drop$ = aheadstatus(Code$, True, Pos)
-  If drop$ = vbNullString And Pos > Len(Code$) Then Exit Sub
+  drop$ = aheadstatus(code$, True, Pos)
+  If drop$ = vbNullString And Pos > Len(code$) Then Exit Sub
   If param$ <> "" Then
-  param$ = param$ + ", " + Left$(Code$, Pos - 1)
+  param$ = param$ + ", " + Left$(code$, Pos - 1)
   Else
-  param$ = Left$(Code$, Pos - 1)
+  param$ = Left$(code$, Pos - 1)
   End If
-  Code$ = Mid$(Code$, Pos)
-  Loop Until Not FastSymbol(Code$, ",")
+  code$ = Mid$(code$, Pos)
+  Loop Until Not FastSymbol(code$, ",")
   If func Then
   Call Run(what$ + " " + param$ + ")")
   Else
   Call Run(what$ + " " + param$)
   End If
 End Sub
-Public Function Eval(Code$) As Variant
+Public Function Eval(code$) As Variant
 Dim Pos As Long, p As Double, s As String, drop$
  Pos = 1
-  drop$ = aheadstatus(Code$, True, Pos)
-  If drop$ = vbNullString And Pos > Len(Code$) Then Exit Function
+  drop$ = aheadstatus(code$, True, Pos)
+  If drop$ = vbNullString And Pos > Len(code$) Then Exit Function
   If InStr(drop$, "N") Then
-  If IsExp(objref, Left$(Code$, Pos), p) Then
+  If IsExp(objref, Left$(code$, Pos), p) Then
   If Not objref.lastobj Is Nothing Then
   Set Eval = objref.lastobj
   
@@ -407,7 +407,7 @@ Dim Pos As Long, p As Double, s As String, drop$
    End If
   End If
   Else
-  If IsStrExp(objref, Left$(Code$, Pos), s$) Then
+  If IsStrExp(objref, Left$(code$, Pos), s$) Then
   If Not objref.lastobj Is Nothing Then
       Set Eval = objref.lastobj
   Else
@@ -417,11 +417,11 @@ Dim Pos As Long, p As Double, s As String, drop$
   End If
 Set objref.lastobj = Nothing
 End Function
-Public Sub AddExecCode(Code$)
+Public Sub AddExecCode(code$)
 If locked Then Exit Sub
-Call Run(Code$, False)
+Call Run(code$, False)
 End Sub
-Public Function Run(ByVal Code$, Optional clean As Boolean = True) As Boolean
+Public Function Run(ByVal code$, Optional clean As Boolean = True) As Boolean
 Dim ohere$, stay As Variant
 If elevatestatus Then Exit Function
 byPassCallback = False
@@ -439,7 +439,7 @@ Run = True
         LastErNum = 0: LastErNum1 = 0
         LastErName = vbNullString
         LastErNameGR = vbNullString
-If Execute(objref, Code$, False) <> 1 Then
+If Execute(objref, code$, False) <> 1 Then
         Run = False
                  MOUT = True
 End If
@@ -542,6 +542,10 @@ End If
 End Function
 Private Sub Class_Initialize()
 Dim anyname As Long
+If InitOk = 0 Then
+myToken = InitGDIPlus()
+InitOk = 1
+End If
 startaddress = VarPtr(anyname)
 stacksize = 900000
 TrushLim = 200000
@@ -677,11 +681,11 @@ Public Sub SendMess(a$)
         
     End If
 End Sub
-Public Property Get Code() As String
+Public Property Get code() As String
 ' GetCode
     If Not ExtForm Is Nothing Then
         On Error Resume Next
-        Code = ExtForm.GetCode
+        code = ExtForm.GetCode
         
         
     End If

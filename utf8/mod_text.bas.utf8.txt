@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 29
+Global Const Revision = 30
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -45041,7 +45041,11 @@ Static once11 As Boolean
 ClaimStack = findstack
 If once11 Then Exit Function
 once11 = True
+If m_bInIDE Then
+findstack = 970000
+Else
 repeatme
+End If
 ClaimStack = findstack
 End Function
 Function repeatme()

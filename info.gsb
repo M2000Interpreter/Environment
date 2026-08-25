@@ -18402,7 +18402,29 @@ Print a$, $(0)   ' return to normal text
 if random(1,2)=1 then Print else Print Under
 Report a$
 }
-MODULE CS {Clear // Clear all variables/objects
+MODULE CS {module  killit(name$="test.exe") {
+	local out$=quote$(dir$+"out.txt")
+	Dos "del "+out$, 500;
+	name$=lcase(name$)
+	Dos format({tasklist /fi "IMAGENAME eq {0}" >}+out$, name$), 500;
+	local a$
+	document a$
+	load.doc a$,"out.txt"
+	local m=Paragraph(a$, 0) 
+	If Forward(a$,m) then
+		While m
+			p=Paragraph$(a$,(m))
+			if lcase(left(p, len(name$)))=name$ then
+				Pid=val(trim(rightpart(p, " ")))
+				Dos "taskkill /F /PID "+pid;
+				//Print "Pid=";Pid;" ...killed in action"
+			End if
+		End While
+	End If
+}
+
+
+Clear // Clear all variables/objects
 Flush // Empty the stack
 first$={using System;
             using System.Drawing;
@@ -18785,13 +18807,15 @@ Function Run1.DblClick {
             Comp.Enabled(1)=False
             Comp.Enabled(2)=False
             Comp.Enabled(3)=False
+            killit "test.exe"
+
             Informe$=""
             Call local gecsc_folder()
             if  path$="" then Beep:Comp.Enabled(0)=True :exit
             if not exist(path$+"csc.exe") then beep : Comp.Enabled(0)=true : exit 
             try {
-                   if exist(dir$+"test.bat") then dos "del "+quote$(dir$+"test.bat");
-                  if exist(dir$+"test.exe") then dos "del "+quote$(dir$+"test.exe");
+                if exist(dir$+"test.bat") then dos "del "+quote$(dir$+"test.bat");
+                if exist(dir$+"test.exe") then dos "del "+quote$(dir$+"test.exe");
             }
             local aa$
             Document aa$=Pad.text$
@@ -50613,7 +50637,7 @@ cls
 gradient 1, 5
 move scale.x/2, scale.y/2
 circle fill 4, scale.y/3
-If ask("Hide the M2000 Console","Cube3d", "*Yes", "No")=1 then title "Cube3d", 0
+If ask("Hide the M2000 Console","Cube3d", "*Yes", "No")=1 then title "Cube3d", 0:wait 500
 method form1, "show"
 call local resetSceneState
 method form1, "Opacity", 180
@@ -53997,11 +54021,11 @@ extern "user32",   DestroyWindow
 extern "user32",   ShowWindow
 extern "user32",   GetMessageW
 extern "user32",   TranslateMessage
-extern "user32",    DispatchMessageW
+extern "user32",   DispatchMessageW
 extern "user32",   DefWindowProcW
 extern "user32",   PostQuitMessage
 
-AppName:           dW AppNameL, 0   ;  use dw for unicode strings
+AppName:           dW AppNameL, 0   ; use dw for unicode strings
 WindowTitle:       dW WindowTitleCaption, 0
 hInstance:         dd 0
 hCursor:           dd 0
@@ -54049,7 +54073,8 @@ main:
    mov dword [esp+32], 0                   ; lpzszMenuName = 0
    mov dword [esp+36], AppName             ; lpszClassName = AppName
 
-   push dword esp                          ; register the window class
+   mov eax, esp                            ; Αντί για push esp, αποθηκεύουμε τη διεύθυνση στον eax
+   push eax                                ; register the window class
    call RegisterClassW
 
 
@@ -54099,7 +54124,7 @@ main:
        jmp  MessageLoop
 
    ExitMessageLoop:
-   add  esp, SIZEOF_MSG                    ; cleanup MSG struct
+   add  esp, SIZEOF_MSG                    ; Καθαρισμός MSG struct (28 bytes)
 
    push dword [hWnd]                       ; destroy the window
    call DestroyWindow
@@ -54108,39 +54133,47 @@ main:
    push dword AppName
    call UnregisterClassW
 
-   add  esp, SIZEOF_WNDCLASS               ; cleanup WNDCLASS Struct
-   pop  ebp
-ret
+   add  esp, SIZEOF_WNDCLASS               ; Καθαρισμός WNDCLASS Struct (40 bytes)
+   
+   pop  ebp                                ; Αποκατάσταση ebp
+   ret                                     ; Καθαρή επιστροφή στη M2000
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;; WndProc Διορθωμένη ;;;;;;;;;;
 
 WndProc:
    mov  eax, [esp+8]                       ; Message
-   cmp  eax, WM_DESTROY                    ; WM_DESTROY?
-   jne  WndProcNext
+   cmp  eax, WM_DESTROY                    ; WM_DESTROY;
+   jne  WndProcNext                        ; No goto DefWindowProcW
+   
+   ; Διαχείριση WM_DESTROY
    push dword 0
    call PostQuitMessage
+   
+   xor  eax, eax                           ; Return 0 (επιτυχία)
+   ret  16                                 ; Έξοδος από τη WndProc χωρίς DefWindowProcW
 
-   WndProcNext:
-       push dword [esp+16]                 ; copy arguments
-       push dword [esp+16]
-       push dword [esp+16]
-       push dword [esp+16]
-       call DefWindowProcW
+WndProcNext:
+   push dword [esp+16]                     
+   push dword [esp+16]
+   push dword [esp+16]
+   push dword [esp+16]
+   call DefWindowProcW
 
-ret 16
+   ret 16
+
 })
+
 killit()
-open "test.exe" for output as #f
+open "testAsm2.exe" for output as #f
 	put #f, Buffer2export
 close #f
 //	Declare ShellExecute Lib "shell32.ShellExecuteW" {Long hWnd, Long lpszOp, lpszFile$, long lpszParams, long LpszDir, Long FsShowCmd }
-//	Print ShellExecute(0, 0, dir$+"test.exe", 0, 0, 1&)
+//	Print ShellExecute(0, 0, dir$+"testAsm2.exe", 0, 0, 1&)
 //	
-win dir$+"test.exe"
+win dir$+"testAsm2.exe"
 
-Sub killit(name$="test.exe")
+Sub killit(name$="testAsm2.exe")
 	local out$=quote$(dir$+"out.txt")
 	Dos "del "+out$, 500;
 	name$=lcase(name$)

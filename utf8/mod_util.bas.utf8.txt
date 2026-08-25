@@ -15657,11 +15657,12 @@ inside:
                                     End If
                                 End If
                             End If
+                            
                         Loop
                         If w2 = -1 Then
                             w3 = res + 1
                             res = -1
-                            While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                            While res = -1 And cur > 0 And w3 <= pppp.Count - cur - 1
                                 For w3 = w3 To pppp.Count - cur - 1
                                     If pppp.MyIsNumeric(pppp.item(w3)) Then
                                         If pppp.item(w3) = Sn(0) Then
@@ -15734,7 +15735,7 @@ there:
                     If w2 = -1 Then
                         w3 = res + 1
                         res = -1
-                        While res = -1 And cur > 0 And w3 < pppp.Count - cur - 1
+                        While res = -1 And cur > 0 And w3 <= pppp.Count - cur - 1
                             For w3 = w3 To pppp.Count - cur - 1
                                 If pppp.IsStringItem(w3) Then
                                     If pppp.item(w3) = st(0) Then
