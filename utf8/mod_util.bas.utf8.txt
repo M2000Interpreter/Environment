@@ -15337,15 +15337,10 @@ cont1112:
                     End If
                 End If
                 End If
-                original = original + 1
+               ' original = original + 1
             End If
             res = 0
-            multi = True
-            fMatrix = True
-            Set usehandler = New mHandler
-            usehandler.t1 = 3
-            Set usehandler.objref = pppp
-            Set bstack.lastobj = usehandler
+            GoTo JMPeMPTY
         Case "MAT", "ΜΑΖΙ"
             If Not IsFlatStringExpr(bstack, a$, ut$) Then
                 MissStringExpr

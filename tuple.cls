@@ -623,7 +623,7 @@ Dim BI As BigInteger
     Err.Clear
 Loop
 End Sub
-Public Sub Neg(v As Long)
+Public Sub neg(v As Long)
 Select Case VarType(itemnumeric(v))
 Case vbBoolean
     item(v) = Not CBool(itemnumeric(v))
@@ -2769,7 +2769,7 @@ End Sub
 Private Sub iBoxArray_CopyArraySliceFast(k As iBoxArray, fromS As Long, toS As Long)
 Dim z As tuple
 If Not k Is Nothing Then If TypeOf k Is tuple Then Set z = k
-iBoxArray_CopyArraySliceFast z, fromS, toS
+    CopyArraySliceFast z, fromS, toS
 Set k = z
 End Sub
 
@@ -2876,7 +2876,7 @@ Private Function iBoxArray_itemnumeric(curitem As Long) As Variant
     iBoxArray_itemnumeric = itemnumeric(curitem)
 End Function
 Private Sub iBoxArray_Neg(v As Long)
-    Neg v
+    neg v
 End Sub
 Private Property Get iBoxArray_itemObject(curitem As Long) As Variant
 On Error Resume Next

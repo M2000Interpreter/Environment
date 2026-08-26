@@ -67,8 +67,8 @@ Dim MaxSpace As Long
 Dim hashlen As Long
 Dim toplim As Long
 Public Stable As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal addr As Long, RetVal As Byte)
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal addr As Long, RetVal As Integer)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private lastfind As String
 Private lasttype As Integer
 Private lastkey As String
