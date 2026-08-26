@@ -109,10 +109,10 @@ With PriveSpace(a)
     .Pad = pd$
 End With
 End Sub
-Function ExistFromOther(RHS) As Boolean
+Function ExistFromOther(RHS, Optional ret As Long) As Boolean
 Dim i As Long
 For i = 0 To toplim
-If RHS = PriveSpace(i).iValue Then ExistFromOther = True: Exit Function
+If RHS = PriveSpace(i).iValue Then ExistFromOther = True: ret = i: Exit Function
 Next i
 End Function
 Function ExistFromOther2(usehandler As mHandler) As Boolean

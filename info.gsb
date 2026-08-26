@@ -16679,6 +16679,8 @@ Main.Task 100 {
             Player 3,xa0,yb
             refresh 5000
             Rem 2 : Cursor 0,Height-1 : Print Over $(,8), yo, yb, Score
+      } else {
+          back {refresh } 
       }
       If xm>x3  or xm<850  Then {
             Score=False
@@ -16703,7 +16705,7 @@ Main.Task 100 {
       Select Case Inkey$
       Case "p","P"
             {
-                  If kr Then { 
+                  If kr Then {
                         Thread mp Hold
                         Layer {
                               Cls 0, 0
@@ -16716,6 +16718,7 @@ Main.Task 100 {
                                     Print Over $(6)," or press space to end the game"
                               }
                               Show
+                              refresh 20
                         }
                   } Else {
                         Layer {
@@ -16725,6 +16728,7 @@ Main.Task 100 {
                         Thread mp Restart
                   }
                   kr~
+                  beep
             }
       Case " "
             {  If Not kr Then Layer {Hide }: kr~
@@ -53424,7 +53428,7 @@ print "fontname: "; fontname$
 print "press any key":push Key$:drop
 font oldfont
 mode mode
-If module(Infobasic) then Pen 15 {Report 2, "Press F3"}
+If module(Infobasic) then double: cursor, height div 2:Pen 15 {Report 2, "Press F3"}:normal
 }
 MODULE BABY {? "Sleep Baby..."
 volume 40

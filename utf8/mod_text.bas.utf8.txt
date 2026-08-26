@@ -41,11 +41,11 @@ Private Declare Function ShowCursor Lib "user32" (ByVal bShow As Long) As Long
 Private Declare Function timeGetTime Lib "winmm.dll" () As Long
 Private Declare Function timeGetTime1 Lib "kernel32.dll" Alias "GetTickCount" () As Long
 Public Declare Function IsValidCodePage Lib "kernel32" (ByVal CodePage As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Byte)
-Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
-Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal Addr As Long, retval As Single)
-Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal Addr As Long, retval As Double)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Byte)
+Public Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
+Private Declare Sub GetMemS Lib "msvbvm60" Alias "GetMem4" (ByVal Addr As Long, RetVal As Single)
+Private Declare Sub GetMem8 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Double)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Declare Sub PutMem2 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Integer)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 31
+Global Const Revision = 32
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -19154,11 +19154,13 @@ ContElse:
                 If Len(W$) = 4 Then
                     If HaveMarkSelEn(bstack) Then
                         IsLabelSymbolNew b$, "", "CASE", 1
+                        loopthis = True
                         Execute = 100
                         Exit Function
                     End If
                 ElseIf HaveMarkSelGr(bstack) Then
                     IsLabelSymbolNew b$, "ΜΕ", "", 0
+                    loopthis = True
                     Execute = 100
                     Exit Function
                 End If
@@ -51137,29 +51139,30 @@ Dim ok As Boolean, x1 As Long, y1 As Long, sp As Variant, st As Variant, sw$, sl
 Dim x2 As Long, y2 As Long, p As Variant, W$, dum As Boolean, i As Long, nd&, usehandler As mHandler
 Dim checkenum As Boolean, enumindex As Long, EnumName As String, that As BigInteger, ifcount As Long
 Dim Pos As Long, sPos As Long, comments As Long, nn&
-                
+Dim HaveEnum As Boolean, ok2 As Boolean
+Dim that1 As BigInteger
 exeSelect = True
-x1 = 0 ' mode numbers using p, sp and st
+x1 = 0
 If IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang) Then
-
-    If IsExpBig(bstack, b$, sp, , Not checkenum) Then
+    If IsExpBig(bstack, b$, sp) Then
         If TypeOf sp Is Symbol Then
             sp = sp.Class
         End If
-        If myVarType(sp, vbString) Then
-            sw$ = sp
-            x1 = 2
-        Else
-            If Not bstack.lastobj Is Nothing Then
-                If TypeOf bstack.lastobj Is BigInteger Then
-                    Set that = bstack.lastobj
-                End If
-            End If
+        x1 = 1
+        If Not bstack.lastobj Is Nothing Then
+            If TypeOf bstack.lastobj Is BigInteger Then
+                Set that = bstack.lastobj
+            Else
+                If Not TypeOf bstack.lastobj Is mHandler Then GoTo err001101
+                Set usehandler = bstack.lastobj
+                If usehandler.t1 <> 4 Then GoTo err001101
+                HaveEnum = True
+                enumindex = usehandler.index_start
+                EnumName = usehandler.objref.KeyToString
+                Set usehandler = Nothing
+             End If
             Set bstack.lastobj = Nothing
-             x1 = 1
         End If
-    ElseIf IsStrExp(bstack, b$, sw$) Then
-        x1 = 2
     End If
 
 secondentry:
@@ -51210,28 +51213,69 @@ jumphere01:
                 If slct > 0 Then         ' WE ARE IN SEARCH
                     Do
                         x2 = 0
-                        If x1 = 1 Then
-                            If IsExpBig(bstack, b$, p, , Not checkenum) Then
-                                If Not that Is Nothing Then
-
-                                If bstack.lastobj Is Nothing Then
-                                    Set bstack.lastobj = Module13.CreateBi(p)
-                                ElseIf Not TypeOf bstack.lastobj Is BigInteger Then
-                                    Set bstack.lastobj = Nothing
-                                    GoTo err001101
-                                End If
+                            If checkenum Then
+                                Pos = 1
+                                If FastPureLabel(b$, W$, Pos, True) = 1 Then
+                                    p = usehandler.objref.SearchSimple(W$, ok2)
+                                    p = usehandler.objref.index
+                                    If Not ok2 Then
+                                        WrongType
+                                        GoTo err001101
+                                    End If
                                     If IsLabelSymbolNew(b$, "ΕΩΣ", "TO", Lang) Then
-                                    Dim that1 As BigInteger
-                                        Set that1 = bstack.lastobj
-                                        If IsExpBig(bstack, b$, p, , Not checkenum) Then
-
-                                        If bstack.lastobj Is Nothing Then
-                                            Set bstack.lastobj = Module13.CreateBi(p)
-                                        ElseIf Not TypeOf bstack.lastobj Is BigInteger Then
-                                            Set bstack.lastobj = Nothing
+                                      
+                                        
+                                        If FastPureLabel(b$, W$, Pos, True) = 1 Then
+                                            st = usehandler.objref.SearchSimple(W$, ok2)
+                                            
+                                            If Not ok2 Then
+                                                WrongType
+                                                GoTo err001101
+                                            End If
+                                            st = usehandler.objref.index
+                                            y1 = 1
+                                            GoTo CONT110011
+                                        Else
+                                            SyntaxError
                                             GoTo err001101
                                         End If
-                                        If (that.compare(that1) > -1 And that.compare(bstack.lastobj) < 1) Or slct = -1 Then
+                                    Else
+                                    x2 = 1
+                                    End If
+                                Else
+                                    SyntaxError
+                                    GoTo err001101
+                                End If
+                            ElseIf IsExpBig(bstack, b$, p) Then
+                            x2 = 1
+                                If Not that Is Nothing Then
+                                    If bstack.lastobj Is Nothing Then
+                                        If slct <> -1 Then Set bstack.lastobj = Module13.CreateBi(p)
+                                    ElseIf Not TypeOf bstack.lastobj Is BigInteger Then
+                                        If TypeOf bstack.lastobj Is mHandler Then
+                                            
+                                          If slct <> -1 Then Set bstack.lastobj = Module13.CreateBi(p)
+                                        Else
+                                        GoTo err001101
+                                        End If
+                                    End If
+                                    If IsLabelSymbolNew(b$, "ΕΩΣ", "TO", Lang) Then
+                                    
+                                        Set that1 = bstack.lastobj
+                                        If IsExpBig(bstack, b$, st) Then
+
+                                        If bstack.lastobj Is Nothing Then
+                                            If slct <> -1 Then Set bstack.lastobj = Module13.CreateBi(st)
+                                        ElseIf Not TypeOf bstack.lastobj Is BigInteger Then
+                                            If TypeOf bstack.lastobj Is mHandler Then
+                                            
+                                                If slct <> -1 Then Set bstack.lastobj = Module13.CreateBi(st)
+                                            Else
+                                                GoTo err001101
+                                            End If
+                                        End If
+                                        If slct = -1 Then
+                                        ElseIf (that.compare(that1) > -1 And that.compare(bstack.lastobj) < 1) Then
                                             Set that1 = Nothing
                                             Set bstack.lastobj = Nothing
                                             If slct = 1 Then slct = 0: GoTo selslct0
@@ -51245,36 +51289,88 @@ jumphere01:
                                             Set bstack.lastobj = Nothing
                                             GoTo err001101
                                         End If
-                                    ElseIf that.compare(bstack.lastobj) = 0 Or slct = -1 Then
+                                    ElseIf slct = -1 Then
+                                    If that.compare(bstack.lastobj) = 0 Then
                                         Set bstack.lastobj = Nothing
                                         If slct = 1 Then slct = 0: GoTo selslct0
                                         GoTo contLoop
                                     End If
+                                    End If
                                     Set bstack.lastobj = Nothing
                                     GoTo contLoop
-                                ElseIf checkenum Then
-                                    If bstack.lastobj Is Nothing Then GoTo cont00123
-                                    If Not TypeOf bstack.lastobj Is mHandler Then GoTo err001101
-                                    Set usehandler = bstack.lastobj
-                                    Set bstack.lastobj = Nothing
-                                    If usehandler.t1 <> 4 Then GoTo err001101
-                                    usehandler.objref.index = usehandler.index_start
-                                    If EnumName = usehandler.objref.KeyToString() Or slct = -1 Then
-                                        Set usehandler = Nothing
-                                        If slct = 1 Then slct = 0: GoTo selslct0
-                                        GoTo contLoop
+                                ElseIf checkenum Or HaveEnum Then
+                                    If bstack.lastobj Is Nothing Then
+                                    GoTo cont00123
                                     End If
+                                    If Not TypeOf bstack.lastobj Is mHandler Then
+                                    If TypeOf bstack.lastobj Is BigInteger Then
+                                    GoTo cont223389
+                                    Else
+                                    GoTo err001101
+                                    End If
+                                    End If
+check76767:
+                                    Set usehandler = bstack.lastobj
+                                    If usehandler.t1 <> 4 Then GoTo err001101
+                                    If IsLabelSymbolNew(b$, "ΕΩΣ", "TO", Lang) Then   ' range ?
+                                        GoTo checkenum1
+                                    End If
+                                    Set bstack.lastobj = Nothing
+                                   
+                                    GoTo CONT1234
                                 ElseIf Not bstack.lastobj Is Nothing Then
+                                    If TypeOf bstack.lastobj Is mHandler Then
+                                    If bstack.lastobj.t1 = 4 Then
+                                    Set bstack.lastobj = Nothing
+                                    GoTo cont00123
+                                    End If
+                                    End If
                                     If Not TypeOf bstack.lastobj Is BigInteger Then
                                         GoTo err001101
                                     End If
+cont223389:
                                     Set that = bstack.lastobj
+                                    Set bstack.lastobj = Nothing
+                                    If IsLabelSymbolNew(b$, "ΕΩΣ", "TO", Lang) Then   ' range ?
+                                    If IsExpBig(bstack, b$, st) Then
+                                        If bstack.lastobj Is Nothing Then
+                                            If slct <> -1 Then Set bstack.lastobj = Module13.CreateBi(st)
+                                        ElseIf Not TypeOf bstack.lastobj Is BigInteger Then
+                                            If TypeOf bstack.lastobj Is mHandler Then
+                                            
+                                               If slct <> -1 Then Set bstack.lastobj = Module13.CreateBi(st)
+                                            Else
+                                                GoTo err001101
+                                            End If
+                                        End If
+                                        If slct = -1 Then
+                                        
+                                        Else
+                                            Set that1 = bstack.lastobj
+                                            Set bstack.lastobj = Module13.CreateBi(CVar(sp))
+                                            
+                                            If that.compare(CVar(bstack.lastobj)) <= 0 And that1.compare(CVar(bstack.lastobj)) >= 0 Then
+                                                Set bstack.lastobj = Nothing
+                                                Set that1 = Nothing
+                                                Set that = Nothing
+                                                If slct = 1 Then slct = 0: GoTo selslct0
+                                                GoTo contLoop
+                                            End If
+                                            Set that1 = Nothing
+                                        End If
+                                    Else
+                                        GoTo err001101
+
+                                    End If
+                                    Else
+                                    If slct = -1 Then
                                     
-                                    If that.compare(Module13.CreateBi(sp)) = 0 Or slct = -1 Then
+                                    ElseIf that.compare(Module13.CreateBi(CVar(sp))) = 0 Then
                                         Set bstack.lastobj = Nothing
                                         Set that = Nothing
                                         If slct = 1 Then slct = 0: GoTo selslct0
                                         GoTo contLoop
+                                    End If
                                     End If
                                     Set bstack.lastobj = Nothing
                                     Set that = Nothing
@@ -51284,81 +51380,90 @@ cont00123:
                                     If TypeOf p Is Symbol Then
                                         p = p.Class
                                     End If
-                                    If MemInt(VarPtr(p)) = vbString Then SwapString2Variant W$, p: x2 = 2 Else x2 = 1
-                                End If
-                            ElseIf IsStrExp(bstack, b$, W$) Then
-                                x2 = 2
-                            End If
-                        Else
-                            If IsExp(bstack, b$, p, , Not checkenum) Then
-                                If TypeOf p Is Symbol Then
-                                    p = p.Class
-                                End If
-                                If MemInt(VarPtr(p)) = vbString Then
-                                    W$ = p: x2 = 2
-                                Else
-                                    y1 = UINT(p)
-                                    If y1 >= &H10000 And y1 <= &H10FFFF Then
-                                        y1 = y1 - &H10000
-                                        W$ = ChrW(UINT(y1 \ &H400& + &HD800&)) + ChrW(UINT((y1 And &H3FF&) + &HDC00&))
-                                    Else
-                                        W$ = ChrW$(y1)
+                                    If MemInt(VarPtr(sp)) = vbString Then
+                                        If MemInt(VarPtr(p)) <> vbString Then
+                                            y1 = UINT(p)
+                                            If y1 >= &H10000 And y1 <= &H10FFFF Then
+                                                y1 = y1 - &H10000
+                                                p = ChrW(UINT(y1 \ &H400& + &HD800&)) + ChrW(UINT((y1 And &H3FF&) + &HDC00&))
+                                            Else
+                                                p = ChrW$(y1)
+                                            End If
+                                            y1 = 0
+                                        End If
                                     End If
-                                    y1 = 0
-                                    x2 = 2
                                 End If
-                            ElseIf IsStrExp(bstack, b$, W$, False) Then
-                                x2 = 2
                             End If
-                        End If
                         If x2 > 0 Then 'WE HAVE NUMBER OR STRING
-                            If checkenum Then
-                            ' do nothing
-                                GoTo CONT1234
-                            ElseIf IsLabelSymbolNew(b$, "ΕΩΣ", "TO", Lang) Then   ' range ?
-                                y1 = 0
-                                If x1 = 1 Then
-                                    If IsExp(bstack, b$, st, , True) Then
-                                        If TypeOf st Is Symbol Then
-                                            st = 0
+                            If IsLabelSymbolNew(b$, "ΕΩΣ", "TO", Lang) Then   ' range ?
+                                If Not bstack.lastobj Is Nothing Then
+                                    If Not usehandler Is Nothing Then
+                                        If TypeOf bstack.lastobj Is mHandler Then
+checkenum1:
+                                            If usehandler.objref.ExistFromOther(sp) Then
+                                                Set usehandler = bstack.lastobj
+                                                Set bstack.lastobj = Nothing
+                                              If checkenum Then p = usehandler.index_start
+                                            Else
+                                                MyEr "wrong enum", "λάθος απαρίθμηση"
+                                                GoTo err001101
+                                            End If
                                         End If
-                                        If MemInt(VarPtr(st)) = vbString Then
-                                            st = 0
-                                        End If
-                                        y1 = 1
-                                    
                                     Else
-                                    
+                                        Set usehandler = Nothing
+                                        Set bstack.lastobj = Nothing
                                     End If
-                                Else
-                                    If IsStrExp(bstack, b$, ss$) Then
-                                    
-                                    y1 = 2
-                                    ElseIf IsExp(bstack, b$, st, , True) Then
-                                        If TypeOf st Is Symbol Then
-                                            st = st.Class
+                                End If
+                                y1 = 0
+                                If IsExp(bstack, b$, st) Then
+                                    x2 = 1
+                                    If Not bstack.lastobj Is Nothing Then
+                                        If Not usehandler Is Nothing Then
+                                            If TypeOf bstack.lastobj Is mHandler Then
+                                                If bstack.lastobj.t1 = 4 Then
+                                                If usehandler.objref.ExistFromOther(sp) Then
+                                                Set usehandler = bstack.lastobj
+                                                Set bstack.lastobj = Nothing
+                                                If checkenum Then st = usehandler.index_start
+                                                End If
+                                                End If
+                                               
+                                            End If
                                         End If
-                                        If MemInt(VarPtr(st)) = vbString Then
-                                            SwapString2Variant ss$, st
-                                            y1 = 2
-                                        Else
+                                    End If
+                                    Set bstack.lastobj = Nothing
+                                    If TypeOf st Is Symbol Then
+                                        st = st.Class
+                                    End If
+                                    If MemInt(VarPtr(sp)) = vbString Then
+                                        If MemInt(VarPtr(st)) <> vbString Then
                                             y1 = UINT(st)
                                             If y1 >= &H10000 And y1 <= &H10FFFF Then
                                                 y1 = y1 - &H10000
-                                                ss$ = ChrW(UINT(y1 \ &H400& + &HD800&)) + ChrW(UINT((y1 And &H3FF&) + &HDC00&))
+                                                st = ChrW(UINT(y1 \ &H400& + &HD800&)) + ChrW(UINT((y1 And &H3FF&) + &HDC00&))
                                             Else
-                                                ss$ = ChrW$(y1)
+                                                st = ChrW$(y1)
                                             End If
-                                            y1 = 2
+                                            y1 = 0
                                         End If
+                                    ElseIf MemInt(VarPtr(st)) = vbString Then
+                                        WrongType
+                                        
+                                    ElseIf MemInt(VarPtr(sp)) = vbString Then
+                                        WrongType
+                                        
                                     End If
+                                    
+                                    y1 = 1
                                 End If
+CONT110011:
                                 If y1 > 0 Then
                                     y2 = 0
-                                    If x1 = 1 Then
-                                        If (sp >= p And sp <= st) Then y2 = 1
+                                    If checkenum Then
+                                        If (enumindex >= p And enumindex <= st) Then y2 = 1
+                                    
                                     Else
-                                        If sw$ >= W$ And sw$ <= ss$ Then y2 = 2
+                                        If (sp >= p And sp <= st) Then y2 = 1
                                     End If
                                     If y2 > 0 Or slct = -1 Then 'slct=-1 from break
                                         If slct = 1 Then slct = 0   ' slct=0 we found
@@ -51372,14 +51477,16 @@ cont00123:
                             Else
 CONT1234:
                                 ' NO WE HAVE ONE VALUE...X1 MASTER, X2 ONE VALUE  Y2 FOR LAST CHECK
+                                Set bstack.lastobj = Nothing
                                 y2 = 0
-                                If x1 = 1 Then
-                                    If sp = p And x2 = 1 Then y2 = 1
+                                If checkenum Then
+                                If enumindex = p Then y2 = 1
+                                
                                 Else
-                                    If W$ = sw$ Then y2 = 2
+                                If sp = p Then y2 = 1
                                 End If
                                 If y2 > 0 Or slct = -1 Then ' ONE VALUE
-                                    If slct = 1 Then slct = 0
+                                If slct = 1 Then slct = 0
                                 End If
                             End If
                         ElseIf Not checkenum Then
@@ -51387,11 +51494,7 @@ CONT1234:
                             If Not that Is Nothing Then
                                 Set p = that
                             Else
-                                If x1 = 2 Then
-                                    p = sw$
-                                Else
-                                    p = sp
-                                End If
+                                p = sp
                             End If
                             If IsHalfLogic(bstack, b$, p) Then
                                 If p <> 0 Or slct = -1 Then
@@ -51404,6 +51507,7 @@ CONT1234:
                                 Exit Function
                             End If
                         End If
+                        
                         If slct = 0 Then
                         
 selslct0:
@@ -51596,6 +51700,7 @@ againcont2:
                 If comments = 0 Then
                     If Not ok Then
                     If IsLabelSymbolNew(b$, "ΜΕ", "CASE", Lang) Then
+                    
                         dum = False
                         Pos = 0
                         GoTo jumphere1
@@ -51683,7 +51788,7 @@ er100:
 
                    
                    
-                    If i = 100 Then ' we have a case
+                    If i = 100 Then ' we have a else case
                         If NOEXECUTION Then
                             ExecuteLong = 1
                             exeSelect = True
@@ -51744,6 +51849,15 @@ er100:
                             b$ = space$(Len(b$) - nn& - 1)
                         End If
                         ExecuteLong = 0: Exit Function
+                    ElseIf i = 51 Then
+                        DropMarkSel bstack
+                        ExecuteLong = 1
+                        If once And Len(b$) = 0 Then
+                            exeSelect = True ' IS EXIT
+                        Else
+                            exeSelect = False
+                        End If
+                        Exit Function
                     End If
                     SetNextLine b$
                 Else
@@ -52072,18 +52186,13 @@ here12002:
         If TypeOf sp Is Symbol Then
             sp = sp.Class
         End If
-        If myVarType(sp, vbString) Then
-            sw$ = sp
-            x1 = 2
-        Else
-             x1 = 1
-        End If
-        
+        x1 = 1
         enumindex = usehandler.index_start
         usehandler.objref.index = enumindex
         EnumName = usehandler.objref.KeyToString()
         checkenum = True
-        Set usehandler = Nothing
+        HaveEnum = True
+'        Set usehandler = Nothing
         
         GoTo secondentry
     End If
@@ -52092,6 +52201,7 @@ ElseIf IsLabelSymbolNew(b$, "ΑΠΑΡΙΘΜΗΣΗ", "ENUMERATION", Lang) Then
     GoTo here12002
 Else
 err001101:
+    Set bstack.lastobj = Nothing
     ExecuteLong = 0
     Exit Function
 End If

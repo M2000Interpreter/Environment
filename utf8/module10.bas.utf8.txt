@@ -28,7 +28,7 @@ Private Declare Function vbaVarLateMemCallLdRf CDecl Lib "msvbvm60" _
                          ByVal cArgs As Long, _
                          ByVal vArgs As Long) As Long
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
 Private Const E_POINTER As Long = &H80004003
 Private Const S_OK As Long = 0
 Private Const INTERNET_MAX_URL_LENGTH As Long = 2083
@@ -389,6 +389,11 @@ ER0001:
                     If TypeOf p Is BigInteger Then
                         Set var(v) = p
                         GoTo abcd
+                    ElseIf TypeOf p Is mHandler Then
+                    If p.t1 = 4 Then
+                    Set var(v) = p
+                    GoTo abcd
+                    End If
                     End If
                 End If
                 bstack.soros.PushObj p
@@ -5046,11 +5051,11 @@ checkplease1:
         End If
     End If
 ElseIf NewStat Or noVarStat Then
-    ' MAKE A NEW ONE SO ONLY = ALLOWED
+    
     If FastOperator2(b$, "=", i) Then
         GoTo jumpiflocal
     Else
-        p = 0#
+        p = Empty ' 0#
         If IsLabelSymbolNew(b$, "ΩΣ", "AS", Lang) Then
             On GetType(bstack, b$, p, v, W$, Lang, VarStat, temphere$, noVarStat) GoTo NewCheck, NewCheck2
             Exit Function
@@ -15723,6 +15728,7 @@ there18274:
                         End If
                     End If
                         If checktype Then
+                        
                                 If AssignTypeNumeric(p, VarType(var(i))) Then
                                     If MemInt(VarPtr(p)) = vbString Then
                                         SwapVariant var(i), p
