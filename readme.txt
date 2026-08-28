@@ -1,20 +1,16 @@
 M2000 Interpreter and Environment
-Version 15 Revision 33
+Version 15 Revision 34
 
-Athens, August 27, 2026
+Athens, August 28, 2026
 
-- Another bomb situation. Was on slice() for tuple, not for the first tuple, but on secondary generated tuple
-The example put ten lambda functions in a tuple, and slice 4th and 5th items and then execute these lambda functions.
-' this was an example for rosettacode.org for closures. Here i is a closure (a copy) attached to lambda function.
-generator=lambda (m=0)->{
-	=lambda m (a)->{
-		i=m*m
-		push lambda i->i
-		m++
-	}
+Fix the END statements without paremeter. Normally this do an exit, unless we use it in immediate mode, which is an exit from program.
+The bug reproduce with this. When this code stop executing we see using List that the variables I and X not erased. This is the abnormal exit. This fixed now. We can use END as exit. 
+FUNCTION ALFA {
+	END
 }
-
-? (,)#expanse(10)#map(generator())#slice(3,4)#map(lambda (x)->{push x()})#str$(", ")="9, 16"
+FOR I=1 TO 1 {
+	×=ALFA()  ' same using CALL ALFA()
+}
 
 
 
