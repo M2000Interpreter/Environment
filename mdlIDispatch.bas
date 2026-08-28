@@ -274,7 +274,9 @@ ExitHere:
                     If Not MyIsNumericPointer(varArr(where)) Then
                         If TypeOf pArgs(lngLoop) Is mArray Then
                             Set mmm = pArgs(lngLoop)
-                            mmm.LoadTuple varArr2(where)
+                            
+                            mmm.LoadArray VarPtr(varArr2(where))
+                            'mmm.LoadTuple varArr2(where)
                             
                         'If VarType(varArr(where)) = 8204 Then
                         '    VarByRefClean VarPtr(varArr(where))

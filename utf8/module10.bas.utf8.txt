@@ -5564,6 +5564,7 @@ Propgetvalue:
                 Else
                     GoTo noexpression
                 End If
+                Set bstack.lastobj = Nothing
                 If extreme Then GoTo NewCheck2 Else GoTo NewCheck
             ElseIf TypeOf var(v) Is lambda Then
                 If IsExp(bstack, b$, p) Then
