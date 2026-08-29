@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 35
+Global Const Revision = 36
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -4468,7 +4468,7 @@ conthere0001:
     If Len(b$) = 0 Then b$ = Chr(8) Else Mid$(b$, 1, 1) = Chr(8)
     If IsNumberNew(bstack, b$, rv, False) Then
         SpeedGroup = 1
-        If pppp.Arr Then
+        If pppp.arr Then
             If safegroup.IamApointer Then
                 'Set tempRef = pppp.GroupRef
                 safegroup.link.ToDelete = True
@@ -4606,7 +4606,7 @@ conthere000:
         If IsStr1(bstack, b$, bb$) Then GoTo conthere
     ElseIf var(y1).HasValue Then
         If var(y1).HasParameters Then
-            If pppp.Arr Then
+            If pppp.arr Then
                 If Left$(b$, 1) = "(" Then
                      bstack.tmpstr = W$ + "$" + Left$(b$, 1)
                 Else
@@ -4632,7 +4632,7 @@ conthere000:
             End If
         End If
 conthere:
-        If pppp.Arr Then
+        If pppp.arr Then
             If safegroup.IamApointer Then
                 'Set tempRef = pppp.GroupRef   'pppp.item(v).Link
                 safegroup.link.ToDelete = True
@@ -4674,7 +4674,7 @@ ElseIf Prefix = "FOR" Then
             ElseIf Len(W$) > 5 Then
                 If Len(bstack.UseGroupname) > 0 Then
                     If W$ = "SUPERCLASS" Or W$ = "ΥΠΕΡΚΛΑΣΗ" Then
-                        Set pppp = New ppppLight: pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
+                        Set pppp = New ppppLight: pppp.PushDim (1): pppp.PushEnd: pppp.arr = True
                         v = 0
                         W$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
                         If Right$(here$, 2) = "()" Then
@@ -4777,7 +4777,7 @@ ElseIf Prefix = "FOR" Then
             End If
         Else
             If pppp Is Nothing Then SpeedGroup = 0: Exit Function
-            If pppp.Arr Then
+            If pppp.arr Then
                 If pppp.item(v).IamApointer Then
                     Set safegroup = pppp.item(v)
                     If Not safegroup.link.IamFloatGroup Then
@@ -4942,7 +4942,7 @@ contheretoo1:
                             If SpeedGroup(bstack, pppp, "VAL", "", b$, v) = 1 Then
                                 If Typename(bstack.lastobj) = mGroup Then
                                     Set pppp = New ppppLight
-                                    pppp.Arr = False
+                                    pppp.arr = False
                                     Set pppp.GroupRef = bstack.lastobj
                                     v = -2
                                 Else
@@ -5033,7 +5033,7 @@ er66876:
                 GoTo er66876
             End If
             Set pppp = New ppppLight
-            pppp.Arr = False
+            pppp.arr = False
             Set pppp.GroupRef = bstack.lastobj
             v = -2
                         'Set bstack.lastobj = Nothing
@@ -5049,7 +5049,7 @@ er66876:
         Else 'If Len(w$) > 5 Then
             If Len(bstack.UseGroupname) > 0 Then
                 If W$ = "SUPERCLASS" Or W$ = "ΥΠΕΡΚΛΑΣΗ" Then
-                    Set pppp = New ppppLight: pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
+                    Set pppp = New ppppLight: pppp.PushDim (1): pppp.PushEnd: pppp.arr = True
                     v = 0
                     W$ = Left$(bstack.UseGroupname, Len(bstack.UseGroupname) - 1)
 jumpthere:
@@ -5498,7 +5498,7 @@ breakexit:
                         Set safegroup = Nothing
                     Else
                         pppp.item(v).ToDelete = True
-                        If pppp.Arr Then
+                        If pppp.arr Then
                             Set pppp.item(v) = CopyGroupObj(var(y1), pppp.IhaveClass, pppp.GroupRef)
                         Else
                             Set pppp.item(v) = CopyGroupObj(var(y1))
@@ -5506,7 +5506,7 @@ breakexit:
                     End If
                 End If
             Else  ' v=-100
-                If pppp.Arr Then
+                If pppp.arr Then
                     v = 0
                     If Not MyIsObject(pppp.item(v)) Then
                         Set pppp.item(v) = CopyGroupObj(var(y1))
@@ -6042,7 +6042,7 @@ Function GetArr(bstack As basetask, b$, p As Variant, s$, skip As Long, lookComp
         FastSymbol b$, ","
 jmp11:
         If lookOne(b$, ")") Then
-            Set pppp = New tuple: pppp.myarrbase = 0: pppp.PushDim (1&): pppp.PushEnd: pppp.Arr = True
+            Set pppp = New tuple: pppp.myarrbase = 0: pppp.PushDim (1&): pppp.PushEnd: pppp.arr = True
             If bstack.lastobj Is Nothing Then
                 pppp.item(0&) = p
             Else
@@ -6087,7 +6087,7 @@ contSecond:
                 GetArr = True
                 Exit Function
             Else
-                Set pppp = New tuple: pppp.myarrbase = 0: pppp.PushDim (2&): pppp.PushEnd: pppp.Arr = True
+                Set pppp = New tuple: pppp.myarrbase = 0: pppp.PushDim (2&): pppp.PushEnd: pppp.arr = True
             End If
             ' feed item 0
             If Not obj1 Is Nothing Then
@@ -6107,7 +6107,7 @@ contSecond:
             End If
         ElseIf IsStrExp(bstack, b$, s$, False) Then
             x1 = 3
-            Set pppp = New tuple: pppp.myarrbase = 0: pppp.PushDim (2&): pppp.PushEnd: pppp.Arr = True
+            Set pppp = New tuple: pppp.myarrbase = 0: pppp.PushDim (2&): pppp.PushEnd: pppp.arr = True
             ' feed 0
             If Not obj1 Is Nothing Then
                 Set pppp.item(0&) = obj1
@@ -6129,7 +6129,7 @@ contSecond:
     Else
         If FastSymbol(b$, ",") Then  ' means empty
            ' GetArr = FastSymbol(b$, ")")
-            Set pppp = New tuple: pppp.myarrbase = 0:: pppp.Arr = True
+            Set pppp = New tuple: pppp.myarrbase = 0:: pppp.arr = True
             p = 0
             GoTo cont111
             Exit Function
@@ -6166,7 +6166,7 @@ CONTaabb:
     Do While MaybeIsSymbol(b$, ",)")
         IsSymbol b$, ","
         If pppp Is Nothing Then
-            Set pppp = New tuple: pppp.myarrbase = 0:: pppp.Arr = True 'pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
+            Set pppp = New tuple: pppp.myarrbase = 0:: pppp.arr = True 'pppp.PushDim (1): pppp.PushEnd: pppp.Arr = True
         End If
         If lookOne(b$, ")") Then
             If x1 = 1 Then
@@ -7970,7 +7970,7 @@ foundprivate:
                             Set ppppl.GroupRef = bstack.lastobj
                             Set bstack.lastobj = Nothing
                             If Not nbstack Is Nothing Then Set nbstack.lastobj = Nothing
-                            ppppl.Arr = False
+                            ppppl.arr = False
                             w2 = -2
                             Set nbstack = Nothing
                             v$ = vbNullString
@@ -9574,7 +9574,7 @@ fun36: ' "EVAL(", "ΕΚΦΡ(", "ΕΚΦΡΑΣΗ("
      Set ppppl = New tuple
      Set ppppl.GroupRef = bstack.lastobj
      Set bstack.lastobj = Nothing
-     ppppl.Arr = False
+     ppppl.arr = False
      GoTo contAr2L
      ElseIf Typename(bstack.lastobj) = myArray Then
      Set ppppl = bstack.lastobj
@@ -10119,7 +10119,7 @@ jumpgroup001:
                 End If
 again1001:
                 Set ppppl = New ppppLight
-                ppppl.Arr = False
+                ppppl.arr = False
                 
                 Set ppppl.GroupRef = bstack.lastobj
                 w2 = -2
@@ -10145,7 +10145,7 @@ group00012:
                     If Not CallLambdaASAP(bstack, a$, r) Then IsNumberNew = False: Exit Function
                 ElseIf IsObjmHandler(bstack.lastobj) Or IsobjArray(bstack.lastobj) Then
                 Set ppppl = New ppppLight
-                ppppl.Arr = False
+                ppppl.arr = False
                 Set ppppl.GroupRef = bstack.lastobj
                 w2 = -2 ' GET THE OBJECT
                  FastSymbol a$, "("
@@ -10202,7 +10202,7 @@ contAr2:
     
 contAr2L:
     If MaybeIsSymbol3(a$, ")", w3) Then
-        If Not ppppl.Arr And Not ppppl.IhaveClass Then
+        If Not ppppl.arr And Not ppppl.IhaveClass Then
 
         If Mid$(a$, w3, 2) = ")^" Then
         If w3 > 1 Then a$ = Mid$(a$, w3)
@@ -10213,7 +10213,7 @@ contAr2L:
         End If
         End If
         IsNumberNew = True
-        If Not ppppl.Arr Then
+        If Not ppppl.arr Then
             If Typename(ppppl.GroupRef) = mGroup Then
                 If ppppl.GroupRef.HasParameters Then
                 
@@ -10292,7 +10292,7 @@ contAr2L:
         Exit Function
     End If
 cont111222:
-    If ppppl.Arr Then
+    If ppppl.arr Then
        ' Set pppp = ppppL
         dn = 0
         ppppl.SerialItem (0), dd, 5
@@ -10457,7 +10457,7 @@ againlambda:
                                                 Set ppppl = anything
                                             Else
                                                 Set ppppl = New ppppLight
-                                                ppppl.Arr = False
+                                                ppppl.arr = False
                                                 Set ppppl.GroupRef = usehandler
                                             End If
                                             Set anything = Nothing
@@ -10465,13 +10465,13 @@ againlambda:
                                         ElseIf usehandler.t1 = 1 Then
                                             PopStage bstack
                                             Set ppppl = New ppppLight
-                                            ppppl.Arr = False
+                                            ppppl.arr = False
                                             Set ppppl.GroupRef = usehandler
                                             w2 = -2
                                             GoTo contrightpar
                                         Else
                                             Set ppppl = New ppppLight
-                                            ppppl.Arr = False
+                                            ppppl.arr = False
                                             Set ppppl.GroupRef = usehandler
                                         End If
                                         Set usehandler = Nothing
@@ -10482,7 +10482,7 @@ againlambda:
                                     
 cont100203030:
                                         Set ppppl = New ppppLight
-                                        ppppl.Arr = False
+                                        ppppl.arr = False
                                         Set ppppl.GroupRef = bstack.lastobj
                                         w2 = -2
                                         GoTo contgroup3
@@ -10496,7 +10496,7 @@ cont100203030:
                                 ElseIf TypeOf bstack.lastobj Is Group Then
                                     PopStage bstack
                                     Set ppppl = New ppppLight
-                                    ppppl.Arr = False
+                                    ppppl.arr = False
                                     Set ppppl.GroupRef = bstack.lastobj
                                     w2 = -2
                                     If Left$(a$, 1) = "." Then
@@ -10528,13 +10528,13 @@ cont100203030:
                                     Set ppppl = anything
                                 Else
                                     Set ppppl = New ppppLight
-                                    ppppl.Arr = False
+                                    ppppl.arr = False
                                     Set ppppl.GroupRef = usehandler
                                 End If
                             Else
                                 If w2 <> -2 Then
                                 Set ppppl = New ppppLight
-                                ppppl.Arr = False
+                                ppppl.arr = False
                                 Set ppppl.GroupRef = usehandler
                                 End If
                             End If
@@ -11042,7 +11042,7 @@ contgrouppar:
                                 Else
                                     Set ppppl.GroupRef = bstack.lastobj
                                 End If
-                                ppppl.Arr = False
+                                ppppl.arr = False
                                 w2 = -2
                                 Set nbstack = Nothing
                                 v$ = vbNullString
@@ -11056,7 +11056,7 @@ contgrouppar:
                                 End If
                                 Set bstack.lastobj = Nothing
                                 Set bstack.lastpointer = Nothing
-                                ppppl.Arr = False
+                                ppppl.arr = False
                                 w2 = -2
                                 Set nbstack = Nothing
                                 v$ = vbNullString
@@ -12108,7 +12108,7 @@ checkc1:
                         a1$ = r$
                         If GetOneAsString(bstack, a$, r$, rr&) Then
                             If neoGetArray(bstack, a1$, pppp) Then
-                                If Not pppp.Arr Then GoTo cont123
+                                If Not pppp.arr Then GoTo cont123
                                 c$ = varhash.lastkey
                                 If Not NeoGetArrayItem(pppp, bstack, a1$, w2, Mid$(r$, Len(a1$) + 1)) Then GoTo cont123
                                 If pppp.ItemType(w2) = mGroup Then
@@ -14827,14 +14827,14 @@ rvalObjectstring:
     If Left$(aheadstatusFast(q$ + CopyUntilEndOfLine(a$)), 1) = "S" Then
 enter2:
         If neoGetArray(bstackstr, q$, ppppl) Then
-            If ppppl.Arr Then
+            If ppppl.arr Then
                 If FastSymbol(a$, ")") Then
                     If MaybeIsSymbol(a$, "#") Then Set bstackstr.lastobj = ppppl: GoTo Final
                 End If
             End If
 enterthis:
             If NeoGetArrayItem(ppppl, bstackstr, q$, W, a$, , , True, True) Then
-                If ppppl.Arr = False Then
+                If ppppl.arr = False Then
                 If MaybeIsSymbol(a$, "#") Then
                 If Not bstackstr.lastobj Is Nothing Then
                 GoTo Final
@@ -14842,7 +14842,7 @@ enterthis:
                 End If
                 End If
                 
-                If Not ppppl.Arr And FastSymbol(a$, ")") Then
+                If Not ppppl.arr And FastSymbol(a$, ")") Then
                     ' need an object
                     If IsNumber(bstackstr, q$ + ")", p) Then
                         If Not bstackstr.lastobj Is Nothing Then
@@ -14893,7 +14893,7 @@ enteragain:
                                     Set ppppl = New ppppLight
                                     Set ppppl.GroupRef = bstackstr.lastobj
                                     Set bstackstr.lastobj = Nothing
-                                    ppppl.Arr = False
+                                    ppppl.arr = False
                                     W = -2
                                     Set nbstack = Nothing
                                     GoTo contrightstrpar
@@ -14902,7 +14902,7 @@ cont1002001:
                                      Set ppppl = New ppppLight
                                      Set ppppl.GroupRef = bstackstr.lastobj
                                      Set bstackstr.lastobj = Nothing
-                                     ppppl.Arr = False
+                                     ppppl.arr = False
                                      W = -2
                                      Set nbstack = Nothing
                                      GoTo groupstrvalue
@@ -15025,7 +15025,7 @@ groupstrvalue:
                         If Not anything Is Nothing Then
                         If myVarType(ppppl.item(W), vbObject) Then If anything Is ppppl.item(W) Then Exit Function
                         Else
-                        If ppppl.Arr Then
+                        If ppppl.arr Then
                         If FastSymbol(a$, ")") Then Set bstackstr.lastobj = ppppl: GoTo Final
                         Exit Function
                         End If
@@ -15042,7 +15042,7 @@ groupstrvalue:
                                     End If
                                 Else
                                     Set ppppl = New ppppLight
-                                    ppppl.Arr = False
+                                    ppppl.arr = False
                                     Set ppppl.GroupRef = anything
                                 End If
                                 Set usehandler = Nothing
@@ -15310,7 +15310,7 @@ contStrFun:
         ElseIf neoGetArray(bstackstr, q$, ppppl) Then
 contStrArr:
             
-            If ppppl.Arr Then
+            If ppppl.arr Then
             If TypeOf ppppl Is iBoxArray Then
             If TypeOf ppppl Is mArray Then
                 Set pppp = ppppl
@@ -15428,7 +15428,7 @@ againlambda:
             ElseIf ppppl.ItemType(w2) = mHdlr Then
                 Set bstackstr.lastobj = ppppl.item(w2)
                 Set ppppl = New ppppLight
-                ppppl.Arr = False
+                ppppl.arr = False
                 Set ppppl.GroupRef = bstackstr.lastobj
                 Set bstackstr.lastobj = Nothing
                 GoTo contStrArr
@@ -15448,7 +15448,7 @@ againlambda:
                  Set ppppl = New ppppLight
                  Set ppppl.GroupRef = anything
                  Set anything = Nothing
-                 ppppl.Arr = False
+                 ppppl.arr = False
                  GoTo contreadprop
             ElseIf ppppl.ItemType(w2) = "ppppLight" Then
                 Set ppppl = ppppl.item(w2)
@@ -15586,7 +15586,7 @@ str00012344:
                         Set usehandler = ppppl.GroupRef
                         Set anything = usehandler.objref
                         dd = anything.index
-                        Set ppppl = New ppppLight: ppppl.PushDim (1): ppppl.PushEnd: ppppl.Arr = True
+                        Set ppppl = New ppppLight: ppppl.PushDim (1): ppppl.PushEnd: ppppl.arr = True
                         Set pppp.item(0) = .ValueObj
                         w2 = 0
                         IsStr1 = IsStr1 And FastSymbol(a$, ")")  ' ????
@@ -17689,7 +17689,7 @@ ForCont:
                         
                         
                         Set ppppl = New ppppLight
-                        ppppl.Arr = False
+                        ppppl.arr = False
                         Set ppppl.GroupRef = bstack.lastobj
                         v = -2
                         GoTo startwithgroup
@@ -18130,7 +18130,7 @@ againarraystring:
                                     If SpeedGroup(bstack, ppppl, "VAL", "", b$, v) = 1 Then
                                         If Typename(bstack.lastobj) = mGroup Then
                                             Set ppppl = New ppppLight
-                                            ppppl.Arr = False
+                                            ppppl.arr = False
                                             Set ppppl.GroupRef = bstack.lastobj
                                             v = -2
                                         Else
@@ -21475,8 +21475,8 @@ If here$ <> ohere$ Or mystack.IamChild Or basestack.IamAnEvent Then
         mystack.ErrVars = var2used
     End If
     If Mid$(sbf(x1).sb, i) = vbNullString Then
-        GoFunc = True
-        If sbf(x1).Extern = 0 Then GoTo emptyfunc
+      '  GoFunc = True
+        If sbf(x1).Extern = 0 Then GoFunc = True: GoTo emptyfunc
     End If
     mystack.originalname$ = here$
     If usesamestack Then
@@ -23371,12 +23371,12 @@ varhash.ItemCreator (Name$), globalvarEmpty, , , True
 End Function
 Function globalvar(Name$, q As Variant, Optional link As Boolean = False, Optional makeitglobal As Boolean = False, Optional ohere$ = vbNullString, Optional useType As Boolean = True) As Long
 On Error GoTo 0
-Dim j As Long, m As Long
+Dim j As Long, M As Long
 If Not link Then
     If ohere$ <> vbNullString Then
-        If varhash.Find2(ohere$ + "." + Name$, m, makeitglobal) And Not link Then
+        If varhash.Find2(ohere$ + "." + Name$, M, makeitglobal) And Not link Then
             If Not makeitglobal Then
-                j = m
+                j = M
             Else
                 j = AllocVar()
                 varhash.ItemCreator ohere$ + "." + Name$, j, link, False, useType
@@ -23420,7 +23420,7 @@ Else
     End If
 End If
 If Right$(Name$, 1) = "$" Then
-    If strID.Find(Name$, m) Then
+    If strID.Find(Name$, M) Then
         If Len(here$) = 0 Or makeitglobal Then
             strID.ItemCreator2 Name$, -2
             varhash.ItemCreator2 strID, Name$, j, link, makeitglobal, useType
@@ -23437,7 +23437,7 @@ If Right$(Name$, 1) = "$" Then
         varhash.ItemCreator here$ + "." + Name$, j, link, , useType
     End If
 Else
-    If numid.Find(Name$, m) Then
+    If numid.Find(Name$, M) Then
         If Len(here$) = 0 Or makeitglobal Then
             numid.ItemCreator2 Name$, -2
             varhash.ItemCreator2 numid, Name$, j, link, makeitglobal, useType
@@ -23459,12 +23459,12 @@ globalvar = j
 End Function
 Function globalvarGroup(Name$, q As Variant, Optional link As Boolean = False, Optional makeitglobal As Boolean = False, Optional ohere$ = vbNullString, Optional useType As Boolean = True) As Long
 On Error GoTo 0
-Dim j As Long, m As Long
+Dim j As Long, M As Long
 If Not link Then
     If ohere$ <> vbNullString Then
-        If varhash.Find2(ohere$ + "." + Name$, m, makeitglobal) And Not link Then
+        If varhash.Find2(ohere$ + "." + Name$, M, makeitglobal) And Not link Then
             If Not makeitglobal Then
-                j = m
+                j = M
             Else
                 j = AllocVar()
                 varhash.ItemCreator ohere$ + "." + Name$, j, link, False, useType
@@ -23519,12 +23519,12 @@ globalvarGroup = j
 End Function
 Function globalvarStr(Name$, q$, Optional link As Boolean = False, Optional makeitglobal As Boolean = False, Optional ohere$ = vbNullString) As Long
 On Error GoTo 0
-Dim j As Long, m As Long
+Dim j As Long, M As Long
 If Not link Then
     If ohere$ <> vbNullString Then
-        If varhash.Find2(ohere$ + "." + Name$, m, makeitglobal) And Not link Then
+        If varhash.Find2(ohere$ + "." + Name$, M, makeitglobal) And Not link Then
             If Not makeitglobal Then
-                j = m
+                j = M
             Else
                 j = AllocVar()
                 varhash.ItemCreator ohere$ + "." + Name$, j, link, False, True
@@ -23547,8 +23547,8 @@ Else
         j = CLng(q)
     End If
 End If
-If strID.Find(Name$, m) Then
-If m > -1 Then strID.ItemCreator2 Name$, -1
+If strID.Find(Name$, M) Then
+If M > -1 Then strID.ItemCreator2 Name$, -1
 End If
 If here$ = vbNullString Or makeitglobal Then
     varhash.ItemCreator2 strID, Name$, j, link, makeitglobal, True
@@ -23562,20 +23562,20 @@ On Error GoTo 0
 Dim j As Long
 j = AllocVar() ' var2used
  var(j) = 0&  ' like an empty...
- Dim m As Long
+ Dim M As Long
  
 If here$ = vbNullString Or gl Then
 If Right$(Name$, 1) = "$" Then
-    If strID.Find(Name$, m) Then strID.ItemCreator2 Name$, -2
+    If strID.Find(Name$, M) Then strID.ItemCreator2 Name$, -2
 Else
-    If numid.Find(Name$, m) Then numid.ItemCreator2 Name$, -2
+    If numid.Find(Name$, M) Then numid.ItemCreator2 Name$, -2
 End If
 varhash.ItemCreator myUcase(Name$), j, , gl, True
 Else
 If Right$(Name$, 1) = "$" Then
-    If strID.Find(Name$, m) Then strID.ItemCreator2 Name$, -1
+    If strID.Find(Name$, M) Then strID.ItemCreator2 Name$, -1
 Else
-If numid.Find(Name$, m) Then numid.ItemCreator Name$, -1
+If numid.Find(Name$, M) Then numid.ItemCreator Name$, -1
 End If
 varhash.ItemCreator here$ + "." + myUcase(Name$), j, , gl, True
 
@@ -24067,7 +24067,7 @@ isagroupvalue:
             If var(k) Is Nothing Then
                 Set ga = New ppppLight
                 Set ga.GroupRef = Nothing
-                ga.Arr = False
+                ga.arr = False
                 neoGetArray = True
                
                 Exit Function
@@ -24076,7 +24076,7 @@ isagroupvalue:
                 Case Is < 3, 5
                     Set ga = New ppppLight
                     Set ga.GroupRef = var(k)
-                    ga.Arr = False
+                    ga.arr = False
                     neoGetArray = True
                     Exit Function
                 Case Else
@@ -24099,7 +24099,7 @@ isagroupvalue:
                 Case Is < 3, 5
                     Set ga = New ppppLight
                     Set ga.GroupRef = var(k)
-                    ga.Arr = False
+                    ga.arr = False
                     neoGetArray = True
                     Exit Function
                 End Select
@@ -24142,7 +24142,7 @@ contHandler:
                         Case Is < 3, 5
                             Set ga = New ppppLight
                             Set ga.GroupRef = var(k)
-                            ga.Arr = False
+                            ga.arr = False
                             neoGetArray = True
                             Exit Function
                         End Select
@@ -24152,7 +24152,7 @@ checkgroup:
                             If var(k).HasParametersSet Then
                                 Set ga = New ppppLight
                                 Set ga.GroupRef = var(k)
-                                ga.Arr = False
+                                ga.arr = False
                                 neoGetArray = True
                             End If
                             Exit Function
@@ -24165,7 +24165,7 @@ checkgroup:
                             Else
                                 ga.CodeName = vbNullString
                             End If
-                            ga.Arr = False
+                            ga.arr = False
                             neoGetArray = True
                             Exit Function
                         Else
@@ -24174,7 +24174,7 @@ checkgroup:
                     ElseIf TypeOf var(k) Is PropReference Then
                         Set ga = New ppppLight
                         Set ga.GroupRef = var(k)
-                        ga.Arr = False
+                        ga.arr = False
                         neoGetArray = True
                         Exit Function
                     ElseIf TypeOf var(k) Is lambda Then
@@ -24196,7 +24196,7 @@ getnewprop:
                         neoProp.ConstructObj myobject, 0, False, vbNullString
                         Set ga = New ppppLight
                         Set ga.GroupRef = neoProp
-                        ga.Arr = False
+                        ga.arr = False
                         neoGetArray = True
                         Exit Function
                     End If
@@ -24216,7 +24216,7 @@ checkforglobal:
                     Case Is < 3, 5
                         Set ga = New ppppLight
                         Set ga.GroupRef = var(k)
-                        ga.Arr = False
+                        ga.arr = False
                         neoGetArray = True
                         Exit Function
                     End Select
@@ -24228,14 +24228,14 @@ checkgrouphere:
                                 ' process parameters
                                 Set ga = New ppppLight
                                 Set ga.GroupRef = var(k)
-                                ga.Arr = False
+                                ga.arr = False
                                 neoGetArray = True
                                 If rightexpression Then Exit Function
                             ElseIf var(k).HasParameters Then  ' this is for inventories
                                 Set ga = New tuple
                                 Set ga.GroupRef = var(k)
                                 ga.CodeName = n$
-                                ga.Arr = False
+                                ga.arr = False
                                 neoGetArray = True
                             End If
                             Exit Function
@@ -24243,7 +24243,7 @@ checkgrouphere:
                         ElseIf TypeOf var(k) Is PropReference Then
                             Set ga = New ppppLight
                             Set ga.GroupRef = var(k)
-                            ga.Arr = False
+                            ga.arr = False
                             neoGetArray = True
                             Exit Function
                         Else
@@ -24286,7 +24286,7 @@ If k <= 0 Then
             If VarTypeName(var(0)) = mHdlr Then
                 Set ga = New ppppLight
                 Set ga.GroupRef = var(0)
-                ga.Arr = False
+                ga.arr = False
                 neoGetArray = True
                 var(0) = 0&
                 Exit Function
@@ -24329,7 +24329,7 @@ ElseIf k = 0 Then
             Case Is < 3, 5
                 Set ga = New ppppLight
                 Set ga.GroupRef = var(k)
-                ga.Arr = False
+                ga.arr = False
                 neoGetArray = True
                 Exit Function
             End Select
@@ -24355,7 +24355,7 @@ ElseIf k = 0 Then
         If TypeOf var(k) Is mHandler Then
             Set ga = New ppppLight
             Set ga.GroupRef = var(k)
-            ga.Arr = False
+            ga.arr = False
             neoGetArray = True
             Exit Function
         End If
@@ -24413,7 +24413,7 @@ isagroupvalue:
             If var(k) Is Nothing Then
                 Set ga = New ppppLight
                 Set ga.GroupRef = Nothing
-                ga.Arr = False
+                ga.arr = False
                 neoGetArray0 = True
                
                 Exit Function
@@ -24422,7 +24422,7 @@ isagroupvalue:
                 Case Is < 3, 5
                     Set ga = New ppppLight
                     Set ga.GroupRef = var(k)
-                    ga.Arr = False
+                    ga.arr = False
                     neoGetArray0 = True
                     Exit Function
                 Case Else
@@ -24445,7 +24445,7 @@ isagroupvalue:
                 Case Is < 3, 5
                     Set ga = New ppppLight
                     Set ga.GroupRef = var(k)
-                    ga.Arr = False
+                    ga.arr = False
                     neoGetArray0 = True
                     Exit Function
                 End Select
@@ -24488,7 +24488,7 @@ contHandler:
                         Case Is < 3, 5
                             Set ga = New ppppLight
                             Set ga.GroupRef = var(k)
-                            ga.Arr = False
+                            ga.arr = False
                             neoGetArray0 = True
                             Exit Function
                         End Select
@@ -24498,7 +24498,7 @@ checkgroup:
                             If var(k).HasParametersSet Then
                                 Set ga = New ppppLight
                                 Set ga.GroupRef = var(k)
-                                ga.Arr = False
+                                ga.arr = False
                                 neoGetArray0 = True
                             End If
                             Exit Function
@@ -24511,7 +24511,7 @@ checkgroup:
                             Else
                                 ga.CodeName = vbNullString
                             End If
-                            ga.Arr = False
+                            ga.arr = False
                             neoGetArray0 = True
                             Exit Function
                         Else
@@ -24520,7 +24520,7 @@ checkgroup:
                     ElseIf TypeOf var(k) Is PropReference Then
                         Set ga = New ppppLight
                         Set ga.GroupRef = var(k)
-                        ga.Arr = False
+                        ga.arr = False
                         neoGetArray0 = True
                         Exit Function
                     End If
@@ -24540,7 +24540,7 @@ checkforglobal:
                     Case Is < 3, 5
                         Set ga = New ppppLight
                         Set ga.GroupRef = var(k)
-                        ga.Arr = False
+                        ga.arr = False
                         neoGetArray0 = True
                         Exit Function
                     End Select
@@ -24552,21 +24552,21 @@ checkgrouphere:
                                 ' process parameters
                                 Set ga = New ppppLight
                                 Set ga.GroupRef = var(k)
-                                ga.Arr = False
+                                ga.arr = False
                                 neoGetArray0 = True
                                 If rightexpression Then Exit Function
                             ElseIf var(k).HasParameters Then  ' this is for inventories
                                 Set ga = New tuple
                                 Set ga.GroupRef = var(k)
                                 ga.CodeName = n$
-                                ga.Arr = False
+                                ga.arr = False
                                 neoGetArray0 = True
                             End If
                             Exit Function
                         ElseIf TypeOf var(k) Is PropReference Then
                             Set ga = New ppppLight
                             Set ga.GroupRef = var(k)
-                            ga.Arr = False
+                            ga.arr = False
                             neoGetArray0 = True
                             Exit Function
 
@@ -24610,7 +24610,7 @@ If k <= 0 Then
             If VarTypeName(var(0)) = mHdlr Then
                 Set ga = New ppppLight
                 Set ga.GroupRef = var(0)
-                ga.Arr = False
+                ga.arr = False
                 neoGetArray0 = True
                 var(0) = 0&
                 Exit Function
@@ -24653,7 +24653,7 @@ ElseIf k = 0 Then
             Case Is < 3, 5
                 Set ga = New ppppLight
                 Set ga.GroupRef = var(k)
-                ga.Arr = False
+                ga.arr = False
                 neoGetArray0 = True
                 Exit Function
             End Select
@@ -24679,7 +24679,7 @@ ElseIf k = 0 Then
         If TypeOf var(k) Is mHandler Then
             Set ga = New ppppLight
             Set ga.GroupRef = var(k)
-            ga.Arr = False
+            ga.arr = False
             neoGetArray0 = True
             Exit Function
         End If
@@ -26667,7 +26667,7 @@ If Len(v$) > 0 Then sp$ = ")"
 again123:
 dd = 0
 dn = 0
-If Not pp.Arr Then
+If Not pp.arr Then
     Dim ppp$
     If TypeOf pp.GroupRef Is mHandler Then
         Set usehandler = pp.GroupRef
@@ -27004,11 +27004,11 @@ CheckThis:
                 Set usehandler = Nothing
             Else
                 Set pp = New ppppLight
-                pp.Arr = False
+                pp.arr = False
                 Set pp.GroupRef = usehandler
             End If
             p = vbEmpty
-            NeoGetArrayItem = pp.Arr
+            NeoGetArrayItem = pp.arr
             GoTo again123
         ElseIf VarTypeName(pp.item(Offset)) = mGroup Then
             NeoGetArrayItem = True
@@ -28358,7 +28358,7 @@ jumpheretoo:
                             With pppp
                                 MakeitPropReference myVar
                                 Set myProp = myVar
-                                If .Arr Then Set .item(NewRef) = myVar
+                                If .arr Then Set .item(NewRef) = myVar
                                 If hardlink Then
                                     Set oo = v(vIndex)
                                     If TypeOf oo Is mHandler Then
@@ -29122,7 +29122,7 @@ again2:
         If Not bstack.lastobj Is Nothing Then
         If TypeOf bstack.lastobj Is mArray Then
                 Set mm = bstack.lastobj
-                If mm.Arr Then
+                If mm.arr Then
                 mm.ExportStringArrayNow
                 mm.refArray = 0&
                 End If
@@ -31322,26 +31322,26 @@ trace = True
 com1020:
 STbyST = True
 STq = False
-Dim m As Long, s$
+Dim M As Long, s$
 Do
-m = 1
+M = 1
 
- what$ = aheadstatus(rest$, , m)
+ what$ = aheadstatus(rest$, , M)
 
- If m > 1 Then
+ If M > 1 Then
  
- If Asc(Left$(LTrim(Left$(rest$, m)), 1) + " ") < 32 Then Exit Do
+ If Asc(Left$(LTrim(Left$(rest$, M)), 1) + " ") < 32 Then Exit Do
  'STq = True
  If s$ <> "" Then
- s$ = s$ + ", " + LTrim$(Left$(rest$, m - 1))
+ s$ = s$ + ", " + LTrim$(Left$(rest$, M - 1))
  Else
-s$ = s$ + LTrim$(Left$(rest$, m - 1))
+s$ = s$ + LTrim$(Left$(rest$, M - 1))
 End If
-Mid$(rest$, 1, m - 1) = space$(m - 1)
+Mid$(rest$, 1, M - 1) = space$(M - 1)
 'STbyST = False
 End If
 If Not FastSymbol(rest$, ",") Then Exit Do
-Loop Until m = 1
+Loop Until M = 1
 If Not Form2.Visible Then Form2.Show , Form1
 Form2.Compute.vartext = s$
 rest$ = NLtrim(rest$)
@@ -32689,6 +32689,8 @@ End Function
 Private Function PushParamSUB(basestack As basetask, rest$, retStiva) As Boolean
     Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
     Dim what As Integer, W$, u1 As Long, flag As Boolean, namedArg As mStiva, safety As Long
+    Dim sym As Symbol
+    
     Set basestack.lastobj = Nothing
     If MaybeIsSymbol(rest$, b12345b) Then
         PushParamSUB = True
@@ -32699,34 +32701,39 @@ Private Function PushParamSUB(basestack As basetask, rest$, retStiva) As Boolean
     
     Do While safety <> Len(rest$)
         safety = Len(rest$)
-        If FastSymbol(rest$, "%") Then
-        p = IsLabel(basestack, rest$, s$, True)
-        If p < 5 Then
-            If FastSymbol(rest$, "=", True) Then
-                If MyArg(basestack, rest$, p) Then
-                    If LastErNum <> 0 Then GoTo cont0303494
-                    If namedArg Is Nothing Then Set namedArg = NewmStiva: Set retStiva = namedArg
-                    namedArg.PushStr s$
-                    
-                    namedArg.PushObjVarItem2 p
+        u1 = MyTrimL(rest$)
+        Select Case Mid$(rest$, u1, 1)
+        Case "%"
+            Mid$(rest$, u1, 1) = " "
+            p = IsLabel(basestack, rest$, s$, True)
+            If p < 5 Then
+                If FastSymbol(rest$, "=", True) Then
+                    If MyArg(basestack, rest$, p) Then
+                        If LastErNum <> 0 Then GoTo cont0303494
+                        If namedArg Is Nothing Then Set namedArg = NewmStiva: Set retStiva = namedArg
+                        namedArg.PushStr s$
+                        
+                        namedArg.PushObjVarItem2 p
+                    Else
+                        GoTo cont0303494
+                    End If
                 Else
-                    GoTo cont0303494
-                End If
-            Else
 cont0303494:
-                PushParamSUB = False
-                Exit Function
+                    PushParamSUB = False
+                    Exit Function
+                End If
+                ps.DataOptional
+                PushParamSUB = True
+            Else
+                MyEr "Array can't pass by name", "Ο πίνακας δεν μπορεί να περάσει με όνομα"
+                GoTo cont0303494
             End If
+        Case "?"
+            Mid$(rest$, u1, 1) = " "
             ps.DataOptional
             PushParamSUB = True
-        Else
-            MyEr "Array can't pass by name", "Ο πίνακας δεν μπορεί να περάσει με όνομα"
-            GoTo cont0303494
-        End If
-    ElseIf FastSymbol(rest$, "?") Then
-            ps.DataOptional
-            PushParamSUB = True
-        ElseIf FastSymbol(rest$, "!") Then
+        Case "!"
+            Mid$(rest$, u1, 1) = " "
             If IsExp(basestack, rest$, p, nostring:=True) Then
                 If basestack.lastobj Is Nothing Then
                    ps.DataValLong p
@@ -32752,7 +32759,33 @@ cont0303494:
                 End If
                 Set basestack.lastobj = Nothing
             End If
-        Else
+        Case "#"
+            If Mid$(rest$, u1 + 1, 6) Like "[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]" Then
+                s$ = Mid$(rest$, u1 + 7, 1)
+                If Len(s$) > 0 Then
+                If Not MyTrimL(s$) = 2 Then
+                    If Not InStr(b123456, s$) > 0 Then
+                    GoTo checked
+                    End If
+                End If
+                End If
+                GoTo conthere1
+            End If
+checked:
+            Mid$(rest$, u1, 1) = " "
+            
+            p = IsLabel(basestack, rest$, s$, True)
+            If p <> 1 Then
+                SyntaxError
+                Exit Function
+            End If
+            
+            sym.Value = s$
+            sym.Class = s$
+            
+            ps.DataVal sym
+            PushParamSUB = True
+        Case Else
             p = 0
             If IsPureLabelNoArray(rest$, s$, u1, ":=", p) Then
                 Select Case s$
@@ -32775,6 +32808,7 @@ cont0303494:
             
             End If
 ' normal
+conthere1:
             If IsExp(basestack, rest$, p) Then
                  If Not basestack.lastobj Is Nothing Then
                     If TypeOf basestack.lastobj Is mStiva Then
@@ -32823,7 +32857,7 @@ Err1:
                 PushParamSUB = False
                 Exit Do
             End If
-        End If
+        End Select
 nextparam:
         If Not PushParamSUB Then Exit Do
         If Len(rest$) = 0 Then Exit Do
@@ -32843,8 +32877,7 @@ nextparam:
 End Function
 Private Function PushParamGeneralV7(basestack As basetask, rest$, ps As mStiva) As Boolean
 Dim p As Variant, s$, usehandler As mHandler, usestiva As mStiva, u1 As Long, safety As Long
-
-Dim ParentStack As basetask, namedArg As mStiva
+Dim ParentStack As basetask, namedArg As mStiva, sym As Symbol
 If MaybeIsSymbol(rest$, b12345b) Then
     PushParamGeneralV7 = True
     Exit Function
@@ -32859,7 +32892,10 @@ basestack.CallLocalLast = False
 
 Do While safety <> Len(rest$)
     safety = Len(rest$)
-    If FastSymbol(rest$, "%") Then
+    u1 = MyTrimL(rest$)
+    Select Case Left$(rest$, u1)
+    Case "%"
+        Mid$(rest$, u1, 1) = " "
         p = IsLabel(basestack, rest$, s$, True)
         If p < 5 Then
             If FastSymbol(rest$, "=", True) Then
@@ -32882,10 +32918,12 @@ cont0303494:
             MyEr "Array can't pass by name", "Ο πίνακας δεν μπορεί να περάσει με όνομα"
             GoTo cont0303494
         End If
-    ElseIf FastSymbol(rest$, "?") Then
+    Case "?"
+        Mid$(rest$, u1, 1) = " "
         ps.DataOptional
         PushParamGeneralV7 = True
-    ElseIf FastSymbol(rest$, "!") Then
+    Case "!"
+        Mid$(rest$, u1, 1) = " "
         If IsExp(ParentStack, rest$, p) Then
             If ParentStack.lastobj Is Nothing Then
                 ps.DataValLong p
@@ -32911,8 +32949,35 @@ cont0303494:
             End If
             Set ParentStack.lastobj = Nothing
         End If
-    Else
-    u1 = 1
+        
+    Case "#"
+                If Mid$(rest$, u1 + 1, 6) Like "[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]" Then
+                s$ = Mid$(rest$, u1 + 7, 1)
+                If Len(s$) > 0 Then
+                If Not MyTrimL(s$) = 2 Then
+                    If Not InStr(b123456, s$) > 0 Then
+                    GoTo checked
+                    End If
+                End If
+                End If
+                GoTo conthere1
+            End If
+checked:
+        Mid$(rest$, u1, 1) = " "
+        
+        p = IsLabel(basestack, rest$, s$, True)
+        If p <> 1 Then
+            SyntaxError
+            Exit Function
+        End If
+        
+        sym.Value = s$
+        sym.Class = s$
+        
+        ps.DataVal sym
+        PushParamGeneralV7 = True
+    Case Else
+        u1 = 1
         If IsPureLabelNoArray(rest$, s$, u1, ":=", p) Then
                 Select Case s$
                 Case "LIST", "QUEUE", "STACK", "ΛΙΣΤΑ", "ΟΥΡΑ", "ΣΩΡΟΣ"
@@ -32933,6 +32998,7 @@ cont0303494:
                 End Select
             
             End If
+conthere1:
             ParentStack.modfuncall = True
             If IsExp(ParentStack, rest$, p) Then
                 If Not ParentStack.lastobj Is Nothing Then
@@ -32976,19 +33042,19 @@ cont0303494:
                 PushParamGeneralV7 = False
                 GoTo ExitHere
             End If
-    End If
+    End Select
     If LastErNum <> -2 And LastErNum <> 0 Then
         MyEr "Error in input list", "Πρόβλημα στις παραμέτρους"
         PushParamGeneralV7 = False
         GoTo ExitHere
     End If
+    
 nextparam:
-'    If Not PushParamGeneralV7 Then Exit Do
     If Len(rest$) = 0 Then Exit Do
     p = MyTrimL(rest$)
     If p > 1 Then
-    rest$ = Mid$(rest$, p)
-    If Len(rest$) = 0 Then Exit Do
+        rest$ = Mid$(rest$, p)
+        If Len(rest$) = 0 Then Exit Do
     End If
     'If InStr(b12345b, Left$(rest$, 1)) > 0 Then Exit Do
     If Left$(rest$, 1) = "," Then Mid$(rest$, 1, 1) = " ": safety = Len(rest$) - 1
@@ -33000,9 +33066,11 @@ basestack.CallLocalLast = oldlocallast
 Set ParentStack = Nothing
 End Function
 Function PushParamGeneral(basestack As basetask, rest$, Optional ByVal temphere$) As Boolean
-PushParamGeneral = True
-Dim namedArg As mStiva, safety As Long, u1 As Long
-Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
+    PushParamGeneral = True
+    Dim namedArg As mStiva, safety As Long, u1 As Long
+    Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
+    Dim sym As Symbol
+    
     Set ps = NewmStiva
     Set basestack.lastobj = Nothing
     If MaybeIsSymbol(rest$, b12345b) Then
@@ -33012,7 +33080,10 @@ Dim ps As mStiva, p As Variant, s$, usehandler As mHandler, usestiva As mStiva
     Set ps = NewmStiva
     Do While safety <> Len(rest$)
         safety = Len(rest$)
-        If FastSymbol(rest$, "%") Then
+        u1 = MyTrimL(rest$)
+        Select Case Mid$(rest$, u1, 1)
+        Case "%"
+            Mid$(rest$, u1, 1) = " "
             p = IsLabel(basestack, rest$, s$, True)
             If p < 5 Then
                 If FastSymbol(rest$, "=", True) Then
@@ -33037,9 +33108,11 @@ cont84848:
                 MyEr "Array can't pass by name", "Ο πίνακας δεν μπορεί να περάσει με όνομα"
                 PushParamGeneral = False: basestack.modfuncall = False: Exit Function
             End If
-        ElseIf FastSymbol(rest$, "?") Then
+        Case "?"
+            Mid$(rest$, u1, 1) = " "
             ps.DataOptional
-        ElseIf FastSymbol(rest$, "!") Then
+        Case "!"
+            Mid$(rest$, u1, 1) = " "
             If IsExp(basestack, rest$, p) Then
                 If basestack.lastobj Is Nothing Then
                    ps.DataValLong p
@@ -33061,9 +33134,34 @@ cont84848:
                 End If
                 Set basestack.lastobj = Nothing
             End If
-        Else
-        u1 = 1
-        If IsPureLabelNoArray(rest$, s$, u1, ":=", p) Then
+        Case "#"
+            If Mid$(rest$, u1 + 1, 6) Like "[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]" Then
+                s$ = Mid$(rest$, u1 + 7, 1)
+                If Len(s$) > 0 Then
+                If Not MyTrimL(s$) = 2 Then
+                    If Not InStr(b123456, s$) > 0 Then
+                    GoTo checked
+                    End If
+                End If
+                End If
+                GoTo conthere1
+            End If
+checked:
+            Mid$(rest$, u1, 1) = " "
+            
+            p = IsLabel(basestack, rest$, s$, True)
+            If p <> 1 Then
+                SyntaxError
+                Exit Function
+            End If
+            
+            sym.Value = s$
+            sym.Class = s$
+            
+            ps.DataVal sym
+        Case Else
+            u1 = 1
+            If IsPureLabelNoArray(rest$, s$, u1, ":=", p) Then
                 Select Case s$
                 Case "LIST", "QUEUE", "STACK", "ΛΙΣΤΑ", "ΟΥΡΑ", "ΣΩΡΟΣ"
                 Case Else
@@ -33083,6 +33181,7 @@ cont84848:
                 End Select
             
             End If
+conthere1:
             basestack.modfuncall = True
             If IsExp(basestack, rest$, p) Then
             If Not basestack.lastobj Is Nothing Then
@@ -33129,8 +33228,8 @@ cont84848:
                 PushParamGeneral = False
             Exit Do
         End If
-    End If
-    End If
+        End If
+    End Select
 nextparam:
     If LastErNum <> -2 And LastErNum <> 0 Then
         MyEr "Error in input list", "Πρόβλημα στις παραμέτρους"
@@ -33148,7 +33247,7 @@ nextparam:
         If Left$(rest$, 1) = "," Then Mid$(rest$, 1, 1) = " ": safety = Len(rest$) - 1
 
     
-    
+
 Loop
 With basestack
     If .SorosNothing Then
@@ -34642,7 +34741,7 @@ Dim useType As Boolean, vt As Integer
 i = Abs(IsLabel(bstack, b$, what$))
 If i > 4 And i < 8 Then
     If neoGetArray(bstack, what$, ppppAny) Then
-        If Not ppppAny.Arr Then NeedAnArray1: Exit Function
+        If Not ppppAny.arr Then NeedAnArray1: Exit Function
         If NeoGetArrayItem(ppppAny, bstack, what$, v, b$) Then
             Set pppp = ppppAny
 againhere:
@@ -34663,7 +34762,7 @@ againhere:
                                     pppp.item(v) = .StackItem(i)
                                 Else
                                     If TypeOf .StackItem(i) Is mArray Then
-                                        If .StackItem(i).Arr Then
+                                        If .StackItem(i).arr Then
                                             Set pppp1 = New mArray
                                             .StackItem(i).CopyArray pppp1
                                             Set pppp.item(v) = pppp1
@@ -34730,7 +34829,7 @@ againhere:
                                 bs.soros.PushObj pppp.item(v)
                                 bs.soros.Copy2TopItem 1
                                 If TypeOf pppp.itemObject(v) Is mArray Then
-                                    If pppp.item(v).Arr Then
+                                    If pppp.item(v).arr Then
                                         Set usehandler = New mHandler
                                         Set var(i) = usehandler
                                         usehandler.t1 = 3
@@ -34763,7 +34862,7 @@ againhere:
                             End If
                         Case 5, 6, 7
                             If neoGetArray(bstack, W$, ppppAny) Then
-                                If Not ppppAny.Arr Then NeedAnArray1: Exit Function
+                                If Not ppppAny.arr Then NeedAnArray1: Exit Function
                                 Set pppp1 = ppppAny
                                 If IsSymbol(b$, ")") Then
                                     bs.soros.PushObj pppp.item(v)
@@ -34816,7 +34915,7 @@ againhere:
                             End If
                         Case 5, 6, 7
                             If neoGetArray(bstack, W$, pppp1) Then
-                                If Not pppp1.Arr Then MissingArray: Exit Function
+                                If Not pppp1.arr Then MissingArray: Exit Function
                                 If lookOne(b$, ")") Then
                                     If Not NeoGetArrayItem(pppp1, bstack, W$ + ")", V1, "") Then
                                         i = -1
@@ -34849,7 +34948,7 @@ againhere:
                     If IsSymbol(b$, ",") Then
                         If Abs(IsLabel(bstack, b$, W$)) > 4 Then
                             If neoGetArray(bstack, W$, pppp1) Then
-                                If Not pppp1.Arr Then NeedAnArray1: Exit Function
+                                If Not pppp1.arr Then NeedAnArray1: Exit Function
                                 If NeoGetArrayItem(pppp1, bstack, W$, V1, b$) Then
                                     If Not (V1 + p - 1 <= pppp1.UpperMonoLimit) Then
                                         MyEr "Invalid index", "Μη έγκυρος δείκτης"
@@ -36505,6 +36604,7 @@ again111:
             Else
                 bs.UseGroupname = sbf(x1).sbgroup
                 bs.tpointer = sbf(x1).tpointer
+                
                 Call GoFunc(bs, ss$, rest$, vvl, True, x1)
             End If
             Set bs = Nothing
@@ -37564,7 +37664,7 @@ Do
         End If
     ElseIf y1 = 5 Or y1 = 7 Then
         If neoGetArray(bstack, what$, pppp) Then
-            If Not pppp.Arr Then NotArray: MyClear = False: Exit Function
+            If Not pppp.arr Then NotArray: MyClear = False: Exit Function
             If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then MyClear = False: Exit Function
                 If pppp.ItemType(it) = mGroup Then
                     Set pppp.item(it) = Nothing
@@ -37582,7 +37682,7 @@ Do
             End If
     ElseIf y1 = 6 Then
         If neoGetArray(bstack, what$, pppp) Then
-            If Not pppp.Arr Then NotArray: MyClear = False: Exit Function
+            If Not pppp.arr Then NotArray: MyClear = False: Exit Function
             If Not NeoGetArrayItem(pppp, bstack, what$, it, rest$) Then MyClear = False: Exit Function
             If pppp.ItemType(it) = mGroup Then
                 Set pppp.item(it) = Nothing
@@ -37736,7 +37836,7 @@ again11:
     Else
         Dim pppp1 As ppppLight
         Set pppp1 = New ppppLight
-        pppp1.Arr = False
+        pppp1.arr = False
         Set pppp1.GroupRef = pppp.item(i)
         Set pppp = pppp1
         Set pppp1 = Nothing
@@ -38903,7 +39003,7 @@ cont878874545871:
                 Fkey = 0:  Exit Function
             End If
             
-            If Not pppp.Arr Then
+            If Not pppp.arr Then
             If pppp.GroupRef Is Nothing Then
                 InternalError
                 Exit Function
@@ -38919,17 +39019,6 @@ cont878874545871:
             GoTo cont2232322
             ElseIf pppp.IsObjAt(it, p) Then
             GoTo aaa2332
-            'ElseIf it < -2 Then
-            
-            'Set mystack = bstack.soros
-            'Set bstack.Sorosref = newmstiva
-            'If FastSymbol(rest$, ")") Then
-            'PushParamStraight bstack, rest$
-           ' If Not FastSymbol(rest$, ")") Then
-           '     SyntaxError
-           '     Exit Function
-           ' End If
-            'End If
             End If
             p = 0#
             ElseIf pppp.IsObjAt(it, p) Then
@@ -39150,7 +39239,7 @@ again112a:
             
                 bstack.soros.DataVal pp
             End If
-            If pppp.Arr Then
+            If pppp.arr Then
             
                 If SpeedGroup(bstack, pppp, "@R2", "", "", it) = 0 Then
                     Set bstack.Sorosref = mystack
@@ -39159,7 +39248,7 @@ again112a:
            ElseIf TypeOf pppp.GroupRef Is mHandler Then
            
                     Set pppp1 = New ppppLight
-                    pppp1.Arr = False
+                    pppp1.arr = False
                     Set pppp1.GroupRef = pppp.item(it)
                     
                     If SpeedGroup(bstack, pppp1, "@R2", "", "", -2&) = 0 Then
@@ -41113,7 +41202,7 @@ Do
             End If
         ElseIf y1 = 6 Then
         If neoGetArray(basestack, what$, pppp) Then
-        If Not pppp.Arr Then NotArray: Exit Function
+        If Not pppp.arr Then NotArray: Exit Function
                 If Not NeoGetArrayItem(pppp, basestack, what$, it, rest$) Then Exit Function
                          If pppp.ItemType(it) = doc Then
                          Set pppp.item(it) = New Document
@@ -41227,7 +41316,7 @@ there1:
 Err.Clear
 End Function
 Function ProcGet(basestack As basetask, rest$) As Boolean
-Dim pppp As iBoxArray, it As Long, what$, p As Variant, f As Variant, par As Boolean, s$, Arr As Boolean
+Dim pppp As iBoxArray, it As Long, what$, p As Variant, f As Variant, par As Boolean, s$, arr As Boolean
 Dim flag As Boolean, usehandler As mHandler, pp As Variant, RF As refArray
 IsSymbol3 rest$, "#"
 
@@ -41262,7 +41351,7 @@ If IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
             pp = 0
                 If IsExp(basestack, rest$, pp, flatobject:=True, nostring:=True) Then
                     ' nothing here
-                    Arr = True
+                    arr = True
                 End If
                 If Not FastSymbol(rest$, ")") Then GoTo ex123
                 If Not VarTypeName(var(it)) = mHdlr Then GoTo ex123
@@ -41384,7 +41473,7 @@ reenter1:
                     .GetData (f), .GetBytePtr(0), .SizeByte
                 End If
             Else
-                If Arr Then
+                If arr Then
                     p = 1
                     If FastSymbol(rest$, ",") Then
                         If Not IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
@@ -41719,9 +41808,9 @@ End If
   
 End Function
 Sub MakeThunk(where$, vvv As Long, ByVal GroupName$, ByVal tpointer As Long)
-Dim EventObj As FastCollection, m As Group, it As Long
-Set m = var(vvv)
-Set EventObj = m.Events
+Dim EventObj As FastCollection, M As Group, it As Long
+Set M = var(vvv)
+Set EventObj = M.Events
 If EventObj Is Nothing Then Exit Sub
 Dim i As Long, j As Long, part$
 If here$ <> "" Then where$ = here$ + "." + where$
@@ -42048,7 +42137,7 @@ End If
 End If
 End Function
 Function MyPut(basestack As basetask, rest$) As Boolean
-Dim s$, f As Long, p As Variant, i As Long, pp As Variant, it As Long, flag As Boolean, Arr As Boolean
+Dim s$, f As Long, p As Variant, i As Long, pp As Variant, it As Long, flag As Boolean, arr As Boolean
 Dim usehandler As mHandler, what$, RF As refArray
 MyPut = False
  IsSymbol3 rest$, "#"
@@ -42087,7 +42176,7 @@ Select Case IsLabel(basestack, rest$, what$)
     pp = 0
     If IsExp(basestack, rest$, pp, flatobject:=True, nostring:=True) Then
     ' nothing here
-    Arr = True
+    arr = True
     End If
     If Not FastSymbol(rest$, ")") Then GoTo ex123
     If Not VarTypeName(var(it)) = mHdlr Then GoTo ex123
@@ -42210,7 +42299,7 @@ Else
 End If
 
 Else
-    If Arr Then
+    If arr Then
     p = 1
     If FastSymbol(rest$, ",") Then
         If Not IsExp(basestack, rest$, p, flatobject:=True, nostring:=True) Then
@@ -42476,7 +42565,7 @@ End Function
 
 Function ProcClass(basestack As basetask, rest$, Lang As Long, super As Boolean) As Boolean
 Dim i As Long, ss$, y1 As Long, what$, W$, ohere$, w2$, subs As Long, snames As Long, s$, pre$
-Dim k As Long, m As Long, once As Boolean, Skipfirsttype As Boolean, wt$
+Dim k As Long, M As Long, once As Boolean, Skipfirsttype As Boolean, wt$
 Dim skipnew As Boolean
 If super Then
     subs = sb2used: snames = subHash.Count:
@@ -42493,8 +42582,8 @@ y1 = IsLabelSymbolNew(rest$, "ΓΕΝΙΚΗ", "GLOBAL", Lang)
 
 Select Case IsLabelA("", rest$, W$)
 Case 1
-If comhash.Find2(W$, m, i) Then
-If m > 0 Then
+If comhash.Find2(W$, M, i) Then
+If M > 0 Then
     skipnew = True
     'MyEr "bad class name", "μη αποδεκτό όνομα κλάσης"
     'ProcClass = False
@@ -42555,9 +42644,9 @@ againhere:
                                  Else
          
                                     k = InStr(sbf(i).sb, vbCrLf)
-                                    m = rinstr(sbf(i).sb, vbCrLf + vbCrLf)
-                                    If m > k And Len(sbf(i).sb) > m Then
-                                        s$ = Mid$(sbf(i).sb, k + 2, m - k)
+                                    M = rinstr(sbf(i).sb, vbCrLf + vbCrLf)
+                                    If M > k And Len(sbf(i).sb) > M Then
+                                        s$ = Mid$(sbf(i).sb, k + 2, M - k)
                                         k = InStr(s$, "{")
                                         If k > 0 Then
                                         
@@ -42586,14 +42675,14 @@ againhere:
          End If
 Case 3
 w2$ = Left$(W$, Len(W$) - 1)
-If comhash.Find2(w2$, m, i) Then
-If m > 0 Then
+If comhash.Find2(w2$, M, i) Then
+If M > 0 Then
     MyEr "bad class name", "μη αποδεκτό όνομα κλάσης"
     ProcClass = False
 Exit Function
 End If
 End If
-m = 0
+M = 0
 i = 0
 againhere1:
         If FastSymbol(rest$, "{") Then
@@ -42649,9 +42738,9 @@ againhere1:
                                  Else
 
                                     k = InStr(sbf(i).sb, vbCrLf)
-                                    m = rinstr(sbf(i).sb, vbCrLf + vbCrLf)
-                                    If m > k And Len(sbf(i).sb) > m Then
-                                        s$ = Mid$(sbf(i).sb, k + 2, m - k)
+                                    M = rinstr(sbf(i).sb, vbCrLf + vbCrLf)
+                                    If M > k And Len(sbf(i).sb) > M Then
+                                        s$ = Mid$(sbf(i).sb, k + 2, M - k)
                                         k = InStr(s$, "{")
                                         If k > 0 Then
                                         
@@ -43367,7 +43456,7 @@ usethisbase = ArrBase
     
     If neoGetArray(basestack, W$, tstArray, here$ <> "") Then
         
-        If Not tstArray.Arr Then Set pppp = Nothing: GoTo ex1
+        If Not tstArray.arr Then Set pppp = Nothing: GoTo ex1
         If TypeOf tstArray Is mArray Then
             Set pppp = tstArray
             If pppp.IhaveClass And pppp.GroupRef Is Nothing Then Set pppp = Nothing: GoTo ex1
@@ -44132,7 +44221,7 @@ Function iter(bstack As basetask, rest$, Lang As Long) As Boolean
     w1 = Abs(IsLabel(bstack, rest$, s$))
     If w1 > 4 Then
     If neoGetArray(bstack, s$, pppp) Then
-        If pppp.Arr Then
+        If pppp.arr Then
             If FastSymbol(rest$, ")") Then
             If Not IsSymbol(rest$, ",") Then
             ' READ KEYWORDS
@@ -44969,13 +45058,13 @@ ElseIf mm.StackItemTypeIsObject(1) Then
          ElseIf Typename$(myobject) = "lambda" Then
                   Set pppp.item(v) = myobject
           ElseIf Typename$(myobject) = myArray Then
-              If myobject.Arr Then
+              If myobject.arr Then
                       Set pppp.item(v) = CopyArray(myobject)
                   Else
                       Set pppp.item(v) = myobject
                   End If
          ElseIf Typename$(myobject) = "tuple" Then
-              If myobject.Arr Then
+              If myobject.arr Then
                       Set pppp.item(v) = CopyArray(myobject)
                   Else
                       Set pppp.item(v) = myobject
@@ -45465,7 +45554,7 @@ contstr:
             End If
             If neoGetArray(bstack, s$, pppp) Then
 check123678:
-                If Not pppp.Arr Then NotArray: Exit Function
+                If Not pppp.arr Then NotArray: Exit Function
                 IsArrayCopy = FastSymbol(a$, ")", True)
                 Dim usehandler1 As mHandler
                     
@@ -45525,7 +45614,7 @@ Dim myGroup As Group, emp As ExtArray
                     pppp.index = usehandler.index_cursor
                     End If
                     If usehandler.UseIterator Then
-                    If Not pppp.Arr Then NotArray: Exit Function
+                    If Not pppp.arr Then NotArray: Exit Function
                     If FastSymbol(a$, ",") Then
                         Set bstack.lastobj = Nothing
                         Set usehandler = Nothing
@@ -45604,7 +45693,7 @@ contFast:
                 Set bstack.lastobj = Nothing
                 If FastSymbol(a$, ")") Then
                 
-                If Not pppp.Arr Then NotArray: Exit Function
+                If Not pppp.arr Then NotArray: Exit Function
                 If pppp.Count = 0 Then
                 MyEr "No item found", "Δεν βρέθηκε στοιχείο"
                 Else
@@ -45678,7 +45767,7 @@ contstr:
             End If
             If neoGetArray(bstack, s$, pppp) Then
 check123678:
-                If Not pppp.Arr Then NotArray: Exit Function
+                If Not pppp.arr Then NotArray: Exit Function
                 If FastSymbol(a$, ",") Then
                     If TypeOf pppp Is FastCollection Then
                     If IsExp(bstack, a$, p, , True, , True) Then
@@ -47030,7 +47119,7 @@ reentry1:
                                 Set pppp = New ppppLight
                                 pppp.PushDim 1
                                 pppp.PushEnd
-                                pppp.Arr = True
+                                pppp.arr = True
                                 Set pppp.item(0) = IsGroupOnly
                                 w2 = 0
                                 GoTo reentry1
@@ -47409,7 +47498,7 @@ getgroup:
                 Set pppp = New ppppLight
                 pppp.PushDim 1
                 pppp.PushEnd
-                pppp.Arr = True
+                pppp.arr = True
                 Set pppp.item(0) = bstack.lastpointer
                 Set bstack.lastpointer = Nothing
                  If pppp.item(0).HasParameters Then
@@ -47432,7 +47521,7 @@ getgroup2:
             Set pppp = New ppppLight
             pppp.PushDim 1
             pppp.PushEnd
-            pppp.Arr = True
+            pppp.arr = True
             Set pppp.item(0) = bstack.lastpointer
             Set bstack.lastpointer = Nothing
             If pppp.item(0).link.HasParameters Then
@@ -47504,7 +47593,7 @@ checkme:
         Set pppp = New ppppLight
             pppp.PushDim 1
             pppp.PushEnd
-            pppp.Arr = True
+            pppp.arr = True
             Set pppp.item(0) = ThisGroup
         If ThisGroup.HasParameters Then
         
@@ -48030,7 +48119,7 @@ Case 1
 Case 5
     If Not neoGetArray(bstack, s$, pppp) Then Exit Function
     If Not NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then Exit Function
-    If pppp.Arr Then
+    If pppp.arr Then
         If pppp.ItemType(w2) = mGroup Then
             r = 0
             If pppp.item(w2).IamApointer Then
@@ -48317,7 +48406,7 @@ If w1 = 1 Or w1 = 5 Then
         If Not MyIsObject(var(w2)) Then GoTo jmp147811
         If Not TypeOf var(w2) Is iBoxArray Then GoTo jmp147811
         Set pppp = var(w2)
-        If pppp.Arr Then GoTo jmp147811
+        If pppp.arr Then GoTo jmp147811
         If Not pppp.ItemType(-1) = mProp Then GoTo jmp147811
         Set bstack.lastobj = pppp.GroupRef
     Else
@@ -48494,7 +48583,7 @@ cont11:
         ElseIf neoGetArray(bstack, s$, ppppl) Then
 
             
-            If Not ppppl.Arr Then
+            If Not ppppl.arr Then
                 If NeoGetArrayItem(ppppl, bstack, s$, w2, a$) Then
                     GoTo conthere
                 End If
@@ -48765,7 +48854,7 @@ ElseIf w1 > 4 Then
     If Not GetVar(bstack, s$, w1) Then
         
         If neoGetArray(bstack, s$, pppp) Then
-            If Not pppp.Arr Then
+            If Not pppp.arr Then
                 If NeoGetArrayItem(pppp, bstack, s$, w2, a$) Then GoTo conthere
             End If
         End If
@@ -50116,7 +50205,7 @@ ElseIf IsExp(basestack, rest$, p) Then
                 SwapStrings rest$, bck$
                 GoTo takeone
             ElseIf Typename(usehandler.objref) = myArray Then
-                If usehandler.objref.Arr Then
+                If usehandler.objref.arr Then
                     Set myobject = usehandler.objref
                     SwapStrings rest$, bck$
                     GoTo takeone
@@ -52260,7 +52349,7 @@ cont:
 Set usehandler = Nothing
 Set ppppl = pp
 
-If ppppl.Arr And Not TypeOf ppppl Is FastCollection Then
+If ppppl.arr And Not TypeOf ppppl Is FastCollection Then
 dn = 0
 
 ppppl.SerialItem (0), dd, 5
@@ -52349,7 +52438,7 @@ Dim dn As Long, dd As Long, p, w3, w2 As Long, pppp As mArray
 If Not Typename$(pp) = myArray Then Exit Function
 Set pppp = pp
 
-If pppp.Arr Then
+If pppp.arr Then
 dn = 0
 
 pppp.SerialItem (0), dd, 5
@@ -52816,35 +52905,35 @@ Function MaybeIsSymbolNoSpace(a$, c$) As Boolean
 MaybeIsSymbolNoSpace = Left$(a$, 1) Like c$
 End Function
 Function IsLabelSymbolLatin(a$, c$, Optional i As Long) As Boolean
-    Dim m As Long
-    m = Len(c$)
+    Dim M As Long
+    M = Len(c$)
     If i = 0 Then i = MyTrimLi(a$, 1)
-    If UCase(Mid$(a$, i, m)) = c$ Then
-        If Len(a$) >= i + m Then
-            Select Case AscW(Mid$(a$, i + m, 1))
+    If UCase(Mid$(a$, i, M)) = c$ Then
+        If Len(a$) >= i + M Then
+            Select Case AscW(Mid$(a$, i + M, 1))
             Case Is < 36, 47, 58, 92, 160
             Case Else
                 Exit Function
             End Select
         End If
-        a$ = Mid$(a$, i + m)
+        a$ = Mid$(a$, i + M)
         IsLabelSymbolLatin = True
     End If
 End Function
 Function IsLabelSymbol(a$, c$, Optional i As Long) As Boolean
-    Dim m As Long
-    m = Len(c$)
+    Dim M As Long
+    M = Len(c$)
     If i = 0 Then i = MyTrimLi(a$, 1)
-    If myUcase(Mid$(a$, i, m), True) = c$ Then
+    If myUcase(Mid$(a$, i, M), True) = c$ Then
         
-        If Len(a$) >= i + m Then
-            Select Case AscW(Mid$(a$, i + m, 1))
+        If Len(a$) >= i + M Then
+            Select Case AscW(Mid$(a$, i + M, 1))
             Case Is < 36, 47, 58, 92, 160
             Case Else
                 Exit Function
             End Select
         End If
-        a$ = Mid$(a$, i + m)
+        a$ = Mid$(a$, i + M)
         IsLabelSymbol = True
     End If
 End Function
@@ -52853,36 +52942,36 @@ Function IsLabelSymbolNewExp(a$, gre$, Eng$, code As Long, usethis$, Optional i 
 ' 0 for gre
 ' 1 for eng
 ' return true if we have label
-Dim m As Long
-m = Len(usethis$)
+Dim M As Long
+M = Len(usethis$)
 If i = 0 Then i = MyTrimLi(a$, 1)
-If m = 0 Then
+If M = 0 Then
     If code = 1 Then
-        m = Len(Eng$)
-            If Not UCase(Mid$(a$, i, m)) = Eng$ Then
-                If IsLabelSYMB33(a$, usethis, m) Then usethis = myUcase(usethis, True)
+        M = Len(Eng$)
+            If Not UCase(Mid$(a$, i, M)) = Eng$ Then
+                If IsLabelSYMB33(a$, usethis, M) Then usethis = myUcase(usethis, True)
                 Exit Function
             End If
     Else
-        m = Len(gre$)
-        If Not myUcase(Mid$(a$, i, m), True) = gre$ Then
-            If IsLabelSYMB33(a$, usethis, m) Then usethis = myUcase(usethis, True)
+        M = Len(gre$)
+        If Not myUcase(Mid$(a$, i, M), True) = gre$ Then
+            If IsLabelSYMB33(a$, usethis, M) Then usethis = myUcase(usethis, True)
             Exit Function
         End If
         
     End If
-    If Len(a$) >= i + m Then
-        Select Case AscW(Mid$(a$, i + m, 1))
+    If Len(a$) >= i + M Then
+        Select Case AscW(Mid$(a$, i + M, 1))
         'Case Is < 36, 47, 58, 92, 123, 160
         Case Is < 36, 39, 41 To 45, 47, 58, 61, 92, 123, 125, 160
         'Case 36, 37, 46, 48 To 58, 94, 95  ' _ . 0123456789
         Case Else '36, 37, 40, 46, 48 To 58, 64, 91, 93 To 95
-            If IsLabelSYMB33(a$, usethis, m) Then usethis = myUcase(usethis, True)
-            usethis = Mid$(a$, i, m)
+            If IsLabelSYMB33(a$, usethis, M) Then usethis = myUcase(usethis, True)
+            usethis = Mid$(a$, i, M)
             Exit Function
         End Select
     End If
-    a$ = Mid$(a$, i + m)
+    a$ = Mid$(a$, i + M)
     IsLabelSymbolNewExp = True
     usethis$ = vbNullString
 Else
@@ -52892,7 +52981,7 @@ Else
     Case 1
     If Len(Eng$) = Len(usethis) Then IsLabelSymbolNewExp = Eng$ = usethis$
     End Select
-    If IsLabelSymbolNewExp Then a$ = Mid$(a$, i + m): usethis$ = vbNullString
+    If IsLabelSymbolNewExp Then a$ = Mid$(a$, i + M): usethis$ = vbNullString
 End If
 
 
@@ -52903,34 +52992,34 @@ Function IsLabelSymbolNew(a$, gre$, Eng$, code As Long, Optional i As Long = 0, 
 ' 1 for eng
 ' return true if we have label
 Const b = vbCr + ",'\/:}"
-    Dim m As Long
+    Dim M As Long
     
     If i = 0 Then i = MyTrimLi(a$, 1)
     If code = 1 Then
-        m = Len(Eng$)
-        If Not UCase(Mid$(a$, i, m)) = Eng$ Then
+        M = Len(Eng$)
+        If Not UCase(Mid$(a$, i, M)) = Eng$ Then
             Exit Function
         End If
     Else
-        m = Len(gre$)
-        If Not myUcase(Mid$(a$, i, m), True) = gre$ Then
+        M = Len(gre$)
+        If Not myUcase(Mid$(a$, i, M), True) = gre$ Then
             Exit Function
         End If
     End If
-    m = m + i
+    M = M + i
     
 
-    If Len(a$) >= m Then
+    If Len(a$) >= M Then
         If skipterminal Then
-        i = MyTrimLi(a$, m)
+        i = MyTrimLi(a$, M)
         If Len(a$) >= i Then If InStr(b, Mid$(a$, i, 1)) > 0 Then Exit Function
-        If i > m Then
+        If i > M Then
             a$ = Mid$(a$, i)
             IsLabelSymbolNew = True
             Exit Function
         End If
         End If
-        Select Case AscW(Mid$(a$, m, 1))
+        Select Case AscW(Mid$(a$, M, 1))
         Case Is < 36, 39, 41 To 45, 47, 58 To 61, 92, 93, 123, 125, 160
         Case Else ' 36, 37, 40, 46, 48 To 58, 64, 91, <<93 old>> To 95 ' _ . 0123456789
             Exit Function
@@ -52938,7 +53027,7 @@ Const b = vbCr + ",'\/:}"
     ElseIf skipterminal Then
         Exit Function
     End If
-        a$ = Mid$(a$, m)
+        a$ = Mid$(a$, M)
     IsLabelSymbolNew = True
 End Function
 
@@ -53039,8 +53128,8 @@ Set usehandler = obj
     
 End If
 If Not obj Is Nothing Then
-If TypeOf obj Is mArray Then If obj.Arr Then CheckIsmArray = True: Set oldobj = Nothing: Exit Function
-If TypeOf obj Is tuple Then If obj.Arr Then CheckIsmArray = True: Set oldobj = Nothing: Exit Function
+If TypeOf obj Is mArray Then If obj.arr Then CheckIsmArray = True: Set oldobj = Nothing: Exit Function
+If TypeOf obj Is tuple Then If obj.arr Then CheckIsmArray = True: Set oldobj = Nothing: Exit Function
 End If
 Set obj = oldobj
 End Function
@@ -54783,7 +54872,7 @@ fstr30: ' "ARRAY$(", "ΠΙΝΑΚΑΣ$(" - OK
                 ElseIf IsobjArray(usehandler.objref) Then
                     Set ppppl = usehandler.objref
                     If bstackstr.lastobj.UseIterator Then
-                        If Not ppppl.Arr Then NotArray: Exit Function
+                        If Not ppppl.arr Then NotArray: Exit Function
                         If FastSymbol(a$, ",") Then
                             strFunctions = IsExp(bstackstr, a$, r, , True)
                             strFunctions = FastSymbol(a$, ")", True)
@@ -54841,7 +54930,7 @@ isStr0021:
             End If
             If neoGetArray(bstackstr, q1$, ppppl) Then
 check1236789:
-                If Not ppppl.Arr Then NotArray: Exit Function
+                If Not ppppl.arr Then NotArray: Exit Function
                 If FastSymbol(a$, ",") Then
                     strFunctions = NeoGetArrayItem(ppppl, bstackstr, q1$, dd, a$)
                 Else
@@ -54917,7 +55006,7 @@ ch1245:
                 If FastSymbol(a$, ")") Then
                     GoTo cont111
                 ElseIf Not NeoGetArrayItem(ppppl, bstackstr, s$, w2, a$) Then
-                    If Not ppppl.Arr Then
+                    If Not ppppl.arr Then
                         If Typename(ppppl.GroupRef) = mHdlr Then
                             Set p = ppppl.GroupRef
                             strFunctions = CheckItemType(bstackstr, p, a$, r$)
@@ -54943,7 +55032,7 @@ cont111:
                     End If
                     Exit Function
                 End If
-                If ppppl.Arr Then
+                If ppppl.arr Then
                     If ppppl.ItemIsObject(w2) Then
                         Set p = ppppl.item(w2)
                         strFunctions = CheckItemType(bstackstr, p, a$, r$)
@@ -55322,7 +55411,7 @@ fstr39: '"MENU$(", "ΕΠΙΛΟΓΗ$(", "ΕΠΙΛΟΓΕΣ$("
         End With
     Else
     ' return a copy
-        Set ppppl = New tuple: ppppl.PushDim (Form1.List1.listcount): ppppl.PushEnd: ppppl.Arr = True
+        Set ppppl = New tuple: ppppl.PushDim (Form1.List1.listcount): ppppl.PushEnd: ppppl.arr = True
         For w2 = 0 To Form1.List1.listcount - 1
             ppppl.item(w2) = Form1.List1.list(w2)
 
@@ -56528,7 +56617,7 @@ fstr64: ' "PROPERTY$(", "ΙΔΙΟΤΗΤΑ$("  ok
             If Not MyIsObject(var(w2)) Then GoTo jmp147811
                 If TypeOf var(w2) Is iBoxArray Then GoTo jmp147811
                     Set ppppl = var(w2)
-                    If ppppl.Arr Then GoTo jmp147811
+                    If ppppl.arr Then GoTo jmp147811
                     If Not ppppl.ItemType(-1) = mProp Then GoTo jmp147811
                     Set bstackstr.lastobj = ppppl.GroupRef
                 Else
@@ -56783,7 +56872,7 @@ getgroup:
                 Set pppp = New ppppLight
                 pppp.PushDim 1
                 pppp.PushEnd
-                pppp.Arr = True
+                pppp.arr = True
                 Set pppp.item(0) = myGroup
 entry100:
                 If myGroup.HasParameters Then Mid$(a$, 1, 1) = "("
@@ -56847,7 +56936,7 @@ entry100:
                 Set pppp = New ppppLight
                 pppp.PushDim 1
                 pppp.PushEnd
-                pppp.Arr = True
+                pppp.arr = True
                 Set myGroup = bstackstr.lastobj
                 Set pppp.item(0) = bstackstr.lastobj
                 Set bstackstr.lastobj = Nothing
@@ -56865,7 +56954,7 @@ entry100:
                     Set pppp = New ppppLight
                     pppp.PushDim 1
                     pppp.PushEnd
-                    pppp.Arr = True
+                    pppp.arr = True
                     Set pppp.item(0) = myGroup
                     If myGroup.HasParameters Then
                         If Left$(a$, 1) <> ")" Then
@@ -58300,7 +58389,7 @@ End Function
 Private Function GetPPPP(tstArray As iBoxArray, pppp As mArray) As Boolean
         Dim usehandler As mHandler, myTuple As tuple
         If Not tstArray Is Nothing Then
-        If Not tstArray.Arr Then
+        If Not tstArray.arr Then
             conflictname tstArray.GroupRef
             Exit Function
         End If

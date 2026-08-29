@@ -5827,6 +5827,7 @@ If Module(Info) Then
 end if
 }
 MODULE INFOBASIC {  \Italic 0
+Set Fast
 Bold 1
 if val(piece$(os$+" 1"," ")(1))>9 then
 	Font "Segoe UI"
@@ -41686,7 +41687,12 @@ MODULE ROSETTA {try {
 	with wb, "silent", false, "object" set wb1, "visible" as visible
 	
 	'with wb,"RegisterAsBrowser", true
-	method wb,"Navigate2", "https://en.wikipedia.org/wiki/Hello"
+	select case random(1,2)
+	case 1
+		method wb,"Navigate2", "https://en.wikipedia.org/wiki/Hello"
+	case 2
+		method wb,"Navigate2", "https://rosettacode.org/wiki/Rosetta_Code"
+	end select
 	with wb1, "readystate" as readystate
 	
 	function wb.TitleChange {
@@ -48106,7 +48112,7 @@ IF NOT EXIST("sqlite3.dll") THEN
 	PRINT "FILE sqlite3.dll NOT FOUND - START DOWNLOAD FROM INTERNET"
 	CONST BINDF_GETNEWESTVERSION = 0x10&
 //		STRING ZIPFILE="https://www.sqlite.org/2025/sqlite-dll-win-x86-3490200.zip"
-	STRING ZIPFILE="https://sqlite.org/2026/sqlite-dll-win-x86-3530100.zip"
+	STRING ZIPFILE="https://sqlite.org/2026/sqlite-dll-win-x86-3530400.zip"
 	DECLARE URLDownloadToFile LIB "urlmon.URLDownloadToFileW" {
 		LONG p, szUrl$, sxFname$, LONG dwRrvd, LONG cback
 	}
@@ -52727,6 +52733,7 @@ Escape on
 Print "done"
 }
 MODULE POLYSPIRAL_JOY {Print "Press Space to Start | space to Exit"
+refresh 25
 do
 	wait 10
 until keypress(32)
@@ -55338,6 +55345,7 @@ while key
 end while
 }
 MODULE ACTOR {' from https://rosettacode.org/wiki/Window_management#M2000_Interpreter
+set fast
 Module WindowManagment{
 	Declare Form1 Form
 	Print "Watch the Window Drama. A Window (user form) as an actor..."
