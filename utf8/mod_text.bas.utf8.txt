@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 36
+Global Const Revision = 37
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8558,8 +8558,7 @@ again11223355:
                                         If Not TypeOf bstack.lastobj Is BigInteger Then
                                             If Not FastSymbol(a$, "^") Then
 checkProp:
-                                                If UseProp.CurObject Is anything Then
-                                                    On Error Resume Next
+                                                   On Error Resume Next
                                                     r = CVar(bstack.lastobj)
                                                     If Err Then
                                                         r = 0
@@ -8568,7 +8567,8 @@ checkProp:
                                                         nMath2.CompactVBArray VarPtr(r), VarPtr(pp)
                                                         SwapVariant pp, r
                                                         Set bstack.lastobj = Nothing
-                                                    Else
+                                                    ElseIf UseProp.CurObject Is anything Then
+                                                 
                                                         If UseProp.LastHasObject Then
                                                             Set bstack.lastobj = UseProp.lastobj
                                                             UseProp.clearlastobject
@@ -8576,10 +8576,10 @@ checkProp:
                                                             Set bstack.lastobj = Nothing
                                                         End If
                                                     End If
-                                                End If
+                                                'End If
                                             Else
-                                        IsNumberNew = True
-                                    Exit Function
+                                                IsNumberNew = True
+                                                Exit Function
                                         
                                             End If
                                         End If
@@ -39465,7 +39465,7 @@ wehavestring:
         Set photo = New cDIBSection
         If cDib(s$, photo) Then
             If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
-                If IsStrExp(bstack, rest$, s$) Then
+                If IsFlatStringExpr(bstack, rest$, s$) Then
                    photo.SaveDib s$
                    Set photo = Nothing
                End If
@@ -39486,7 +39486,7 @@ wehavestring:
             Dim mb As MemBlock, mb1 As MemBlock
             Set mb = New MemBlock
             If photo.SaveDibToMeMBlock(mb) Then
-                Dim ok As Boolean
+               Dim ok As Boolean
                Set mb = mb.RenderToPng(ok)
                If ok Then
                     MyCopy = mb.SaveBufferToFile(s$)

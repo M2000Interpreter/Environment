@@ -27170,7 +27170,9 @@ move s, top+3*s
 for i = 11 to 3 {
       drawPolygon i, s
 }
-copy "this.bmp"    'export to bmp
+'copy "this.bmp"    'export to bmp
+copy "this.png"    'export to png
+
 A$=KEY$ ' Wait for a keypress
 if module(info) then info
 }
@@ -36872,7 +36874,7 @@ video$=path$(0xE)
 Print video$
 dir video$
 menu
-files + "avi|mp4"
+files + "avi|mp4|mkv|mov|webm|gif"
 Menu !
 if menu>0 then
 	p$=menu$(menu)
@@ -38471,7 +38473,8 @@ Print type$(m)="mArray"
 Print m#sum()
 list
 }
-MODULE C1 {\\$ c:\users\person\appdata\roaming\m2000\m2000rock.jpg
+MODULE C1 {' to insert a binary file use dropdown menu, scroll down and find Load Resource.
+\\$ c:\users\person\appdata\roaming\m2000\m2000rock.jpg
 Binary {
       /9j/4AAQSkZJRgABAQAAAQABAAD//gAMTTIwMDAgVXNlcv/+AHtKUEVHIEVuY29k
       ZXIgQ2xhc3MNCldyaXR0ZW4gYnkgSm9obiBLb3JlandhIDxrb3JlandhQHRpYWMu

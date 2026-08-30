@@ -1,49 +1,58 @@
 M2000 Interpreter and Environment
-Version 15 Revision 36
+Version 15 Revision 37
 
-Athens, August 29, 2026
+Athens, August 31, 2026
 
-Expand symbols to work decoupled from caller. In module Ver15rev36 symbols defined inside module alfa.
-A name for decoupled symbol can't be a html color like this #a0ccff (this is a number), but can be this #a0ccf or this #a0ccffa
-Works with subs, functions, lambda too.
+1) Added EXPORT for PNG in IMAGE statement
+The old way was to make the PNG through the IMAGE() function. See example.
 
-Module Ver15rev35{
-	symbol beta, epsilon, quality, best
-	module alfa (a!,b!, v="", c!) {
-		print "module alfa - Ver15 rev35"	
-		if a=beta then print a
-		if b=epsilon then print b
-		print v
-		' c has operator = only
-		' for equal
-		if c="" else print c, c="BEST"
-		
-	}
-	' using external symbols as qualifiers
-	alfa "a value"
-	alfa beta "a value"
-	alfa beta epsilon "a value" best
+REFRESH 2000
+CLS
+SMOOTH ON
+GRADIENT 1, 5
+MOVE SCALE.X/2, SCALE.Y/2
+R=MIN.DATA(SCALE.X, SCALE.Y)/3
+CIRCLE R
+R*=1.2
+WIDTH 2, 4 {
+	STEP -R
+	DRAW R*2
+	STEP -R, -R
+	DRAW 0, R*2
+	STEP 0, -R
 }
-Ver15rev35
-Module Ver15rev36{
-	module alfa (a!,b!, v="", c!) {
-		print "module alfa - Ver15 rev36"	
-		symbol beta, epsilon, quality
-		if a=beta then print a
-		if b=epsilon then print b
-		print v
-		' c has operator = only
-		' for equal
-		if c="" else print c, c="BEST"
-		
-	}
-	' using internal symbols as qualifiers
-	alfa "a value"
-	alfa #beta "a value"
-	alfa#beta#epsilon "a value"#best
-}
-Ver15rev36
+STEP -R,-R
+VAR A : COPY R*2, R*2 TO A
+IMAGE A EXPORT "TARGET.PNG"
+IMAGE A EXPORT "TARGET.BMP"
+IMAGE A EXPORT "TARGET.JPG", 100 ' 80% quality
+MOVE 0,0
+IMAGE "TARGET.PNG"
+PRINT TYPE(A)="String", LEN(A)*2 ' BYTES
+PRINT "file length TARGET.BMP : ";FILELEN("TARGET.BMP")
+PRINT "file length TARGET.PNG : ";FILELEN("TARGET.PNG")
+PRINT "file length TARGET.JPG : ";FILELEN("TARGET.JPG")
+' MAKE FILES INSIDE
+MEMFILE=IMAGE(IMAGE(A) AS PNG)
+PRINT LEN(MEMFILE)=FILELEN("TARGET.PNG")
+MEMFILE=IMAGE(IMAGE(A) AS JPG 100)
+' ITS NOT THE SAME ALGORITHM (IMAGE USE GDI+, EXPORT USE INNER VB6 JPG ENCODER)
+PRINT LEN(MEMFILE)<>FILELEN("TARGET.JPG")
+MOVE SCALE.X-R*2/3, 0
+IMAGE MEMFILE, R*2/3
+MOVE SCALE.X-R/3, R
+IMAGE MEMFILE, R*2/3,,45 ' DEGREE USE HOTSPOT AT CENTER OF IMAGE.
+DRAWING {
+	MOVE 0,0
+	IMAGE MEMFILE
+	PEN 15
+	PRINT "THIS IS AN IMAGE"	
+} AS ALFA ' EMF FILE
+MOVE SCALE.X/2, SCALE.Y/2
+IMAGE ALFA, R,,45 
+REFRESH 25
 
+2) Update Help: see: Help SYMBOL_Definition
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
