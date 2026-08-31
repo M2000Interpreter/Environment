@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 37
+Global Const Revision = 38
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -32281,18 +32281,10 @@ myerror1:
                     GoTo thh1
                 End If
             End If
-            'If bs.ErrorOriginal > 0 Then
-            'If bs.ErrorOriginal <> bs.OriginalCode Then
-            'If Left$(bb$, 10) <> ": Error -1" Then bb$ = ": Error -1 " + bb$
-            'If bs.IamChild Then If bs.Parent.OriginalCode <> bs.ErrorOriginal Then bs.Parent.ErrorOriginal = bs.ErrorOriginal
-            'rest$ = bb$: ProcModuleEntry = False
-            'FK$(13) = GetNextLine((sbf(bs.ErrorOriginal).sb)) & (-Len(bb$))
-            ''GoTo th0
-            'End If
-            'End If
             If Len(FK$(13)) > 0 Then
-                
-                
+            If Not InStr(LastErName, "in module") > 0 Then
+                MyEr "in module " + GetName(here$), "στο τμημα " + GetName(here$)
+            End If
                 GoTo th0
             End If
             
@@ -32333,6 +32325,9 @@ myerror1:
                 FK$(13) = "EDIT " + sbf(S3).goodname + ", " & (-Len(bb$))
             End If
         End If
+            If Not InStr(LastErName, "in module") > 0 Then
+                MyEr "in module " + GetName(here$), "στο τμημα " + GetName(here$)
+            End If
             GoTo th0
         Else
             pa$ = "EDIT " + GetModuleName(bs, here$) + "," + str$(Len(sbf(x1).sb) + 1)

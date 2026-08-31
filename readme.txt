@@ -1,58 +1,19 @@
 M2000 Interpreter and Environment
-Version 15 Revision 37
+Version 15 Revision 38
 
-Athens, August 31, 2026
+Athens, September 1, 2026
 
-1) Added EXPORT for PNG in IMAGE statement
-The old way was to make the PNG through the IMAGE() function. See example.
-
-REFRESH 2000
-CLS
-SMOOTH ON
-GRADIENT 1, 5
-MOVE SCALE.X/2, SCALE.Y/2
-R=MIN.DATA(SCALE.X, SCALE.Y)/3
-CIRCLE R
-R*=1.2
-WIDTH 2, 4 {
-	STEP -R
-	DRAW R*2
-	STEP -R, -R
-	DRAW 0, R*2
-	STEP 0, -R
+The difference form this test and the previous revision is on message only (shift+f1 works as expected), we get the error message but from a mistake (for modules only, not calling using CALL) we didn't get the "in module B". Older revisions had this. So, I restore it.
+Test:
+Edit A then copy the code and run it. We get division by zero in module b. Pressing shift+F1 open module A and place the cursor to 0.
+module c {
+	module b {
+		? 1/0
+	}
+	b
 }
-STEP -R,-R
-VAR A : COPY R*2, R*2 TO A
-IMAGE A EXPORT "TARGET.PNG"
-IMAGE A EXPORT "TARGET.BMP"
-IMAGE A EXPORT "TARGET.JPG", 100 ' 80% quality
-MOVE 0,0
-IMAGE "TARGET.PNG"
-PRINT TYPE(A)="String", LEN(A)*2 ' BYTES
-PRINT "file length TARGET.BMP : ";FILELEN("TARGET.BMP")
-PRINT "file length TARGET.PNG : ";FILELEN("TARGET.PNG")
-PRINT "file length TARGET.JPG : ";FILELEN("TARGET.JPG")
-' MAKE FILES INSIDE
-MEMFILE=IMAGE(IMAGE(A) AS PNG)
-PRINT LEN(MEMFILE)=FILELEN("TARGET.PNG")
-MEMFILE=IMAGE(IMAGE(A) AS JPG 100)
-' ITS NOT THE SAME ALGORITHM (IMAGE USE GDI+, EXPORT USE INNER VB6 JPG ENCODER)
-PRINT LEN(MEMFILE)<>FILELEN("TARGET.JPG")
-MOVE SCALE.X-R*2/3, 0
-IMAGE MEMFILE, R*2/3
-MOVE SCALE.X-R/3, R
-IMAGE MEMFILE, R*2/3,,45 ' DEGREE USE HOTSPOT AT CENTER OF IMAGE.
-DRAWING {
-	MOVE 0,0
-	IMAGE MEMFILE
-	PEN 15
-	PRINT "THIS IS AN IMAGE"	
-} AS ALFA ' EMF FILE
-MOVE SCALE.X/2, SCALE.Y/2
-IMAGE ALFA, R,,45 
-REFRESH 25
+c
 
-2) Update Help: see: Help SYMBOL_Definition
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
