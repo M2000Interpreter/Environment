@@ -1,5 +1,5 @@
 M2000 Interpreter and Environment
-Version 15 Revision 38
+Version 15 Revision 39
 
 Athens, September 2, 2026
 
