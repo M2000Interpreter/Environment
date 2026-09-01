@@ -452,7 +452,7 @@ Dim myCancel As myButton
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
 Dim Mysize As Single
 Dim setupxy As Single
-Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim a$
 Dim bordertop As Long, borderleft As Long
@@ -506,7 +506,7 @@ If Button = 1 Then
     If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = Y
     End If
     
@@ -514,7 +514,7 @@ If Button = 1 Then
     If (Y > Height - bordertop And Y < Height) And (X > Width - borderleft And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = Y
     End If
     End If
@@ -538,11 +538,11 @@ If dr Then
 If bordertop < 150 Then
 
         If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
+     If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
 
@@ -569,10 +569,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        Lx = X
+        lX = X
         
         Else
-        Lx = X * lastfactor / factor
+        lX = X * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -588,7 +588,7 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        Lx = X
+        lX = X
         lY = Y
    
 End If
@@ -1371,4 +1371,8 @@ Set LastGlist = this
 End Sub
 Private Sub gList2_RefreshDesktop()
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
+End Sub
+Public Sub UNhookMe()
+Set LastGlist = Nothing
+UnHook hWnd
 End Sub

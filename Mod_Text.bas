@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 38
+Global Const Revision = 39
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -3408,7 +3408,7 @@ Exit Function
 End If
 If MemInt(VarPtr(po)) = vbString Then
     IsHalfLogic = True
-    If Not logicalSelect(bstack, aa$, po, True) Then
+    If Not logicalSelect(bstack, aa$, po) Then
         IsHalfLogic = False
         Exit Function
     End If
@@ -20674,8 +20674,18 @@ ContGoto:
                     Exit Function
                 ElseIf i = 0 Then
                     If IsNumberLabel(b$, W$) Then
-                        once = False
+                        
                         b$ = W$
+                        If Len(b$) = 1 Then
+                            If b$ = "0" Then
+                                b$ = "BREAK"
+                                once = True
+                            Else
+                                once = False
+                            End If
+                        Else
+                            once = False
+                        End If
                         Execute = 2
                         Exit Function
                         '  Else
@@ -22143,14 +22153,14 @@ there2:
             If GetVar(basestack, what$, i) Then
                 If x1 = 1 Then If Not myVarType(var(i), vbString) Then MissingStrVar: RepPara = False: Exit Function
                 If FastSymbol(rest$, ",") Then
-                    If IsStrExp(basestack, rest$, ss$, False) Then
+                    If IsFlatStringExpr(basestack, rest$, ss$) Then
                         aa = Split(var(i), ss$)
                             Do While FastSymbol(rest$, ",")
                                 RepPara = True
                                 If IsExp(basestack, rest$, p, flatobject:=True) Then
                                     p = Abs(p)
                                     If FastSymbol(rest$, ":=", , 2) Then
-                                        If IsStrExp(basestack, rest$, s$, False) Then
+                                        If IsFlatStringExpr(basestack, rest$, s$) Then
                                         ' HERE PLACE PART TO ARRAY, MAKE IT BIGGER IF NEEDED
                                             If UBound(aa) < p Then
                                                 ReDim Preserve aa(p)
@@ -22193,14 +22203,14 @@ there2:
                         End If
                     End If
                     If FastSymbol(rest$, ",") Then
-                        If IsStrExp(basestack, rest$, ss$) Then
+                        If IsFlatStringExpr(basestack, rest$, ss$) Then
                             aa = Split(pppp.item(i), ss$)
                             Do While FastSymbol(rest$, ",")
                                 RepPara = True
                                 If IsExp(basestack, rest$, p, flatobject:=True) Then
                                     p = Abs(p)
                                     If FastSymbol(rest$, ":=", , 2) Then
-                                        If IsStrExp(basestack, rest$, s$, False) Then
+                                        If IsFlatStringExpr(basestack, rest$, s$) Then
                                         ' HERE PLACE PART TO ARRAY, MAKE IT BIGGER IF NEEDED
                                             If UBound(aa) < p Then ReDim Preserve aa(p)
                                             aa(p) = s$
@@ -22264,7 +22274,7 @@ there2:
                             RepPara = False
                             Exit Function
                         Else
-                            If Not IsStrExp(basestack, rest$, what$) Then
+                            If Not IsFlatStringExpr(basestack, rest$, what$) Then
                                 MissStringExpr
                                 RepPara = False
                                 Exit Function
@@ -22321,7 +22331,7 @@ there2:
                     RepPara = False
                     Exit Function
                 Else
-                    If IsStrExp(basestack, rest$, what$) Then
+                    If IsFlatStringExpr(basestack, rest$, what$) Then
                         s$ = GetNextLineNoTrim(what$)
                         j = pppp.item(i).ParagraphFromOrder(Y)
                         If j = -1 Then
@@ -22595,7 +22605,7 @@ Identifier = MyOrder(basestack, rest$, Lang)
 Exit Function
 Case "ÅÐÉÓÔÑÏÖÇ", "RETURN"  ' no need here
 ' ÂÁÓÇ,"SELECT ÐÉÍÁÊÁÓ",ÓÔÏÉ×ÅÉÁ
-If IsStrExp(basestack, rest$, s$) Then
+If IsFlatStringExpr(basestack, rest$, s$) Then
 append_table basestack, s$, rest$, True, Lang
 End If
 Exit Function
@@ -22970,10 +22980,13 @@ Case "IMAGE", "ÅÉÊÏÍÁ"
     Exit Function
 Case "SPRITE", "ÄÉÁÖÁÍÏ", "ÄÉÁÖÁÍÅÉÁ"
     ' ok NeoSprite exist
-    If IsStrExp(basestack, rest$, s$) Then
-        sprite basestack, s$, rest$
-    ElseIf IsExp(basestack, rest$, p) Then
-        spriteGDI basestack, rest$
+    If IsExp(basestack, rest$, p) Then
+        If VarPtr(p) = vbString Then
+            SwapString2Variant s$, p
+            sprite basestack, s$, rest$
+        Else
+            spriteGDI basestack, rest$
+        End If
     End If
     If LastErNum1 <> 0 Then Identifier = False
     Exit Function
@@ -25508,320 +25521,154 @@ End If
 End Function
 
 
-Function logicalSelect(basestack As basetask, s$, D As Variant, Optional par As Long = 0, Optional flatobject As Boolean = False, Optional ByPass As Boolean = False, Optional sg As Integer = 1, Optional ByVal nostring As Boolean) As Boolean
-Dim b$, s2$, S3$, usehandler As mHandler, getcom As Boolean
-Dim ah As String, i As Long
-
-For i = 1 To Len(s$)
-    If InStr("><=", Mid$(s$, i)) = 0 Then Exit For
-Next i
-If MemInt(VarPtr(D)) = vbString Then
-    SwapString2Variant b$, D
-    D = Empty
-    GoTo conthere
-End If
-again11:
-If ByPass Then
-    ah = aheadstatusFast(basestack.tmpstr)
-Else
-    ah = aheadstatusFast(s$)
-End If
-If InStr(ah, "l") = 0 Then
-    If InStr(ah, "N") > 0 Then
-        If Len(ah) = 1 Then
-            If Not IsNumber(basestack, s$, D, flatobject, sg) Then
-                Set basestack.lastobj = Nothing
-                If LastErNum1 < 0 Then Exit Function
-            Else
-                If flatobject Then
-                    Set basestack.lastobj = Nothing
-                End If
-                logicalSelect = True
-            End If
-        Else
-            If Not IsNumber(basestack, s$, D, flatobject, sg) Then
-                Set basestack.lastobj = Nothing
-                If LastErNum1 < 0 Then Exit Function
-            Else
-                logicalSelect = True
-            End If
-        End If
-    Else
-        If par > 0 Then
-            If Not GetArr(basestack, s$, D, s2$, 0, getcom) Then
-                Set basestack.lastobj = Nothing
-            Else
-                If Len(s$) > 0 Then
-                    If AscW(s$) = 8 Then
-                        par = par - 1
-                        ' what ????
-                        ByPass = True
-                        GoTo again11
-                    End If
-                End If
-                logicalSelect = True
-            End If
-            If logicalSelect Then
-                par = par - 1
-            End If
-            Exit Function
-        Else
-            logicalSelect = False
-        End If
-    End If
-    If nostring Then If myVarType(D, vbString) Then GoTo jumpnostr1
-    s$ = NLtrim$(s$)
-    Exit Function
-Else
-    If Left$(ah, 2) = "SN" Then Exit Function
-    nostring = False
-End If
-
+Function logicalSelect(basestack As basetask, s$, D As Variant) As Boolean
+Dim b$, s2$, S3$
+If Not MemInt(VarPtr(D)) = vbString Then Exit Function
+SwapString2Variant b$, D
+D = Empty
 On Error Resume Next
-
-If Err.Number > 0 Then Exit Function
-If Left$(ah, 1) <> "N" Then
-    IsStrExp basestack, s$, b$, False
-conthere:
-    logicalSelect = False
-    If Not mTextCompare Then
-        If FastSymbol(s$, "=") Then
-            logicalSelect = False
-            If IsStrExp(basestack, s$, s2$, False) Then
-                logicalSelect = True
-                D = b$ = s2$
-            Else
-                MissStringExpr
-            End If
-            Exit Function
-        ElseIf FastSymbol(s$, "<") Then
-            logicalSelect = False
-            If Left$(s$, 1) = "=" Then
-                Mid$(s$, 1, 1) = " "
-                If Left$(s$, 2) = " >" Then
-                    Mid$(s$, 2, 1) = " "
-                    If IsStrExp(basestack, s$, s2$, False) Then
-                        logicalSelect = True
-                        Select Case b$
-                        Case Is < s2$
-                            D = -1
-                        Case Is = s2$
-                            D = 0
-                        Case Else
-                            D = 1
-                        End Select
-                    Else
-                        MissStringExpr
-                    End If
-                Else
-                    If IsStrExp(basestack, s$, s2$, False) Then
-                        logicalSelect = True
-                        D = b$ <= s2$
-                    Else
-                        MissStringExpr
-                    End If
-                End If
-                Exit Function
-            ElseIf Left$(s$, 1) = ">" Then
-                Mid$(s$, 1, 1) = " "
-                If IsStrExp(basestack, s$, s2$, False) Then
-                    logicalSelect = True
-                    D = b$ <> s2$
-                Else
-                    MissStringExpr
-                End If
-            ElseIf IsStrExp(basestack, s$, s2$, False) Then
-                logicalSelect = True
-                D = b$ < s2$
-            Else
-                MissStringExpr
-            End If
-            Exit Function
-        ElseIf FastSymbol(s$, ">") Then
-            logicalSelect = False
-            If Left$(s$, 1) = "=" Then
-                Mid$(s$, 1, 1) = " "
-                If IsStrExp(basestack, s$, s2$, False) Then
-                    logicalSelect = True
-                    D = b$ >= s2$
-                Else
-                    MissStringExpr
-                End If
-            ElseIf IsStrExp(basestack, s$, s2$, False) Then
-                logicalSelect = True
-                D = b$ > s2$
-            Else
-                MissStringExpr
-            End If
-            Exit Function
-        ElseIf FastSymbol(s$, "~") Then
-            logicalSelect = False
-            If IsStrExp(basestack, s$, s2$, False) Then
-                logicalSelect = True
-                D = b$ Like s2$
-            Else
-                MissStringExpr
-            End If
-            Exit Function
-        ElseIf MaybeIsSymbol(s$, "+") Then
-        If myVarType(D, vbString) Then
-            logicalSelect = False
-            Mid$(s$, 1, 1) = " "
-            If IsStrExp(basestack, s$, s2$, False) Then
-                logicalSelect = True
-                b$ = b$ + s2$
-               GoTo conthere
-            ElseIf IsNumber(basestack, s$, D, True) Then
-                logicalSelect = True
-                
-                If CheckInt64(D) Then
-                       s2$ = CStr(D)
-                ElseIf MemInt(VarPtr(D)) = vbBoolean Then
-                    If ShowBooleanAsString Then
-                        s2$ = format$(D, DefBooleanString)
-                    Else
-                        s2$ = CStr(D * 1)
-                    End If
-                Else
-                    s2$ = fixthis(D)
-                End If
-                b$ = b$ + s2$
-
-               GoTo conthere
-            Else
-                MissStringExpr
-            End If
-        End If
-        ElseIf MaybeIsSymbol(s$, "-") Then
-        If myVarType(D, vbEmpty) Then
-            D = vbNullString
-            SwapString2Variant b$, D
-            logicalSelect = True
-            Exit Function
-           End If
-        End If
-    Else
-        If FastSymbol(s$, "=") Then
-            logicalSelect = False
-            If IsStrExp(basestack, s$, s2$, False) Then
-                logicalSelect = True
-                D = CompareStr2(b$, s2$) = 0
-            Else
-                MissStringExpr
-            End If
-            Exit Function
-        ElseIf FastSymbol(s$, "<") Then
-            logicalSelect = False
-            If Left$(s$, 1) = "=" Then
-                Mid$(s$, 1, 1) = " "
-                If Left$(s$, 2) = " >" Then
-                    Mid$(s$, 2, 1) = " "
-                    If IsStrExp(basestack, s$, s2$, False) Then
-                        logicalSelect = True
-                        D = CompareStr2(b$, s2$)
-                    Else
-                        MissStringExpr
-                    End If
-                ElseIf IsStrExp(basestack, s$, s2$, False) Then
-                    logicalSelect = True
-                    D = CompareStr2(b$, s2$) < 1
-                Else
-                    MissStringExpr
-                End If
-            ElseIf Left$(s$, 1) = ">" Then
-                Mid$(s$, 1, 1) = " "
-                If IsStrExp(basestack, s$, s2$, False) Then
-                    logicalSelect = True
-                    D = CompareStr2(b$, s2$) <> 0
-                Else
-                    MissStringExpr
-                End If
-            ElseIf IsStrExp(basestack, s$, s2$, False) Then
-                logicalSelect = True
-                D = CompareStr2(b$, s2$) = -1
-            Else
-                MissStringExpr
-            End If
-            Exit Function
-            ElseIf FastSymbol(s$, ">") Then
-                logicalSelect = False
-                If Left$(s$, 1) = "=" Then
-                    Mid$(s$, 1, 1) = " "
-                    If IsStrExp(basestack, s$, s2$, False) Then
-                        logicalSelect = True
-                        D = CompareStr2(b$, s2$) > -1
-                    Else
-                        MissStringExpr
-                    End If
-                ElseIf IsStrExp(basestack, s$, s2$, False) Then
-                    logicalSelect = True
-                    D = CompareStr2(b$, s2$) = 1
-                Else
-                    MissStringExpr
-                End If
-                Exit Function
-            ElseIf FastSymbol(s$, "~") Then
-                logicalSelect = False
-                If IsStrExp(basestack, s$, s2$, False) Then
-                    logicalSelect = True
-                    D = b$ Like s2$
-                Else
-                    MissStringExpr
-                End If
-                Exit Function
-            ElseIf MaybeIsSymbol(s$, "+") Then
-                If myVarType(D, vbString) Then
-                    logicalSelect = False
-                    Mid$(s$, 1, 1) = " "
-                    If IsStrExp(basestack, s$, s2$, False) Then
-                        logicalSelect = True
-                        b$ = b$ + s2$
-                       GoTo conthere
-                    End If
-                End If
-            ElseIf MaybeIsSymbol(s$, "-") Then
-                If myVarType(D, vbEmpty) Then
-                    D = vbNullString
-                    SwapString2Variant b$, D
-                    logicalSelect = True
-                    Exit Function
-                   End If
-                End If
-            End If
-        If LastErNum = -2 Then
-        logicalSelect = True
-        Else
-        GoTo cont145
-        End If
-        Exit Function
-Else
-cont145:
-If IsNumber(basestack, s$, D, flatobject, sg) Then
-    If myVarType(D, vbString) Then
-        If nostring Then
-jumpnostr1:
-        MyEr "no string allowed", "äåí åðéôñÝðåôáé áëöáñéèìçôéêü"
+logicalSelect = False
+If Not mTextCompare Then
+    If FastSymbol(s$, "=") Then
         logicalSelect = False
-        Exit Function
-End If
-    SwapString2Variant b$, D
-    GoTo conthere
-ElseIf Not basestack.lastobj Is Nothing Then
-    If TypeOf basestack.lastobj Is mHandler Then
-    Set usehandler = basestack.lastobj
-    If usehandler.t1 = 4 Then
-    If myVarType(usehandler.index_cursor, vbString) Then
-        If nostring Then GoTo jumpnostr1
-        b$ = usehandler.index_cursor
-        Set basestack.lastobj = Nothing
-        GoTo conthere
+        If IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = b$ = s2$
+        Else
+            MissStringExpr
+        End If
+    ElseIf FastSymbol(s$, "<") Then
+        logicalSelect = False
+        If Left$(s$, 1) = "=" Then
+            Mid$(s$, 1, 1) = " "
+            If Left$(s$, 2) = " >" Then
+                Mid$(s$, 2, 1) = " "
+                If IsFlatStringExpr(basestack, s$, s2$) Then
+                    logicalSelect = True
+                    Select Case b$
+                    Case Is < s2$
+                        D = -1
+                    Case Is = s2$
+                        D = 0
+                    Case Else
+                        D = 1
+                    End Select
+                Else
+                    MissStringExpr
+                End If
+            Else
+                If IsFlatStringExpr(basestack, s$, s2$) Then
+                    logicalSelect = True
+                    D = b$ <= s2$
+                Else
+                    MissStringExpr
+                End If
+            End If
+        ElseIf Left$(s$, 1) = ">" Then
+            Mid$(s$, 1, 1) = " "
+            If IsFlatStringExpr(basestack, s$, s2$) Then
+                logicalSelect = True
+                D = b$ <> s2$
+            Else
+                MissStringExpr
+            End If
+        ElseIf IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = b$ < s2$
+        Else
+            MissStringExpr
+        End If
+    ElseIf FastSymbol(s$, ">") Then
+        logicalSelect = False
+        If Left$(s$, 1) = "=" Then
+            Mid$(s$, 1, 1) = " "
+            If IsFlatStringExpr(basestack, s$, s2$) Then
+                logicalSelect = True
+                D = b$ >= s2$
+            Else
+                MissStringExpr
+            End If
+        ElseIf IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = b$ > s2$
+        Else
+            MissStringExpr
+        End If
+    ElseIf FastSymbol(s$, "~") Then
+        logicalSelect = False
+        If IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = b$ Like s2$
+        Else
+            MissStringExpr
+        End If
     End If
-End If
-End If
-End If
-'If SG < 0 Then D = -D
-logicalSelect = True
-End If
+Else
+    If FastSymbol(s$, "=") Then
+        logicalSelect = False
+        If IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = CompareStr2(b$, s2$) = 0
+        Else
+            MissStringExpr
+        End If
+    ElseIf FastSymbol(s$, "<") Then
+        logicalSelect = False
+        If Left$(s$, 1) = "=" Then
+            Mid$(s$, 1, 1) = " "
+            If Left$(s$, 2) = " >" Then
+                Mid$(s$, 2, 1) = " "
+                If IsFlatStringExpr(basestack, s$, s2$) Then
+                    logicalSelect = True
+                    D = CompareStr2(b$, s2$)
+                Else
+                    MissStringExpr
+                End If
+            ElseIf IsFlatStringExpr(basestack, s$, s2$) Then
+                logicalSelect = True
+                D = CompareStr2(b$, s2$) < 1
+            Else
+                MissStringExpr
+            End If
+        ElseIf Left$(s$, 1) = ">" Then
+            Mid$(s$, 1, 1) = " "
+            If IsFlatStringExpr(basestack, s$, s2$) Then
+                logicalSelect = True
+                D = CompareStr2(b$, s2$) <> 0
+            Else
+                MissStringExpr
+            End If
+        ElseIf IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = CompareStr2(b$, s2$) = -1
+        Else
+            MissStringExpr
+        End If
+    ElseIf FastSymbol(s$, ">") Then
+        logicalSelect = False
+        If Left$(s$, 1) = "=" Then
+            Mid$(s$, 1, 1) = " "
+            If IsFlatStringExpr(basestack, s$, s2$) Then
+                logicalSelect = True
+                D = CompareStr2(b$, s2$) > -1
+            Else
+                MissStringExpr
+            End If
+        ElseIf IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = CompareStr2(b$, s2$) = 1
+        Else
+            MissStringExpr
+        End If
+    ElseIf FastSymbol(s$, "~") Then
+        logicalSelect = False
+        If IsFlatStringExpr(basestack, s$, s2$) Then
+            logicalSelect = True
+            D = b$ Like s2$
+        Else
+            MissStringExpr
+        End If
+    End If
 End If
 
 End Function
@@ -31915,11 +31762,11 @@ Form1.TEXT1.TabWidth = EditTabWidth
 Form1.TabControl = EditTabWidth
 s$ = aheadstatus(rest$, False, y1)
 If y1 > 2 And Left$(s$, 1) = "S" Then
-    If Mid$(rest$, y1 - 1, 1) = "(" Or Mid$(rest$, y1 - 2, 2) = "()" Then s$ = "ok"
+    If Mid$(rest$, y1 - 1, 1) = "(" Or Mid$(rest$, y1 - 2, 2) = "()" Then s$ = "**"
 End If
 
-If Left$(s$, 1) = "S" Then
-    If IsStrExp(basestack, rest$, s$) Then
+If Left$(s$, 1) = "S" Or InStr(s$, "o") > 0 Then
+    If IsFlatStringExpr(basestack, rest$, s$) Then
         If s$ <> "" Then
             If ExtractPath(s$) = vbNullString Then
                 If CFname(s$) <> "" Then
@@ -42461,7 +42308,7 @@ x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
     SwapStrings ss$, W$
 Else
-    x1 = IsStrExp(basestack, rest$, ss$, False)
+    x1 = IsFlatStringExpr(basestack, rest$, ss$)
 End If
 
 'If Left$(ss$, 1) = "." Then x1 = 1

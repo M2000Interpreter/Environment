@@ -118,7 +118,9 @@ ElseIf val("0" + bstack.Owner.Tag) > 32 Then
     Wend
     Scr.UNhookMe
 ElseIf Not Screen.ActiveForm Is Nothing Then
+On Error Resume Next
     Screen.ActiveForm.UNhookMe
+Err.Clear
 End If
 
 If Not Screen.ActiveForm Is Nothing Then
@@ -176,7 +178,9 @@ ElseIf val("0" + bstack.Owner.Tag) > 32 Then
     Wend
     Scr.UNhookMe
 ElseIf Not Screen.ActiveForm Is Nothing Then
+On Error Resume Next
     Screen.ActiveForm.UNhookMe
+Err.Clear
 End If
 
 If thisform Is Nothing Then
@@ -266,7 +270,9 @@ ElseIf val("0" + bstack.Owner.Tag) > 32 Then
     Wend
     Scr.UNhookMe
 ElseIf Not Screen.ActiveForm Is Nothing Then
+On Error Resume Next
     Screen.ActiveForm.UNhookMe
+Err.Clear
 End If
 
 If thisform Is Nothing Then
@@ -365,7 +371,9 @@ ElseIf val("0" + bstack.Owner.Tag) > 32 Then
     Wend
     Scr.UNhookMe
 ElseIf Not Screen.ActiveForm Is Nothing Then
+On Error Resume Next
     Screen.ActiveForm.UNhookMe
+Err.Clear
 End If
 If thisform Is Nothing Then
 LoadFile.Show
@@ -462,7 +470,9 @@ ElseIf val("0" + bstack.Owner.Tag) > 32 Then
     Wend
     Scr.UNhookMe
 ElseIf Not Screen.ActiveForm Is Nothing Then
+On Error Resume Next
     Screen.ActiveForm.UNhookMe
+Err.Clear
 End If
 
 
@@ -556,7 +566,9 @@ ElseIf val("0" + bstack.Owner.Tag) > 32 Then
     Wend
     Scr.UNhookMe
 ElseIf Not Screen.ActiveForm Is Nothing Then
+On Error Resume Next
     Screen.ActiveForm.UNhookMe
+Err.Clear
 End If
 
 If thatform Is Nothing Then

@@ -21,23 +21,15 @@ Begin VB.Form NeoMsgBox
       TabStop         =   0   'False
       Top             =   135
       Width           =   3420
-      _ExtentX        =   6033
-      _ExtentY        =   873
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   14.25
-         Charset         =   161
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      Enabled         =   -1  'True
-      Backcolor       =   3881787
-      ForeColor       =   16777215
-      CapColor        =   16777215
+      _extentx        =   6033
+      _extenty        =   873
+      max             =   1
+      vertical        =   -1
+      font            =   "NeoMsgBox.frx":000C
+      enabled         =   -1
+      backcolor       =   3881787
+      forecolor       =   16777215
+      capcolor        =   16777215
    End
    Begin M2000.gList command1 
       Height          =   525
@@ -45,21 +37,13 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   1
       Top             =   4245
       Width           =   3225
-      _ExtentX        =   5689
-      _ExtentY        =   926
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   14.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      ForeColor       =   16777215
+      _extentx        =   5689
+      _extenty        =   926
+      max             =   1
+      vertical        =   -1
+      font            =   "NeoMsgBox.frx":0030
+      showbar         =   0
+      forecolor       =   16777215
    End
    Begin M2000.gList gList1 
       Height          =   1995
@@ -67,22 +51,14 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   4
       Top             =   960
       Width           =   4755
-      _ExtentX        =   8387
-      _ExtentY        =   3519
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   11.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      Backcolor       =   3881787
-      ForeColor       =   16777215
+      _extentx        =   8387
+      _extenty        =   3519
+      max             =   1
+      vertical        =   -1
+      font            =   "NeoMsgBox.frx":0054
+      showbar         =   0
+      backcolor       =   3881787
+      forecolor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   315
@@ -90,20 +66,12 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   3
       Top             =   3600
       Width           =   4590
-      _ExtentX        =   8096
-      _ExtentY        =   556
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   8.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
+      _extentx        =   8096
+      _extenty        =   556
+      max             =   1
+      vertical        =   -1
+      font            =   "NeoMsgBox.frx":0078
+      showbar         =   0
    End
    Begin M2000.gList command2 
       Height          =   525
@@ -111,21 +79,13 @@ Begin VB.Form NeoMsgBox
       TabIndex        =   2
       Top             =   4200
       Width           =   3225
-      _ExtentX        =   5689
-      _ExtentY        =   926
-      Max             =   1
-      Vertical        =   -1  'True
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Arial"
-         Size            =   14.25
-         Charset         =   0
-         Weight          =   700
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-      ShowBar         =   0   'False
-      ForeColor       =   16777215
+      _extentx        =   5689
+      _extenty        =   926
+      max             =   1
+      vertical        =   -1
+      font            =   "NeoMsgBox.frx":009C
+      showbar         =   0
+      forecolor       =   16777215
    End
 End
 Attribute VB_Name = "NeoMsgBox"
@@ -142,7 +102,7 @@ Private Type myImage
     Image As StdPicture
     Height As Long
     Width As Long
-    Top As Long
+    top As Long
     Left As Long
 End Type
 Dim Image1 As myImage
@@ -309,7 +269,7 @@ Set myOk = New myButton
 Set myOk.Container = command1
 
   Set myOk.Callback = Me
-  myOk.Index = 1
+  myOk.index = 1
   If Left$(AskOk$, 1) = "*" Then
   LastActive = command1.Name
   AskOk$ = Mid$(AskOk$, 2)
@@ -387,7 +347,7 @@ Set myCancel = Nothing
 AskDIB$ = vbNullString
 AskOk$ = vbNullString
 AskLastX = Left
-AskLastY = Top
+AskLastY = top
 ''Sleep 200
 ASKINUSE = False
 End Sub
@@ -513,7 +473,7 @@ allheight = height1 * factor
 itemWidth = allwidth - 2 * borderleft
 itemwidth3 = (itemWidth - 2 * borderleft) / 3
 itemwidth2 = (itemWidth - borderleft) / 2
-move Left, Top, allwidth, allheight
+move Left, top, allwidth, allheight
 FontTransparent = False  ' clear background  or false to write over
 gList2.move borderleft, bordertop, itemWidth, bordertop * 3
 gList2.FloatLimitTop = VirtualScreenHeight() - bordertop - bordertop * 3
@@ -618,13 +578,13 @@ b = 2
 CopyFromLParamToRect a, thatRect
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), 0
 b = 5
 a.Left = b
 a.Right = setupxy - b
-a.Top = b
+a.top = b
 a.Bottom = setupxy - b
 FillThere thathDC, VarPtr(a), rgb(255, 160, 0)
 
@@ -701,8 +661,8 @@ Private Sub gList3_Selected2(item As Long)
  command1.SetFocus
 End Sub
 
-Private Sub InterPress_Press(Index As Long)
-If Index = 0 Then
+Private Sub InterPress_Press(index As Long)
+If index = 0 Then
 AskResponse$ = AskCancel$
 AskCancel$ = vbNullString
 Else
@@ -726,4 +686,8 @@ End Sub
 
 Private Sub gList2_RefreshDesktop()
 If Form1.Visible Then Form1.Refresh: If Form1.DIS.Visible Then Form1.DIS.Refresh
+End Sub
+Public Sub UNhookMe()
+Set LastGlist = Nothing
+UnHook hWnd
 End Sub

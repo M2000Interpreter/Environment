@@ -1856,7 +1856,7 @@ Function ImageFunc(bstack As basetask, a$, r, Lang As Long) As Boolean
 Dim usehandler As mHandler, s$, p
     
     
-    If IsStrExp(bstack, a$, s$) Then
+    If False Then 'IsStrExp(bstack, a$, s$) Then
 j1222:
         If Left$(s$, 4) = "cDIB" And Len(s$) > 12 Then
             Set usehandler = New mHandler
@@ -9081,99 +9081,56 @@ ReplaceSpace = a$
 End Function
 Function GetReturnArray(bstack As basetask, x1 As Long, b$, p As Variant, ss$, pppp As iBoxArray) As Boolean ' true is error
 Dim s As String * 3
+Dim nowsize As Long
 Do
-        Set bstack.lastobj = Nothing
-        If IsExp(bstack, b$, p) Then
-        If x1 = 0 Then If lookOne(b$, ",") Then x1 = 1: Set pppp = New tuple: pppp.PushDim (1): pppp.PushEnd
+    Set bstack.lastobj = Nothing
+    If IsExp(bstack, b$, p) Then
+        If x1 = 0 Then If lookOne(b$, ",") Then x1 = 1: Set pppp = New tuple: nowsize = 10: pppp.PushDim (nowsize): pppp.PushEnd
         If x1 = 0 Then
-                s = Right$(bstack.originalname$, 3)
-                    If Left$(s$, 1) = "$" Then
-                        If Not myVarType(p, vbString) Then
-                            'If Mid$(bstack.originalname$, Len(bstack.originalname$) - 2, 1) = "$" Then
-                                MissString
-                                Exit Do
-                            End If
-                    ElseIf Left$(s$, 1) = "%" Then
-                        If Not myVarType(p, vbString) Then
-                            If IsNumeric(p) Then
-                                p = MyRound(p)
-                            End If
-                        Else
-                            missNumber
-                        Exit Do
-                        End If
-                    End If
-                
-                 'If Right$(bstack.originalname$, 3) = "%()" Then p = MyRound(p)
-                 Set bstack.FuncObj = bstack.lastobj
-                 Set bstack.lastobj = Nothing
-                 bstack.FuncValue = p
-        Else
-                pppp.SerialItem 0, x1 + 1, 9
-                If bstack.lastobj Is Nothing Then
-                    pppp.item(x1 - 1) = p
-                Else
-                    Set pppp.item(x1 - 1) = bstack.lastobj
-                    Set bstack.lastobj = Nothing
+            s = Right$(bstack.originalname$, 3)
+            If Left$(s$, 1) = "$" Then
+                If Not myVarType(p, vbString) Then
+                    MissString
+                    Exit Do
                 End If
-                bstack.FuncValue = p
-                x1 = x1 + 1
-                             
-        End If
-        ElseIf Not bstack.lastobj Is Nothing Then
-cont1:
-        If x1 = 0 Then If lookOne(b$, ",") Then x1 = 1: Set pppp = New tuple: pppp.PushDim (1): pppp.PushEnd
-        If x1 = 0 Then
+            ElseIf Left$(s$, 1) = "%" Then
+                If Not myVarType(p, vbString) Then
+                    If IsNumeric(p) Then
+                        p = MyRound(p)
+                    End If
+                Else
+                    missNumber
+                Exit Do
+                End If
+            End If
             Set bstack.FuncObj = bstack.lastobj
             Set bstack.lastobj = Nothing
-            bstack.FuncValue = vbNullString
+            bstack.FuncValue = p
         Else
-                pppp.SerialItem 0, x1 + 1, 9
-                If bstack.lastobj Is Nothing Then
-                    pppp.item(x1 - 1) = p
-                Else
-                    Set pppp.item(x1 - 1) = bstack.lastobj
-                    Set bstack.lastobj = Nothing
-                End If
-                bstack.FuncValue = p
-                x1 = x1 + 1
-        End If
-        ElseIf IsStrExp(bstack, b$, ss$, False) Then  ' Len(bstack.tmpstr) = 0
-            If x1 = 0 Then If lookOne(b$, ",") Then x1 = 1: Set pppp = New tuple: pppp.PushDim (1): pppp.PushEnd
-            If x1 = 0 Then
-                    
-misum:
-
-                Set bstack.FuncObj = bstack.lastobj
-                Set bstack.lastobj = Nothing
-                bstack.FuncValue = ss$
+            If nowsize <= x1 Then nowsize = nowsize + 10: pppp.SerialItem 0, nowsize, 9
+            If bstack.lastobj Is Nothing Then
+                pppp.item(x1 - 1) = p
             Else
-                pppp.SerialItem 0, x1 + 1, 9
-                If bstack.lastobj Is Nothing Then
-                    pppp.item(x1 - 1) = ss$
-                Else
-                    Set pppp.item(x1 - 1) = bstack.lastobj
-                    Set bstack.lastobj = Nothing
-                End If
-                x1 = x1 + 1
-                bstack.FuncValue = ss$
+                Set pppp.item(x1 - 1) = bstack.lastobj
+                Set bstack.lastobj = Nothing
             End If
-            ElseIf Not bstack.lastobj Is Nothing Then
-           GoTo cont1
+            bstack.FuncValue = p
+            x1 = x1 + 1
         End If
-        Loop Until Not FastSymbol(b$, ",")
-        If x1 > 0 Then
-         pppp.SerialItem 0, x1, 9
-         Set bstack.FuncObj = pppp
-         Set pppp = Nothing
-         Set bstack.lastobj = Nothing
-         If myVarType(bstack.FuncValue, vbString) Then
-         bstack.FuncValue = vbNullString
-         Else
-         bstack.FuncValue = 0
-         End If
-        End If
-        x1 = 0
+    End If
+Loop Until Not FastSymbol(b$, ",")
+If x1 > 0 Then
+    pppp.SerialItem 0, x1, 9
+    Set bstack.FuncObj = pppp
+    Set pppp = Nothing
+    Set bstack.lastobj = Nothing
+    If myVarType(bstack.FuncValue, vbString) Then
+        bstack.FuncValue = vbNullString
+    Else
+        bstack.FuncValue = 0
+    End If
+End If
+x1 = 0
 End Function
 
 
@@ -9725,8 +9682,6 @@ If IsExp(bstack, rest$, p) Then
     Else
         spriteGDI bstack, rest$
     End If
-ElseIf IsStrExp(bstack, rest$, s$, False) Then
-sprite bstack, s$, rest$
 End If
 resp = LastErNum1 = 0
 End Sub
@@ -9765,10 +9720,8 @@ If IsExp(bstack, rest$, p) Then
         SwapString2Variant s$, p
         resp = append_table(bstack, s$, rest$, False)
     Else
-    resp = AddInventory(bstack, rest$)
+        resp = AddInventory(bstack, rest$)
     End If
-ElseIf IsStrExp(bstack, rest$, s$, False) Then
-    resp = append_table(bstack, s$, rest$, False)
 Else
 SyntaxError
 resp = False
@@ -13902,7 +13855,7 @@ If FastPureLabel(rest$, w1$, , , , , , gr) = 1 Then
         SyntaxError
         Exit Function
     End If
-    If Not IsStrExp(bstack, rest$, s$, False) Then
+    If Not IsFlatStringExpr(bstack, rest$, s$) Then
         MissStringExpr
         Exit Function
     End If
@@ -14150,19 +14103,17 @@ Function ProcText(basestack As basetask, isHtml As Boolean, rest$) As Boolean
 Dim x1 As Long, frm$, pa$, s$
 ProcText = True
 If IsSymbol(rest$, "UTF-8", 5) Then
-x1 = 2
+    x1 = 2
 ElseIf IsSymbol(rest$, "UTF-16", 6) Then
-x1 = 0 ' only little endian (but if something convert it to big we can read...)
+    x1 = 0 ' only little endian (but if something convert it to big we can read...)
 Else
-x1 = 3
+    x1 = 3
 End If
 
 s$ = vbNullString
-If Not IsStrExp(basestack, rest$, s$) Then
-If Not FastPureLabel(rest$, s$) = 1 Then
+If Not GetStringOrLabel(basestack, rest$, s$) Then
     ProcText = False
     Exit Function
-End If
 End If
 FastSymbol rest$, ","
 If s$ <> "" Then
@@ -14182,6 +14133,33 @@ End If
 ProcText = FastSymbol(rest$, "}")
 End If
 Exit Function
+
+End Function
+Function GetStringOrLabel(basestack As basetask, rest$, s$, Optional novar As Boolean = False) As Boolean
+Dim ok As Boolean, Pos As Long
+Pos = 1
+aheadstatusNew rest$, Pos, ok
+If ok And Pos > 2 Then
+    If aheadstatus(Left$(rest$, Pos - 1)) = "N" Then
+        If Not FastPureLabel(Left$(rest$, Pos - 1), s$) = 1 Then
+            Exit Function
+        End If
+        If novar Then
+            Mid$(rest$, 1, Pos - 1) = space(Pos - 1)
+        ElseIf GetVar(basestack, myUcase(s$, True), Pos) Then
+            If Not IsFlatStringExpr(basestack, rest$, s$) Then
+                Exit Function
+            End If
+        Else
+            Mid$(rest$, 1, Pos - 1) = space(Pos - 1)
+        End If
+    ElseIf Not IsFlatStringExpr(basestack, rest$, s$) Then
+        Exit Function
+    End If
+Else
+    Exit Function
+End If
+GetStringOrLabel = True
 
 End Function
 Private Function textPUT(bstack As basetask, ByVal ThisFile As String, THISBODY As String, c$, mode2save As Long) As Boolean
@@ -20479,7 +20457,7 @@ x1 = IsLabelFileName(bstack, rest$, W$)
 If x1 = 1 Then
     SwapStrings s$, W$
 Else
-    x1 = IsStrExp(bstack, rest$, s$, False)
+    x1 = IsFlatStringExpr(bstack, rest$, s$)
 End If
 
 If x1 = 0 Then
@@ -20715,7 +20693,7 @@ If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
                         idPara = False
                         Exit Function
                     Else
-                        If Not IsStrExp(basestack, rest$, s$, False) Then
+                        If Not IsFlatStringExpr(basestack, rest$, s$) Then
                             MissStringExpr
                             idPara = False
                             Exit Function
@@ -20764,7 +20742,7 @@ If IsLabelSymbolNew(rest$, "ΣΤΟ", "TO", Lang) Then
                         idPara = False
                         Exit Function
                     Else
-                        If IsStrExp(basestack, rest$, s$, False) Then
+                        If IsFlatStringExpr(basestack, rest$, s$) Then
                             If pppp.item(it).ParagraphFromOrder(Y + 1) = -1 Then
                                 CheckVar pppp.item(it), s$
                             ElseIf Y < 1 Then
@@ -20835,7 +20813,7 @@ ElseIf IsExp(basestack, rest$, X) Then
                         idPara = False
                         Exit Function
                     Else
-                        If Not IsStrExp(basestack, rest$, s$, False) Then
+                        If Not IsFlatStringExpr(basestack, rest$, s$) Then
                             MissStringExpr
                             idPara = False
                             Exit Function
@@ -20869,7 +20847,7 @@ ElseIf IsExp(basestack, rest$, X) Then
                         idPara = False
                         Exit Function
                     Else
-                        If Not IsStrExp(basestack, rest$, s$, False) Then
+                        If Not IsFlatStringExpr(basestack, rest$, s$) Then
                             MissStringExpr
                             idPara = False
                             Exit Function
@@ -20902,7 +20880,7 @@ ElseIf IsExp(basestack, rest$, X) Then
                 If Not NeoGetArrayItem(pppp, basestack, what$, it, rest$) Then idPara = False: Exit Function
                 If pppp.ItemType(it) = doc Then
                     If FastSymbol(rest$, "=") Then
-                        If IsStrExp(basestack, rest$, s$, False) Then
+                        If IsFlatStringExpr(basestack, rest$, s$) Then
                             If Y = 0 Then
                                 pppp.item(it).FindPos 1, 0, CLng(X), xa, ya, w3, w4
                                  If w4 = 0 Then
@@ -20926,7 +20904,7 @@ ElseIf IsExp(basestack, rest$, X) Then
                             Exit Function
                 End If
                 If FastSymbol(rest$, "=") Then
-                    If IsStrExp(basestack, rest$, s$, False) Then
+                    If IsFlatStringExpr(basestack, rest$, s$) Then
                         If Y = 0 Then
                             pppp.item(it) = Left$(pppp.item(it), X - 1) + s$ + Mid$(var(i), X)
                         Else
@@ -22148,7 +22126,7 @@ x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
     SwapStrings pa$, W$
 Else
-    x1 = IsStrExp(basestack, rest$, pa$, False)
+    x1 = IsFlatStringExpr(basestack, rest$, pa$)
 End If
 
 If x1 <> 0 Then
@@ -29079,7 +29057,7 @@ x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
     SwapStrings s$, W$
 Else
-    x1 = IsStrExp(basestack, rest$, s$, False)
+    x1 = IsFlatStringExpr(basestack, rest$, s$)
 End If
 
 If x1 Then
@@ -29092,7 +29070,7 @@ If IsSymbol(rest$, ",") Then
 x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
 Else
-    x1 = IsStrExp(basestack, rest$, W$, False)
+    x1 = IsFlatStringExpr(basestack, rest$, W$)
 End If
 
 
@@ -29130,7 +29108,7 @@ x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
     SwapStrings s$, W$
 Else
-    x1 = IsStrExp(basestack, rest$, s$, False)
+    x1 = IsFlatStringExpr(basestack, rest$, s$)
 End If
 If FastSymbol(rest$, ",") Then
 If Not IsExp(basestack, rest$, p) Then MissNumExpr: Exit Function
@@ -29448,7 +29426,7 @@ x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
     s$ = W$  ' never swap here we need the backup later.
 Else
-    x1 = IsStrExp(basestack, rest$, s$, False)
+    x1 = IsFlatStringExpr(basestack, rest$, s$)
 End If
 
 If x1 <> 0 Then
@@ -29997,7 +29975,7 @@ x1 = IsLabelFileName(basestack, rest$, W$)
 If x1 = 1 Then
     SwapStrings ss$, W$
 Else
-    x1 = IsStrExp(basestack, rest$, ss$, False)
+    x1 = IsFlatStringExpr(basestack, rest$, ss$)
 End If
 If x1 <> 0 Then
     ss$ = mcd + ss$
@@ -33043,7 +33021,7 @@ x1 = IsLabelFileName(bstack, rest$, W$)
 If x1 = 1 Then
    SwapStrings s$, W$
 Else
-    x1 = IsStrExp(bstack, rest$, s$, False)
+    x1 = IsFlatStringExpr(bstack, rest$, s$)
 End If
 
 If Not IsLabelSymbolNew(rest$, "ΩΣ", "AS", Lang) Then ProcName = False: Exit Function
@@ -33052,7 +33030,7 @@ y1 = IsLabelFileName(bstack, rest$, W$)
 If y1 = 1 Then
     SwapStrings ss$, W$
 Else
-    y1 = IsStrExp(bstack, rest$, ss$)
+    y1 = IsFlatStringExpr(bstack, rest$, ss$)
 End If
 If x1 = 0 Or y1 = 0 Then SyntaxError: ProcName = False: Exit Function
 If Not CanKillFile(CFname(s$)) Then FilePathNotForUser: ProcName = False: Exit Function
@@ -39216,7 +39194,9 @@ Private Function fixthis(p As Variant) As String '!!!!!!!!!!!!!!!!!!
             Case 20
                 fixthis = CStr(p)
             Case Else
+                On Error Resume Next
                 fixthis = LTrim$(str(p))
+                If Err Then Err.Clear: fixthis = Typename(p): Exit Function
                 If Left$(fixthis, 1) = "." Then
                 fixthis = "0" + fixthis
                 ElseIf Left$(fixthis, 2) = "-." Then

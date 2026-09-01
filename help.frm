@@ -67,7 +67,7 @@ Private jump As Boolean
  Dim scrTwips As Long
 
 Private Declare Function CopyFromLParamToRect Lib "user32" Alias "CopyRect" (lpDestRect As RECT, ByVal lpSourceRect As Long) As Long
-Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long
 Dim UAddPixelsTop As Long, flagmarkout As Boolean
@@ -173,7 +173,7 @@ If Button = 1 Then
     If (Y > Height - 150 And Y < Height) And (X > Width - 150 And X < Width) Then
     dr = True
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = Y
     End If
     
@@ -181,7 +181,7 @@ If Button = 1 Then
     If (X > Width - borderleft And X < Width) Or (Y > Height - bordertop) Then  ' (y > Height - bordertop And y < Height) And
     dr = True
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = Y
     End If
     End If
@@ -205,11 +205,11 @@ If dr Then
 If bordertop < 150 Then
 
         If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
+     If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
 
@@ -238,10 +238,10 @@ Else
         
         If Helplastfactor <> factor Then ScaleDialog Helplastfactor, Width
 
-        Lx = X
+        lX = X
         
         Else
-        Lx = X * Helplastfactor / factor
+        lX = X * Helplastfactor / factor
              ScaleDialog Helplastfactor, (Width + addX) * Helplastfactor / factor
          
    
@@ -255,7 +255,7 @@ Else
         lY = lY * Helplastfactor / factor
         End If
         Else
-        Lx = X
+        lX = X
         lY = Y
    
 End If
@@ -519,4 +519,8 @@ End Sub
 
 Private Sub label1_inform(tLine As Long, tPos As Long)
 label1.ReplaceTitle = "" 'vH_title$
+End Sub
+Public Sub UNhookMe()
+Set LastGlist = Nothing
+UnHook hWnd
 End Sub

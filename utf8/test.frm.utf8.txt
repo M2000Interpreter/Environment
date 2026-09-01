@@ -23,15 +23,23 @@ Begin VB.Form Form2
       TabIndex        =   5
       Top             =   810
       Width           =   3705
-      _extentx        =   6535
-      _extenty        =   3387
-      max             =   1
-      vertical        =   -1
-      font            =   "TEST.frx":000C
-      borderstyle     =   1
-      showbar         =   0
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6535
+      _ExtentY        =   3387
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   12
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      BorderStyle     =   1
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   600
@@ -41,13 +49,21 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   810
       Width           =   3930
-      _extentx        =   6932
-      _extenty        =   1058
-      max             =   1
-      vertical        =   -1
-      font            =   "TEST.frx":0030
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6932
+      _ExtentY        =   1058
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   161
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList0 
       Height          =   555
@@ -55,14 +71,22 @@ Begin VB.Form Form2
       TabIndex        =   1
       Top             =   4620
       Width           =   7665
-      _extentx        =   13520
-      _extenty        =   979
-      max             =   1
-      vertical        =   -1
-      font            =   "TEST.frx":0054
-      showbar         =   0
-      backcolor       =   657930
-      forecolor       =   16777215
+      _ExtentX        =   13520
+      _ExtentY        =   979
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   657930
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList1 
       Height          =   1800
@@ -70,14 +94,22 @@ Begin VB.Form Form2
       TabIndex        =   0
       Top             =   2775
       Width           =   7665
-      _extentx        =   13520
-      _extenty        =   3175
-      max             =   1
-      vertical        =   -1
-      font            =   "TEST.frx":0078
-      showbar         =   0
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   13520
+      _ExtentY        =   3175
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   615
@@ -87,14 +119,22 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   1455
       Width           =   3930
-      _extentx        =   6932
-      _extenty        =   1085
-      max             =   1
-      vertical        =   -1
-      font            =   "TEST.frx":009C
-      showbar         =   0
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6932
+      _ExtentY        =   1085
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList3 
       Height          =   615
@@ -104,14 +144,22 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   2115
       Width           =   3930
-      _extentx        =   6932
-      _extenty        =   1085
-      max             =   1
-      vertical        =   -1
-      font            =   "TEST.frx":00C0
-      showbar         =   0
-      backcolor       =   3881787
-      forecolor       =   16777215
+      _ExtentX        =   6932
+      _ExtentY        =   1085
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   11.25
+         Charset         =   0
+         Weight          =   700
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      ShowBar         =   0   'False
+      Backcolor       =   3881787
+      ForeColor       =   16777215
    End
    Begin M2000.gList gList2 
       Height          =   495
@@ -120,15 +168,23 @@ Begin VB.Form Form2
       TabStop         =   0   'False
       Top             =   135
       Width           =   7635
-      _extentx        =   13467
-      _extenty        =   873
-      max             =   1
-      vertical        =   -1
-      font            =   "TEST.frx":00E4
-      enabled         =   -1
-      backcolor       =   3881787
-      forecolor       =   16777215
-      capcolor        =   16777215
+      _ExtentX        =   13467
+      _ExtentY        =   873
+      Max             =   1
+      Vertical        =   -1  'True
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Arial"
+         Size            =   14.25
+         Charset         =   161
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Enabled         =   -1  'True
+      Backcolor       =   3881787
+      ForeColor       =   16777215
+      CapColor        =   16777215
    End
 End
 Attribute VB_Name = "Form2"
@@ -146,7 +202,7 @@ Private Label(0 To 2) As New myTextBox
 Dim run_in_basestack1 As Boolean
 Dim MyBaseTask As New basetask
 Dim setupxy As Single
-Dim Lx As Long, lY As Long, dr As Boolean, drmove As Boolean
+Dim lX As Long, lY As Long, dr As Boolean, drmove As Boolean
 Dim prevx As Long, prevy As Long
 Dim bordertop As Long, borderleft As Long
 Dim allheight As Long, allwidth As Long, itemWidth As Long, itemwidth3 As Long, itemwidth2 As Long
@@ -1035,7 +1091,7 @@ If Button = 1 Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = Y
     End If
     
@@ -1044,7 +1100,7 @@ If Button = 1 Then
     dr = True
     tracecounter = 100
     MousePointer = vbSizeNWSE
-    Lx = X
+    lX = X
     lY = Y
     End If
     End If
@@ -1067,11 +1123,11 @@ If dr Then
 If bordertop < 150 Then
 
         If Y < (Height - 150) Or Y > Height Then addy = (Y - lY)
-     If X < (Width - 150) Or X > Width Then addX = (X - Lx)
+     If X < (Width - 150) Or X > Width Then addX = (X - lX)
      
 Else
     If Y < (Height - bordertop) Or Y > Height Then addy = (Y - lY)
-        If X < (Width - borderleft) Or X > Width Then addX = (X - Lx)
+        If X < (Width - borderleft) Or X > Width Then addX = (X - lX)
     End If
     
 
@@ -1098,10 +1154,10 @@ Else
 
         If addX = 0 Then
         If lastfactor <> factor Then ScaleDialog lastfactor, Width
-        Lx = X
+        lX = X
         
         Else
-        Lx = X * lastfactor / factor
+        lX = X * lastfactor / factor
          ScaleDialog lastfactor, (Width + addX) * lastfactor / factor
          End If
 
@@ -1116,7 +1172,7 @@ Else
         lY = lY * lastfactor / factor
         End If
         Else
-        Lx = X
+        lX = X
         lY = Y
    
 End If
@@ -1246,4 +1302,8 @@ Case 0 To 2
     End With
 End Select
 100
+End Sub
+Public Sub UNhookMe()
+Set LastGlist = Nothing
+UnHook hWnd
 End Sub

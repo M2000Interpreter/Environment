@@ -475,3 +475,7 @@ For i = 1 To Forms.Count - 1
 Next i
 affiliatehwnd = 0
 End Property
+Public Sub UNhookMe()
+Set LastGlist = Nothing
+UnHook hWnd
+End Sub

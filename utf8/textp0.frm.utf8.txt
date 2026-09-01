@@ -2712,7 +2712,7 @@ Else
 End If
 End Sub
 
-Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
+Private Sub view1_BeforeNavigate2(ByVal pDisp As Object, Url As Variant, Flags As Variant, TargetFrameName As Variant, PostData As Variant, Headers As Variant, Cancel As Boolean)
 If look1 Then
 look1 = False:  lookfirst = False
 
@@ -3861,7 +3861,11 @@ If once Then Exit Function
 once = True
 ASKINUSE = True
 If Not Screen.ActiveForm Is Nothing Then
-If TypeOf Screen.ActiveForm Is GuiM2000 Then Screen.ActiveForm.UNhookMe
+If TypeOf Screen.ActiveForm Is GuiM2000 Then
+On Error Resume Next
+    Screen.ActiveForm.UNhookMe
+Err.Clear
+End If
 Set zz = Screen.ActiveForm
 End If
 Dim INFOONLY As Boolean

@@ -1,19 +1,11 @@
 M2000 Interpreter and Environment
 Version 15 Revision 38
 
-Athens, September 1, 2026
+Athens, September 2, 2026
 
-The difference form this test and the previous revision is on message only (shift+f1 works as expected), we get the error message but from a mistake (for modules only, not calling using CALL) we didn't get the "in module B". Older revisions had this. So, I restore it.
-Test:
-Edit A then copy the code and run it. We get division by zero in module b. Pressing shift+F1 open module A and place the cursor to 0.
-module c {
-	module b {
-		? 1/0
-	}
-	b
-}
-c
+1. Some fixes, for string expressions (some commands like INSERT and OVERWRITE updated to work with strings functions without suffix $, using newer evaluator code).
 
+2. Goto 0 now do EXIT as before. Module Jukebox on INFO now works ok. Also I found a bug when CONTROL from was open and CHOOSE FOLDER form was open together, a wrong call to not exist method on CONTROL form close abnormal the CHOOSE FOLDER form and can't open by a flag which not properly reset.
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com
