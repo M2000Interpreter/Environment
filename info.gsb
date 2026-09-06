@@ -5888,7 +5888,7 @@ Pen 0 {
 	italic
 	Pen 5{
 		cursor 0, row-1
-		Report 1, "George Karras 1999-2027"
+		Report 1, "George Karras 1999-2026"
 	}
 }
 cls backcolor, row
@@ -54119,7 +54119,7 @@ main:
 
    sub  esp, SIZEOF_MSG                    ; space for MSG Struct
    mov  [wMsg], esp
-
+   align 4
    MessageLoop:
        push dword 0                        ; get a message from the queue
        push dword 0
@@ -55413,5 +55413,176 @@ Module WindowManagment{
 	Declare Form1 Nothing
 }
 WindowManagment
+}
+MODULE ASMDLL {Static Function MachineCode
+Enum PESubsystem {
+    Subsystem_GUI = 2
+    Subsystem_CUI = 3
+}
+Assembler =getobject("","m2000.x86")
+Assembler=>Subsystem=Subsystem_CUI
+Assembler=>PEDll=true 
+Assembler=>DLLName = "testasm.dll"
+Assembler=>AddExport "AddNumbers", "MyFunction"
+
+Buffer2export=MachineCode({
+; =========================================================================
+; STANDARD WIN32 DLL ENTRY POINT (DLLMAIN)
+; =========================================================================
+DllMain:
+    push ebp
+    mov ebp, esp
+    mov eax, 1
+    leave
+    ret 0xC
+; =========================================================================
+; EXPORTED FUNCTION (AddNumbers)
+; =========================================================================
+align 4  ; new pseudo op code for alingment
+MyFunction:
+    push ebp
+    mov ebp, esp
+    
+    mov eax, dword [ebp + 8]   ; First parameter (a)
+    add eax, dword [ebp + 0xC]  ; Second parameter (b)
+    leave
+;    mov esp, ebp
+;    pop ebp
+    ret 8                ; Clean up 2 arguments (2 * 4 bytes = 8) and return
+})
+open "testasm.dll" for output as #f
+	put #f, Buffer2export
+close #f
+if exist("testasm.dll") then
+print "testasm.dll saved"
+	print {declare add2 lib dir$+"testAsm.AddNumbers" {long a, long b} as long}
+	declare add2 lib dir$+"testAsm.AddNumbers" {long a, long b} as long
+	print add2(1022322,22340) = 1022322+22340
+	remove dir$+"testAsm"
+	print {remove dir$+"testAsm"}
+	print "dll loaded, used, and removed"
+end if
+
+Function MachineCode(assembly as string)
+	if Assembler=>assemble(assembly, true) then
+		local OutPutSize=Assembler=>OutputSize
+		local mc
+		buffer code mc as byte*OutputSize
+		' feed the base address to Assembler
+		Assembler=>BaseAddress=&h10000000 		
+		if Assembler=>assemble(assembly) then
+			' get a copy of final machine code
+			mc=>FillDataFromMem Assembler=>GetOutPtr
+			=mc
+			exit function
+		End if
+	End if
+	error Assembler=>LastErrorMessage 
+End Function
+}
+MODULE ASMDLL2 {name$="TESTASM7.DLL"
+Static Function MachineCode
+Enum PESubsystem {
+    Subsystem_GUI = 2
+    Subsystem_CUI = 3
+}
+Assembler =getobject("","m2000.x86")
+Assembler=>Subsystem=Subsystem_GUI
+Assembler=>PEDll=true 
+Assembler=>DLLName = name$
+Assembler=>AddExport "AddNumbers", "MyFunction"
+Assembler=>AddExport "Time", "MyTime"
+' we use a space so this sortrd to first place - ordinal 1
+Assembler=>AddExport " 01", "MyTick"
+
+Buffer2export=MachineCode({
+
+extern "winmm", timeGetTime
+
+; =========================================================================
+; STANDARD WIN32 DLL ENTRY POINT (DLLMAIN)
+; =========================================================================
+DllMain:
+    push ebp
+    mov ebp, esp
+    mov eax, 1
+    leave
+    ret 0xC
+
+; =========================================================================
+; EXPORTED FUNCTION (MyFunction to Addnumbers)
+; =========================================================================
+align 4
+MyFunction:
+    push ebp
+    mov ebp, esp
+    
+    mov eax, dword [ebp + 8]   ; First parameter (a)
+    add eax, dword [ebp + 0xC]  ; Second parameter (b)
+    leave
+;    mov esp, ebp ; same as leave
+;    pop ebp
+    ret 8                ; Clean up 2 arguments (2 * 4 bytes = 8) and return
+    	
+; =========================================================================
+; EXPORTED FUNCTION (MyTime to Time)
+; =========================================================================
+	align 4
+MyTime:
+	call_ext timeGetTime   ; new directive for absolute call
+	; so the code can be moved and the timeGetTime works fine
+	ret
+
+; =========================================================================
+; EXPORTED FUNCTION (MyTick to #1 - no name)
+; =========================================================================
+	align 4 ; new directive for alignment
+MyTick:
+	push ebp
+	mov ebp, esp
+	mov eax, [data1]
+	inc eax
+	mov [data1], eax
+	leave
+	ret
+data1:
+	dd 0x20304050
+})
+Print "File name: ";name$
+Print "Assembler Output Size: "; assembler=>outputsize
+open name$ for output as #f
+	put #f, Buffer2export
+close #f
+Print  "Saved ok. length:"; filelen(name$)
+check$=file.name.only$(name$)
+declare add2 lib dir$+check$+".AddNumbers" {long a, long b} as long
+declare mytime lib dir$+check$+".Time" as long
+' using ordinal number:
+declare mytick lib dir$+check$+".#1" as long
+
+try ok {
+	? add2(1022322,22340) = 1022322+22340,  mytime(), mytick()
+	? add2(1022322,-22340) = 1022322-22340,  mytime(), mytick()
+	? add2(-1022322,22340) = -1022322+22340,  mytime(), mytick()
+	? add2(10222,-2240) = 10222-2240, mytime(), mytick()
+}
+if ok then remove dir$+check$ else print error$
+
+Function MachineCode(assembly as string)
+	if Assembler=>assemble(assembly, true) then
+		local OutPutSize=Assembler=>OutputSize
+		local mc
+		buffer code mc as byte*OutputSize
+		' feed the base address to Assembler
+		Assembler=>BaseAddress=&h10010000 		
+		if Assembler=>assemble(assembly) then
+			' get a copy of final machine code
+			mc=>FillDataFromMem Assembler=>GetOutPtr
+			=mc
+			exit function
+		End if
+	End if
+	error Assembler=>LastErrorMessage 
+End Function
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

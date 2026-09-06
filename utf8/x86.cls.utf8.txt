@@ -36,6 +36,7 @@ Private Const IMAGE_NT_OPTIONAL_HDR32_MAGIC     As Long = &H10B&
 Private Const IMAGE_DOS_HDR16_MAGIC             As Long = &H5A4D&
 Private Const IMAGE_DOS_HDR32_MAGIC             As Long = &H4550&
 Private Const IMAGE_FILE_MACHINE_I386           As Long = &H14C&
+Private Const IMAGE_REL_BASED_HIGHLOW           As Byte = 3
 
 Private Const DOS_CODE_RELOCATIONS As String = _
         "0E1FBA0E00B409CD21B8014CCD21546869732070726" & _
@@ -216,7 +217,7 @@ Private Type ASMInstruction
     ArgCount                    As Long
     Size                        As Long
     Offset                      As Long
-    flags                       As OpCodePrefixes
+    Flags                       As OpCodePrefixes
     Data                        As RawData
     Line                        As Long
     Section                     As String
@@ -233,6 +234,21 @@ Private Type Scanner
     LastWasEOI                  As Boolean
     NextToken                   As ASMToken
     CurToken                    As ASMToken
+End Type
+
+
+Private Type IMAGE_EXPORT_DIRECTORY
+    Characteristics             As Long
+    TimeDateStamp               As Long
+    MajorVersion                As Integer
+    MinorVersion                As Integer
+    Name                        As Long
+    Base                        As Long
+    NumberOfFunctions           As Long
+    NumberOfNames               As Long
+    AddressOfFunctions          As Long
+    AddressOfNames              As Long
+    AddressOfNameOrdinals       As Long
 End Type
 
 Private Type IMAGE_IMPORT_DIRECTORY
@@ -359,6 +375,29 @@ Private m_lngOutPos             As Long
 Private m_udeSubsystem          As PESubsystem
 
 Private m_blnWritePE            As Boolean
+' new for DLL
+Private Type ASMExport
+    Name                        As String
+    LabelName                   As String
+End Type
+
+Private Type ASMRelocation
+    Offset                      As Long
+    Type                        As Byte
+End Type
+Private m_blnWriteDLL           As Boolean
+Private m_udtExports()          As ASMExport
+Private m_strDLLName            As String
+Private m_lngExportSize         As Long
+Private m_lngExportCount        As Long
+Private m_btExportData()        As Byte
+
+Private m_udtRelocs()           As ASMRelocation
+Private m_lngRelocCount         As Long
+Private m_lngRelocSize          As Long
+Private m_btRelocData()         As Byte
+
+
 Private m_lngPECodeSize         As Long
 
 Private m_lngBaseAddress        As Long
@@ -412,6 +451,12 @@ Public Property Let PEHeader(ByVal blnValue As Boolean)
     m_blnWritePE = blnValue
 End Property
 
+Private Sub AddRelocation(ByVal lngRVA As Long)
+    ReDim Preserve m_udtRelocs(m_lngRelocCount) As ASMRelocation
+    m_udtRelocs(m_lngRelocCount).Offset = lngRVA ' +RoundToSectionSize(GetPEHeaderSize(sections))..
+    m_udtRelocs(m_lngRelocCount).Type = IMAGE_REL_BASED_HIGHLOW
+    m_lngRelocCount = m_lngRelocCount + 1
+End Sub
 
 Public Property Get BaseAddress() As Long
     BaseAddress = m_lngBaseAddress
@@ -419,8 +464,20 @@ End Property
 
 
 Public Property Let BaseAddress(ByVal lngVal As Long)
-    m_lngBaseAddress = lngVal
-    If m_lngBaseAddress < 0 Then Err.Raise 6, , "Image Base < 0 invalid"
+    If lngVal < 0 Then
+    MyEr "Image Base < 0 invalid", "όχι αρνητική τιμή για βάση"
+    lngVal = &H1000000
+    End If
+    ' ? LOW-LEVEL FIX: Enforce Windows 64 KB (0x10000) Allocation Granularity Alignment.
+    ' If the passed address is not a multiple of 64 KB, we automatically round it UP
+    ' to the next valid 64 KB boundary to ensure the Windows Loader accepts the file.
+    Const IMAGE_BASE_ALIGNMENT As Long = &H10000  ' 64 KB in Hex
+    
+    If (lngVal Mod IMAGE_BASE_ALIGNMENT) <> 0 Then
+        m_lngBaseAddress = lngVal + (IMAGE_BASE_ALIGNMENT - (lngVal Mod IMAGE_BASE_ALIGNMENT))
+    Else
+        m_lngBaseAddress = lngVal
+    End If
 End Property
 
 
@@ -491,19 +548,75 @@ Public Function Assemble( _
     TokenizeInput
     If FindLabels() Then
         If ParseInstructions() Then
-            If GetInstructionSizes() Then
+            Dim Sections As Integer
+            If m_blnWriteDLL Then Sections = 3
+            If GetInstructionSizes(Sections) Then
                 If OnlySize Then
                     Assemble = True
                 Else
                     If ParsePointers() Then
-                        If m_blnWritePE Then
+                        If m_blnWritePE Or m_blnWriteDLL Then
                             If Not WritePEHeader() Then Exit Function
                         End If
                         
                         If AssembleInstructions() Then
-                            If m_blnWritePE Then
+                            If m_blnWritePE Or m_blnWriteDLL Then
+                                If m_lngExternCount > 0 Then
                                 OutputJumpTo RoundToMinSize(OutputPosition)
-                                WritePEImports
+                                
+                                WritePEImports Sections
+                                End If
+                                If m_blnWriteDLL Then
+                                    ' Write Dynamic Link Exports Section
+                                    If m_lngExportSize > 0 Then
+                                        OutputJumpTo RoundToMinSize(OutputPosition)
+                                        OutputMem VarPtr(m_btExportData(0)), m_lngExportSize
+                                    End If
+                                   ' If False Then
+                                    ' =============================================================
+                                    '  FIX: Safely generate and write relocation data
+                                    ' =============================================================
+                                    'If m_lngRelocSize > 0 Then
+                                        Dim lngTempSize As Long
+                                        
+                                        ' Build the relocation byte array. The array resizing (ReDim)
+                                        ' happens safely inside BuildRelocationSection.
+                                        If m_lngExternCount > 0 Then
+                                        m_btRelocData = BuildRelocationSection(Sections + 1, MEM_SECTION_SIZE, lngTempSize)
+                                        Else
+                                        m_btRelocData = BuildRelocationSection(Sections, MEM_SECTION_SIZE, lngTempSize)
+                                        End If
+                                        ' Jump to the pre-allocated space for the .reloc section
+                                        OutputJumpTo RoundToMinSize(OutputPosition)
+                                        
+                                        ' Use the safely returned array to write bytes to the file
+                                        OutputMem VarPtr(m_btRelocData(0)), lngTempSize
+                                    'End If
+                                    ' =============================================================
+                                    'End If
+                                End If
+                                ' =============================================================
+                                ' CALCULATE & PATCH THE PE CHECKSUM (DYNAMIC HYBRID METHOD)
+                                ' =============================================================
+                                Dim lngChecksumPos As Long
+                                Dim lngNewChecksum As Long
+                                Dim mzHdrTemp As IMAGE_DOS_HEADER
+                                Dim PE_Offset As Long
+                                
+                                ' Safely read the PE signature offset from the MZ Header structure (e_lfanew)
+                                CopyMemory mzHdrTemp, m_btOutput(0), Len(mzHdrTemp)
+                                PE_Offset = mzHdrTemp.NewHeaderOffset
+                                
+                                ' OptionalHeader.CheckSum is exactly 88 bytes after the PE Signature start
+                                ' (4 bytes Signature + 20 bytes FileHeader + 64 bytes inside OptionalHeader)
+                                lngChecksumPos = PE_Offset + 4 + 20 + 64
+                                
+                                ' Compute the valid checksum over the fully generated file array
+                                lngNewChecksum = CalculatePECheckSum(lngChecksumPos)
+                                
+                                ' Inject the calculated checksum back into the binary data array
+                                CopyMemory m_btOutput(lngChecksumPos), lngNewChecksum, 4
+                                ' =============================================================
                             End If
                             Assemble = True
                         End If
@@ -515,16 +628,13 @@ Public Function Assemble( _
 End Function
 
 
-Private Sub WritePEImports()
+Private Sub WritePEImports(ByVal Sections As Integer)
     Dim lngRVAIAT   As Long
     Dim ntHdr       As IMAGE_NT_HEADERS
     Dim scHdr       As IMAGE_SECTION_HEADER
     
-    Const SECTIONS = 2
-    
-    lngRVAIAT = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * SECTIONS)
+    lngRVAIAT = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * Sections)
     lngRVAIAT = lngRVAIAT + RoundToSectionSize(m_lngPECodeSize)
-    
     WriteIAT lngRVAIAT
     WriteIIDs lngRVAIAT
     WriteIAT lngRVAIAT
@@ -654,20 +764,31 @@ Private Function WritePEHeader() As Boolean
     Dim ntHdr   As IMAGE_NT_HEADERS
     Dim scHdr   As IMAGE_SECTION_HEADER
     Dim sdHdr   As IMAGE_SECTION_HEADER
+    Dim seHdr   As IMAGE_SECTION_HEADER
+    Dim srHdr   As IMAGE_SECTION_HEADER
     Dim impTbl  As IMAGE_IMPORT_DIRECTORY
     Dim lngImp  As Long
     Dim btDOS() As Byte
     
-    Const SECTIONS = 2
+    Dim Sections As Integer
     
-    If GetLabelIndex("MAIN") = -1 Then
+    If m_blnWriteDLL Then
+        If GetLabelIndex("DLLMAIN") = -1 Then
+            SetError "Entrypoint ""dllMain"" not found.", 0, ""
+            Exit Function
+        End If
+        Sections = 3
+    ElseIf GetLabelIndex("MAIN") = -1 Then
         SetError "Entrypoint ""Main"" not found.", 0, ""
         Exit Function
+    Else
+        Sections = 2
     End If
-    
     lngImp = GetNeededImportsSize()
-    If lngImp = 0 Then lngImp = 1
-    
+    Dim skipImport As Boolean
+    If lngImp = 0 Then lngImp = 1: skipImport = True: Sections = Sections - 1
+
+        
     With mzHdr
         .Magic = IMAGE_DOS_HDR16_MAGIC
         .BytesInLastPage = 144
@@ -678,70 +799,130 @@ Private Function WritePEHeader() As Boolean
         .RelocationTableFileAddress = &H40
         .NewHeaderOffset = Len(mzHdr) + 64
     End With
-      
+    Dim more As Long
     With ntHdr
         .Signature = IMAGE_DOS_HDR32_MAGIC
         
         With .FileHeader
             .Machine = IMAGE_FILE_MACHINE_I386
-            .NumberOfSections = SECTIONS
+            .NumberOfSections = Sections
             .SizeOfOptionalHeader = Len(ntHdr.OptionalHeader)
-            .Characteristics = IMAGE_FILE_RELOCS_STRIPPED Or IMAGE_FILE_LINE_NUMS_STRIPPED Or _
+            
+            If m_blnWriteDLL Then
+                .Characteristics = IMAGE_FILE_EXECUTABLE_IMAGE Or IMAGE_FILE_DEBUG_STRIPPED Or IMAGE_FILE_LINE_NUMS_STRIPPED Or IMAGE_FILE_LOCAL_SYMS_STRIPPED Or IMAGE_FILE_32BIT_MACHINE Or IMAGE_FILE_DLL
+            Else
+                .Characteristics = IMAGE_FILE_RELOCS_STRIPPED Or IMAGE_FILE_LINE_NUMS_STRIPPED Or _
                                IMAGE_FILE_LOCAL_SYMS_STRIPPED Or IMAGE_FILE_EXECUTABLE_IMAGE Or _
                                IMAGE_FILE_32BIT_MACHINE Or IMAGE_FILE_DEBUG_STRIPPED Or _
                                IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP Or IMAGE_FILE_NET_RUN_FROM_SWAP
+            End If
         End With
         
         With .OptionalHeader
             .Magic = IMAGE_NT_OPTIONAL_HDR32_MAGIC
-            .SizeOfCode = RoundToMinSize(m_lngPECodeSize)
+            .SizeOfCode = RoundToMinSize(m_lngPECodeSize)  '
             .SizeOfInitializedData = RoundToMinSize(lngImp)
-            .BaseOfCode = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * SECTIONS)
+            .BaseOfCode = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * Sections)
             .BaseOfData = .BaseOfCode + RoundToSectionSize(.SizeOfCode)
-            .AddressOfEntryPoint = m_udtLabels(GetLabelIndex("MAIN")).Offset - m_lngBaseAddress
+            If m_blnWriteDLL Then
+                .AddressOfEntryPoint = m_udtLabels(GetLabelIndex("DLLMAIN")).Offset - m_lngBaseAddress
+            Else
+                .AddressOfEntryPoint = m_udtLabels(GetLabelIndex("MAIN")).Offset - m_lngBaseAddress
+            End If
             .ImageBase = m_lngBaseAddress
             .SectionAlignment = MEM_SECTION_SIZE
             .FileAlignment = FILE_SECTION_SIZE
             .MajorOperatingSystemVersion = 4
             .MajorSubsystemVersion = 4
+            ' here add size of export round to scection size
+            If skipImport Then
+            .SizeOfImage = .BaseOfData
+            Else
             .SizeOfImage = .BaseOfData + RoundToSectionSize(lngImp)
-            .SizeOfHeaders = GetPEHeaderSize()
+            End If
+            If m_blnWriteDLL Then
+                .SizeOfImage = .SizeOfImage + RoundToSectionSize(m_lngExportSize)
+               ' If False Then
+                    If m_lngRelocSize > 0 Then
+                       ' Sections = Sections + 1
+                        '.BaseOfCode = .BaseOfCode + Len(scHdr)
+                      '  .SizeOfImage = .SizeOfImage + RoundToSectionSize(m_lngRelocSize)
+                    End If
+               ' End If
+            End If
+            .DllCharacteristics = 0
+            .SizeOfHeaders = GetPEHeaderSize(Sections)
             .Subsystem = m_udeSubsystem
             .SizeOfStackReserve = m_SizeOfStackReserve
             .SizeOfStackCommit = m_SizeOfStackCommit
             .SizeOfHeapReserve = m_SizeOfHeapReserve
             .SizeOfHeapCommit = m_SizeOfHeapCommit
             .NumberOfRvaAndSizes = 16
+            Dim edataVirtualAddress As Long
+            Dim relocVirtualAddress As Long
             
-            With .DataDirectory(ETableImport)
-                .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + _
-                                  RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode) + _
-                                  GetNeededIATSize()
-                                  
-                .Size = Len(impTbl)
-            End With
+            If Not skipImport Then
+                With .DataDirectory(ETableImport)
+                    .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + _
+                                      RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode) + _
+                                      GetNeededIATSize()
+                                      
+                    .Size = Len(impTbl)
+                End With
+                
+                With .DataDirectory(ETableIAT)
+                    .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + _
+                                      RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode)
+                                      
+                    .Size = GetNeededIATSize()
+                    
+                End With
+                edataVirtualAddress = .DataDirectory(ETableIAT).VirtualAddress + RoundToSectionSize(.DataDirectory(ETableImport).Size + .DataDirectory(ETableIAT).Size)
+            Else
+                edataVirtualAddress = .BaseOfData
+                
+            End If
+            If m_blnWriteDLL Then
+                With .DataDirectory(ETableExport)
+                    .VirtualAddress = edataVirtualAddress
+                    .Size = m_lngExportSize
+                    relocVirtualAddress = RoundToSectionSize(.Size) + .VirtualAddress
+                End With
+               'If False Then
+                    With .DataDirectory(ETableRelocation)
+                        .VirtualAddress = relocVirtualAddress
+                        .Size = m_lngRelocSize
+                    more = m_lngRelocSize
+                    End With
+                    .SizeOfHeaders = GetPEHeaderSize(Sections + 1)
+                    
+                    Sections = Sections + 1
+                
+               ' End If
+            End If
             
-            With .DataDirectory(ETableIAT)
-                .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + _
-                                  RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode)
-                                  
-                .Size = GetNeededIATSize()
-            End With
         End With
+        If .FileHeader.NumberOfSections < Sections Then
+       .OptionalHeader.SizeOfImage = .OptionalHeader.SizeOfImage + more
+        
+        .FileHeader.NumberOfSections = Sections
+        
+        End If
     End With
     
     With scHdr
-        WriteSectionName scHdr, ".text"
+        WriteSectionName scHdr, ".code"
         .VirtSizePhysAddr = m_lngPECodeSize
         .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode
         .SizeOfRawData = RoundToMinSize(m_lngPECodeSize)
-        .PointerToRawData = GetPEHeaderSize()
+        .PointerToRawData = GetPEHeaderSize(Sections)
         .Characteristics = IMAGE_SCN_CNT_CODE Or _
+                           IMAGE_SCN_CNT_INITIALIZED_DATA Or _
                            IMAGE_SCN_MEM_EXECUTE Or _
                            IMAGE_SCN_MEM_READ Or _
                            IMAGE_SCN_MEM_WRITE
     End With
-    
+     If Not skipImport Then
     With sdHdr
         WriteSectionName sdHdr, ".rdata"
         .VirtSizePhysAddr = lngImp
@@ -751,15 +932,68 @@ Private Function WritePEHeader() As Boolean
         .Characteristics = IMAGE_SCN_MEM_READ Or _
                            IMAGE_SCN_MEM_WRITE
     End With
-    
+    End If
+    If m_blnWriteDLL Then
+        With seHdr
+            WriteSectionName seHdr, ".edata"
+            .VirtSizePhysAddr = m_lngExportSize
+            .VirtualAddress = edataVirtualAddress
+            .SizeOfRawData = RoundToMinSize(m_lngExportSize)
+            If Not skipImport Then
+            .PointerToRawData = sdHdr.PointerToRawData + sdHdr.SizeOfRawData
+            Else
+            
+            .PointerToRawData = scHdr.PointerToRawData + scHdr.SizeOfRawData
+            End If
+            .Characteristics = &H40000040 ' INITIALIZED_DATA | READ
+        End With
+        If True Then
+            With srHdr
+                WriteSectionName srHdr, ".reloc"
+                
+                ' ? FIX: VirtualSize must represent the exact, non-aligned data size in memory.
+                ' Using the precise m_lngRelocSize ensures Windows validation passes during ASLR relocation.
+                .VirtSizePhysAddr = m_lngRelocSize
+                
+                .VirtualAddress = relocVirtualAddress
+                
+                ' ? FIX: Ensure SizeOfRawData is perfectly aligned to the disk sector size (FILE_SECTION_SIZE = 512).
+                ' If there are no relocations, set it to 0 so the loader knows it's empty.
+                If m_lngRelocSize > 0 Then
+                    .SizeOfRawData = RoundToMinSize(m_lngRelocSize)
+                Else
+                    .SizeOfRawData = 0
+                End If
+                
+                .PointerToRawData = seHdr.PointerToRawData + seHdr.SizeOfRawData
+                .Characteristics = &H42000040 ' IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_DISCARDABLE | IMAGE_SCN_MEM_READ
+            End With
+        Else
+           With srHdr
+                WriteSectionName srHdr, ".reloc"
+                .VirtSizePhysAddr = m_lngRelocSize
+                .VirtualAddress = relocVirtualAddress
+                .SizeOfRawData = RoundToMinSize(m_lngRelocSize)
+                .PointerToRawData = seHdr.PointerToRawData + seHdr.SizeOfRawData
+                .Characteristics = &H42000040 ' INITIALIZED_DATA | DISCARDABLE | READ
+            End With
+        End If
+    End If
     btDOS = HexToByte(DOS_CODE_RELOCATIONS)
     
-    OutputMem VarPtr(mzHdr), Len(mzHdr)
+    OutputMem VarPtr(mzHdr), Len(mzHdr) '
     OutputMem VarPtr(btDOS(0)), UBound(btDOS) + 1
     OutputMem VarPtr(ntHdr), Len(ntHdr)
     OutputMem VarPtr(scHdr), Len(scHdr)
-    OutputMem VarPtr(sdHdr), Len(sdHdr)
-    
+    If Not skipImport Then
+        OutputMem VarPtr(sdHdr), Len(sdHdr)
+    End If
+    If m_blnWriteDLL Then
+        OutputMem VarPtr(seHdr), Len(seHdr)
+        'If False Then
+            OutputMem VarPtr(srHdr), Len(srHdr)
+        'End If
+    End If
     OutputJumpTo RoundToMinSize(OutputPosition)
     
     WritePEHeader = True
@@ -775,14 +1009,13 @@ Private Sub WriteSectionName(sc As IMAGE_SECTION_HEADER, ByVal strName As String
 End Sub
 
 
-Private Function GetPEHeaderSize() As Long
+Private Function GetPEHeaderSize(ByVal Sections As Integer) As Long
     Dim mzHdr   As IMAGE_DOS_HEADER
     Dim ntHdr   As IMAGE_NT_HEADERS
     Dim scHdr   As IMAGE_SECTION_HEADER
+
     
-    Const SECTIONS = 2
-    
-    GetPEHeaderSize = RoundToMinSize(Len(mzHdr) + 64 + Len(ntHdr) + Len(scHdr) * SECTIONS)
+    GetPEHeaderSize = RoundToMinSize(Len(mzHdr) + 64 + Len(ntHdr) + Len(scHdr) * Sections)
 End Function
 
 
@@ -795,7 +1028,12 @@ Private Function AssembleInstructions() As Boolean
     For i = 0 To m_lngInstrCount - 1
         lngSz = m_lngOutPos
         
-        If m_udtInstrs(i).Data.Size <> BitsUnknown Then
+        If m_udtInstrs(i).Mnemonic = "ALIGN" Then
+            Dim idxNOP As Long
+            For idxNOP = 1 To m_udtInstrs(i).Size
+                OutputByte &H90 ' Write 0x90 (NOP) opcode
+            Next idxNOP
+        ElseIf m_udtInstrs(i).Data.Size <> BitsUnknown Then
             If Not RawDataOut(m_udtInstrs(i).Data) Then Exit Function
         Else
             InstructionOutPrefixes m_udtInstrs(i)
@@ -881,6 +1119,13 @@ Private Function InstructionOutArgs(udtInstr As ASMInstruction) As Boolean
                         SetError "Relative value too big for instruction", udtInstr.Line, udtInstr.Section
                         Exit Function
                     End If
+                    
+                        If (udtInstr.Args(i).TType And ParamExt) Then
+                            If m_blnWriteDLL Or m_blnWritePE Then
+                                AddRelocation m_lngOutPos
+                            End If
+                        End If
+                    
                     
                     udeImmSize(lngImmValCnt) = .Size
                     lngImmValCnt = lngImmValCnt + 1
@@ -996,7 +1241,11 @@ Private Function InstructionOutArgs(udtInstr As ASMInstruction) As Boolean
                             udeDispSize = Bits32
                             udtModRM.rm = 5
                             blnDisplacement = True
-                        
+                            'If m_blnWriteDLL Or m_blnWritePE Then
+                            '    AddRelocation m_lngOutPos
+                            'End If
+                            'blnDisplacement = False
+                            
                         ElseIf udtInstr.Args(i).TType = ParamMM Then
                             Select Case udtInstr.Args(i).MMRegister
                                 Case MM0, XMM0: udtModRM.rm = 0
@@ -1028,7 +1277,68 @@ Private Function InstructionOutArgs(udtInstr As ASMInstruction) As Boolean
         If blnModRM Then WriteModRM udtModRM
     End If
     
-    If blnDisplacement Then OutputBytes lngDisplacement, udeDispSize
+'    If blnDisplacement Then
+'        If m_blnWritePE Or m_blnWriteDLL Then
+'            AddRelocation m_lngOutPos
+'       End If
+'        OutputBytes lngDisplacement, udeDispSize
+'    End If
+    
+'    If blnDisplacement Then
+'        If m_blnWritePE Or m_blnWriteDLL Then
+'            ' ? FIX: Only register a relocation if the displacement belongs to an External API (ParamExt)
+'            ' or a global symbol/label. Do NOT record frame/stack offsets like [ebp + 8] or [esp + 4].
+'            Dim blnIsGlobalSymbol As Boolean
+'            blnIsGlobalSymbol = False
+'
+'            ' Scan the arguments to see if this instruction actually references an external or global symbol
+'            For i = 0 To udtInstr.ArgCount - 1
+'                If (udtInstr.Args(i).TType And ParamExt) Or (udtInstr.Args(i).TType = ParamRel) Then
+'                    blnIsGlobalSymbol = True
+'                    Exit For
+'                End If
+'            Next i
+'
+'            ' Only add to the .reloc table if it's a true global memory address change
+'            If blnIsGlobalSymbol Then
+'                AddRelocation m_lngOutPos
+'            End If
+'        End If
+        
+        ' Write the actual displacement bytes (like 8 or 0xC) safely to the file array
+'        OutputBytes lngDisplacement, udeDispSize
+'    End If
+
+    If blnDisplacement Then
+        If m_blnWritePE Or m_blnWriteDLL Then
+            Dim blnIsGlobalReloc As Boolean
+            blnIsGlobalReloc = False
+            
+            ' Check if this displacement is an external API or an absolute global variable
+            For i = 0 To udtInstr.ArgCount - 1
+                If (udtInstr.Args(i).TType And ParamExt) Then
+                    blnIsGlobalReloc = True
+                    Exit For
+                ElseIf (udtInstr.Args(i).TType = ParamMem) Then
+                    ' If it has no registers (RegisterCount = 0), it's an absolute global data pointer!
+                    If udtInstr.Args(i).Pointer.RegisterCount = 0 Then
+                        blnIsGlobalReloc = True
+                        Exit For
+                    End If
+                End If
+            Next i
+            
+            ' Only register in .reloc table if it's a true global address
+            If blnIsGlobalReloc Then
+                Debug.Print m_lngOutPos
+                AddRelocation m_lngOutPos
+            End If
+        End If
+        
+        OutputBytes lngDisplacement, udeDispSize
+    End If
+
+
     If blnImmVal Then
         For i = 0 To lngImmValCnt - 1
             OutputBytes lngImmVal(i), udeImmSize(i)
@@ -1253,11 +1563,11 @@ Private Sub InstructionOutPrefixes(udtInstr As ASMInstruction)
     End With
     
     With udtInstr
-        If (.flags And PrefixFlgLock) Then _
+        If (.Flags And PrefixFlgLock) Then _
             OutputByte PREFIX_LOCK
-        If (.flags And PrefixFlgRep) Then _
+        If (.Flags And PrefixFlgRep) Then _
             OutputByte PREFIX_REP
-        If (.flags And PrefixFlgRepne) Then _
+        If (.Flags And PrefixFlgRepne) Then _
             OutputByte PREFIX_REPNE
     End With
     
@@ -1411,7 +1721,7 @@ Private Function ParsePointer(Ptr As Pointer) As Boolean
 End Function
 
 
-Private Function GetInstructionSizes() As Boolean
+Private Function GetInstructionSizes(Optional ByVal Sections As Integer = 2) As Boolean
     Dim i           As Long
     Dim j           As Long
     Dim k           As Long
@@ -1434,7 +1744,7 @@ Private Function GetInstructionSizes() As Boolean
                     If CompareInstrs(m_udtInstrs(i), Instructions(j)) Then
                         ' OpCode length + all used prefixes, ModR/M Byte
                         Size = Instructions(j).OpCodeLen + _
-                               BitCount(Instructions(j).Prefixes Or m_udtInstrs(i).flags) + _
+                               BitCount(Instructions(j).Prefixes Or m_udtInstrs(i).Flags) + _
                                Abs(m_udtInstrs(i).Segment <> SegUnknown) + _
                                Abs(Instructions(j).ModRM) + _
                                Abs(Instructions(j).Now3DByte > -1)
@@ -1489,43 +1799,317 @@ Private Function GetInstructionSizes() As Boolean
             End If
         End If
     Next
+    ' =============================================================
+    '  NEW: Scan instructions to find the exact number of relocations
+    ' =============================================================
+            ' UPDATED FIX: Scan for External APIs OR Absolute Global Memory Displacements
+            ' Ignore stack frame offsets like [ebp + 8] (which have RegisterCount > 0)
+            Dim idxInstr As Long
+            Dim idxArg As Long
+            Dim lngEstimatedRelocs As Long
+            
+            lngEstimatedRelocs = 0
+            For idxInstr = 0 To m_lngInstrCount - 1
+                For idxArg = 0 To m_udtInstrs(idxInstr).ArgCount - 1
+                    
+                    ' Case A: External Windows API Function Call
+                    If (m_udtInstrs(idxInstr).Args(idxArg).TType And ParamExt) Then
+                        lngEstimatedRelocs = lngEstimatedRelocs + 1
+                        
+                    ' Case B: Absolute Global Memory Access (like [data1] where RegisterCount = 0)
+                    ElseIf (m_udtInstrs(idxInstr).Args(idxArg).TType = ParamMem) Then
+                        If m_udtInstrs(idxInstr).Args(idxArg).Pointer.RegisterCount = 0 And _
+                           m_udtInstrs(idxInstr).Args(idxArg).Pointer.HasDisplacement Then
+                            lngEstimatedRelocs = lngEstimatedRelocs + 1
+                        End If
+                    End If
+                    
+                Next idxArg
+            Next idxInstr
+
     
-    FillInOffsets
-    If m_blnWritePE Then
+'    Dim idxInstr As Long
+'    Dim idxArg As Long
+'    Dim lngEstimatedRelocs As Long
+'
+'    lngEstimatedRelocs = 0
+'            lngEstimatedRelocs = 0
+'            For idxInstr = 0 To m_lngInstrCount - 1
+'                For idxArg = 0 To m_udtInstrs(idxInstr).ArgCount - 1
+'                    ' A true relocation is required ONLY if the instruction targets
+'                    ' an external API function (ParamExt) or a global symbol/label.
+'                    If (m_udtInstrs(idxInstr).Args(idxArg).TType And ParamExt) Or _
+'                       (m_udtInstrs(idxInstr).Args(idxArg).TType = ParamRel) Then
+'                        lngEstimatedRelocs = lngEstimatedRelocs + 1
+'                    End If
+'                Next idxArg
+'            Next idxInstr
+'
+    If lngEstimatedRelocs = 0 And m_blnWriteDLL Then
+        Sections = Sections - 1
+    End If
+                
+    FillInOffsets Sections
+    If m_blnWritePE Or m_blnWriteDLL Then
         m_lngPECodeSize = m_lngOutSize
         
         lngImpSz = GetNeededImportsSize()
         If lngImpSz = 0 Then
-            m_lngOutSize = RoundToMinSize(GetPEHeaderSize()) + _
+            m_lngOutSize = RoundToMinSize(GetPEHeaderSize(Sections)) + _
                            RoundToMinSize(m_lngPECodeSize) + _
                            RoundToMinSize(1)
         Else
-            m_lngOutSize = RoundToMinSize(GetPEHeaderSize()) + _
+            m_lngOutSize = RoundToMinSize(GetPEHeaderSize(Sections)) + _
                            RoundToMinSize(m_lngPECodeSize) + _
                            RoundToMinSize(lngImpSz)
         End If
         
-        FillInIAT RoundToSectionSize(GetPEHeaderSize()) + _
-                  RoundToSectionSize(m_lngPECodeSize)
+        
+            If m_blnWriteDLL Then
+                FillInIAT RoundToSectionSize(GetPEHeaderSize(Sections + 1)) + _
+                      RoundToSectionSize(m_lngPECodeSize)
+                      
+                ' 1. Calculate Export RVA and build the Exports section
+                Dim lngExportRVA As Long
+                lngExportRVA = RoundToSectionSize(GetPEHeaderSize(Sections)) + _
+                               RoundToSectionSize(m_lngPECodeSize)
+                If lngImpSz > 0 Then lngExportRVA = lngExportRVA + _
+                               RoundToSectionSize(lngImpSz)
+                               
+                m_btExportData = BuildExportSection(lngExportRVA, m_lngExportSize)
+                m_lngOutSize = RoundToSectionSize(m_lngOutSize) + m_lngExportSize
+                
+                ' REMOVED BuildRelocationSection FROM HERE
+                ' Because m_lngRelocCount is still 0 at this stage.
+                ' It will be generated later in Assemble() after instructions are assembled.
+                ' Calculate exact size for the .reloc section based on the count
+                ' Each relocation item takes 2 bytes. If there are items, we add 8 bytes
+                ' for the Base Relocation Table Header (Page RVA + Block Size).
+                If lngEstimatedRelocs > 0 Then
+                    Dim lngTotalBytes As Long
+                    lngTotalBytes = 8 + (lngEstimatedRelocs * 2)
+                    
+                    ' Ensure 4-byte DWORD padding alignment inside the block
+                    If lngTotalBytes Mod 4 <> 0 Then lngTotalBytes = lngTotalBytes + 2
+                    
+                    m_lngRelocSize = lngTotalBytes
+                    m_lngOutSize = RoundToSectionSize(m_lngOutSize) + m_lngRelocSize
+
+                Else
+                    Sections = Sections - 1
+                    ' If no relocations are found, allocate the 8-byte dummy block
+                    m_lngRelocSize = 8
+                End If
+                
+                ' Add the precise relocation size to the final output file size
+                                ' =============================================================
+                
+            Else
+                FillInIAT RoundToSectionSize(GetPEHeaderSize(Sections)) + _
+                          RoundToSectionSize(m_lngPECodeSize)
+            End If
     End If
     If m_lngOutSize = 0 Then Exit Function
     ReDim m_btOutput(m_lngOutSize - 1) As Byte
 
     GetInstructionSizes = True
 End Function
+Private Function BuildRelocationSection(ByVal Sections As Integer, ByVal BaseRVA As Long, ByRef OutSize As Long) As Byte()
+    Dim lngPageRVA As Long, lngPageStartPos As Long
+    Dim lngWord As Integer
+    
+    If m_lngRelocCount = 0 Then
+        Dim btDummy(7) As Byte
+        lngPageRVA = BaseRVA
+        lngWord = 8
+        CopyMemory btDummy(0), lngPageRVA, 4
+        CopyMemory btDummy(4), lngWord, 4
+        OutSize = 8
+        BuildRelocationSection = btDummy
+        Exit Function
+    End If
+    
+    Dim btOut()     As Byte
+    Dim lngPos      As Long
+    ReDim btOut(m_lngRelocCount * 2 + 100) As Byte
+    Dim i As Long, j As Long
+    ', headersize As Long
+    
+    'headersize = RoundToSectionSize(GetPEHeaderSize(Sections))
+    
+    ' Perfect Virtual Alignment for the Code Section based on PE-BEAR values
+    ' Code section starts at Raw 1024 (&H400) and loads at Virtual 4096 (&H1000)
+    Dim lngRawCodeStart As Long
+    Dim lngVirtualCodeStart As Long
+    
+    lngRawCodeStart = RoundToMinSize(GetPEHeaderSize(Sections))         ' This equals 1024 (&H400)
+    lngVirtualCodeStart = RoundToSectionSize(lngRawCodeStart) ' This equals 4096 (&H1000)
+   ' lngRawCodeStart = 4096  ' .code VirtualAddress = 0x1000 (4096 bytes)
+    
+    For i = 0 To m_lngRelocCount - 1
+        ' Formula: (RawFileOffset - lngRawCodeStart) + lngVirtualCodeStart
+        ' 1st MOV (data1): (1056 - 1024) + 4096 = RVA 4128 (&H1020) -> Byte-Perfect!
+        ' 2nd MOV (data1): (1062 - 1024) + 4096 = RVA 4134 (&H1026) -> Byte-Perfect!
+        ' Extern Call:     (1054 - 1024) + 4096 = RVA 4126 (&H101E) -> Byte-Perfect!
+        m_udtRelocs(i).Offset = (m_udtRelocs(i).Offset - lngRawCodeStart) + lngVirtualCodeStart
+    Next i
+    
+    Dim udtTempReloc As ASMRelocation
+    For i = 0 To m_lngRelocCount - 2
+        For j = i + 1 To m_lngRelocCount - 1
+            If m_udtRelocs(i).Offset > m_udtRelocs(j).Offset Then
+                udtTempReloc = m_udtRelocs(i)
+                m_udtRelocs(i) = m_udtRelocs(j)
+                m_udtRelocs(j) = udtTempReloc
+            End If
+        Next j
+    Next i
+    
+    i = 0
+    Do While i < m_lngRelocCount
+        lngPageRVA = m_udtRelocs(i).Offset And &HFFFFF000
+        lngPageStartPos = lngPos
+        
+        CopyMemory btOut(lngPos), lngPageRVA, 4: lngPos = lngPos + 4
+        lngPos = lngPos + 4
+        
+        Do While i < m_lngRelocCount
+            If (m_udtRelocs(i).Offset And &HFFFFF000) <> lngPageRVA Then Exit Do
+            
+            lngWord = (m_udtRelocs(i).Offset And &HFFF) Or (CInt(IMAGE_REL_BASED_HIGHLOW) * &H1000)
+            CopyMemory btOut(lngPos), lngWord, 2: lngPos = lngPos + 2
+            i = i + 1
+        Loop
+        
+        If (lngPos - lngPageStartPos) Mod 4 <> 0 Then
+            lngWord = 0 ' IMAGE_REL_BASED_ABSOLUTE (Padding)
+            CopyMemory btOut(lngPos), lngWord, 2: lngPos = lngPos + 2
+        End If
+        
+        Dim lngBlockSize As Long
+        lngBlockSize = lngPos - lngPageStartPos
+        CopyMemory btOut(lngPageStartPos + 4), lngBlockSize, 4
+    Loop
+    
+    ReDim Preserve btOut(lngPos - 1) As Byte
+    OutSize = lngPos
+    BuildRelocationSection = btOut
+End Function
+
+Private Function BuildExportSection(ByVal BaseRVA As Long, ByRef OutSize As Long) As Byte()
+    If m_lngExportCount = 0 Then Exit Function
+    Dim i As Long, j As Long
+    Dim udtTemp As ASMExport
+    ' sort
+    For i = 0 To m_lngExportCount - 2
+        For j = i + 1 To m_lngExportCount - 1
+            If StrComp(m_udtExports(i).Name, m_udtExports(j).Name, vbBinaryCompare) > 0 Then
+            udtTemp = m_udtExports(i)
+            m_udtExports(i) = m_udtExports(j)
+            m_udtExports(j) = udtTemp
+        End If
+        Next
+    Next
+    
+    Dim lngNamesSize As Long
+    Dim strDLLFile As String
+    strDLLFile = IIf(m_strDLLName = "", "compiled_lib.dll", m_strDLLName) & ChrW$(0)
+    lngNamesSize = EvenSize(Len(strDLLFile))
+    For i = 0 To m_lngExportCount - 1
+        lngNamesSize = lngNamesSize + EvenSize(Len(m_udtExports(i).Name & ChrW$(0)))
+    Next
+    Dim lngTotalSize As Long
+    lngTotalSize = 40 + (4 * m_lngExportCount) + (4 * m_lngExportCount) + (2 * m_lngExportCount) + lngNamesSize
+    Dim btOut() As Byte
+    ReDim btOut(lngTotalSize - 1) As Byte
+    Dim ptrHeader As Long: ptrHeader = 0
+    Dim ptrEAT As Long: ptrEAT = 40
+    Dim ptrNamePtr As Long: ptrNamePtr = ptrEAT + (4 * m_lngExportCount)
+    Dim ptrOrdinals As Long: ptrOrdinals = ptrNamePtr + (4 * m_lngExportCount)
+    Dim ptrStrings As Long: ptrStrings = ptrOrdinals + (2 * m_lngExportCount)
+    Dim btStr() As Byte
+    Dim lngDLLNameRVA As Long
+    btStr = StrConv(strDLLFile, vbFromUnicode)
+    CopyMemory btOut(ptrStrings), btStr(0), UBound(btStr) + 1
+    lngDLLNameRVA = BaseRVA + ptrStrings
+    ptrStrings = ptrStrings + EvenSize(UBound(btStr) + 1)
+    Dim lngNameRVAs() As Long
+    ReDim lngNameRVAs(m_lngExportCount - 1) As Long
+    For i = 0 To m_lngExportCount - 1
+        btStr = StrConv(m_udtExports(i).Name & ChrW$(0), vbFromUnicode)
+        CopyMemory btOut(ptrStrings), btStr(0), UBound(btStr) + 1
+        lngNameRVAs(i) = BaseRVA + ptrStrings
+        ptrStrings = ptrStrings + EvenSize(UBound(btStr) + 1)
+    Next
+    Dim lngFuncRVA As Long
+    Dim idxLabel As Long
+    Dim wordOrdinal As Integer
+    For i = 0 To m_lngExportCount - 1
+        idxLabel = GetLabelIndex(m_udtExports(i).LabelName)
+        If idxLabel <> -1 Then
+            ' Since Offset already contains (ImageBase + RVA),
+            ' we simply subtract the BaseAddress to get the exact memory RVA!
+            lngFuncRVA = m_udtLabels(idxLabel).Offset - m_lngBaseAddress
+        Else
+            lngFuncRVA = 0
+        End If
+        
+        CopyMemory btOut(ptrEAT + (i * 4)), lngFuncRVA, 4
+        CopyMemory btOut(ptrNamePtr + (i * 4)), lngNameRVAs(i), 4
+        wordOrdinal = CInt(i)
+        CopyMemory btOut(ptrOrdinals + (i * 2)), wordOrdinal, 2
+    Next
+
+    Dim expDir As IMAGE_EXPORT_DIRECTORY
+    With expDir
+        .Name = lngDLLNameRVA
+        .Base = 1
+        .NumberOfFunctions = m_lngExportCount
+        .NumberOfNames = m_lngExportCount
+        .AddressOfFunctions = BaseRVA + 40
+        .AddressOfNames = BaseRVA + 40 + (4 * m_lngExportCount)
+        .AddressOfNameOrdinals = BaseRVA + 40 + (4 * m_lngExportCount) + (4 * m_lngExportCount)
+    End With
+    CopyMemory btOut(0), expDir, 40
+    OutSize = lngTotalSize
+    BuildExportSection = btOut
+End Function
+
 
 
 ' calculate label- and instructionoffsets
-Private Sub FillInOffsets()
+Private Sub FillInOffsets(ByVal Sections As Integer)
     Dim i           As Long
     Dim j           As Long
     Dim lngPEOffset As Long
     
     If m_blnWritePE Then
-        lngPEOffset = RoundToSectionSize(GetPEHeaderSize)
+        lngPEOffset = RoundToSectionSize(GetPEHeaderSize(Sections))
     End If
     
     For i = 0 To m_lngInstrCount - 1
+        ' ? FIX: Dynamically calculate ALIGN size based on the current live address
+        If m_udtInstrs(i).Mnemonic = "ALIGN" Then
+            Dim lngCurrentVirtualAddr As Long
+            Dim lngAlignBoundary As Long
+            Dim lngPaddingNeeded As Long
+            
+            ' Calculate the actual memory address where this ALIGN instruction starts
+            lngCurrentVirtualAddr = m_lngOutSize + m_lngBaseAddress + lngPEOffset
+            lngAlignBoundary = m_udtInstrs(i).Args(0).Value
+            
+            If lngAlignBoundary > 0 Then
+                If (lngCurrentVirtualAddr Mod lngAlignBoundary) <> 0 Then
+                    ' Calculate exactly how many NOP bytes are needed to reach mod boundary = 0
+                    lngPaddingNeeded = lngAlignBoundary - (lngCurrentVirtualAddr Mod lngAlignBoundary)
+                    m_udtInstrs(i).Size = lngPaddingNeeded
+                Else
+                    m_udtInstrs(i).Size = 0
+                End If
+            End If
+        End If
+
+        ' Assign the calculated offset to the instruction
         m_udtInstrs(i).Offset = m_lngOutSize + m_lngBaseAddress + lngPEOffset
         m_lngOutSize = m_lngOutSize + m_udtInstrs(i).Size
 
@@ -1792,16 +2376,39 @@ End Function
 Private Function ParseRawData() As Boolean
     Dim udtInstr    As ASMInstruction
     Dim i           As Long
-    Dim lngLen      As Long
     Dim lngTemp     As Long
+    Dim strOp       As String
     
-    Select Case UCase$(token.content)
+    strOp = UCase$(token.content)
+    
+    ' Configure size based on data type
+    Select Case strOp
         Case "DB":  udtInstr.Data.Size = Bits8
         Case "DW":  udtInstr.Data.Size = Bits16
         Case "DD":  udtInstr.Data.Size = Bits32
+        Case "ALIGN": udtInstr.Data.Size = Bits8 ' NOPs are 1 byte each
     End Select
     Match TokenRawData
+    ' ? FIX: Just parse and store the alignment boundary value (e.g., 4)
+    If strOp = "ALIGN" Then
+        udtInstr.Mnemonic = "ALIGN"
+        If token.TType = TokenValue Then
+            ' Store the alignment boundary (like 4) in the first argument's value
+            udtInstr.Args(0).Value = token.Value
+            Match TokenValue
+        Else
+            SetError "Alignment boundary expected (e.g., ALIGN 4)", token.Line, token.Section
+            Exit Function
+        End If
+        
+        ' At parse time, the size of this pseudo-instruction is temporary 0
+        udtInstr.Size = 0
+        AddInstruction udtInstr
+        ParseRawData = True
+        Exit Function
+    End If
     
+    ' Standard DB, DW, DD handling (Original Elster Code)
     With udtInstr.Data
         Do
             Select Case token.TType
@@ -1813,16 +2420,15 @@ Private Function ParseRawData() As Boolean
                     
                 Case TokenString:
                     lngTemp = .ValueCount
-                    
                     ReDim Preserve .Values(.ValueCount + Len(token.content) - 1) As Long
                     If udtInstr.Data.Size = Bits8 Then
-                    For i = 1 To Len(token.content)
-                        .Values(lngTemp + i - 1) = Asc(Mid$(token.content, i, 1))
-                    Next
+                        For i = 1 To Len(token.content)
+                            .Values(lngTemp + i - 1) = Asc(Mid$(token.content, i, 1))
+                        Next
                     Else
-                    For i = 1 To Len(token.content)
-                        .Values(lngTemp + i - 1) = AscW(Mid$(token.content, i, 1))
-                    Next
+                        For i = 1 To Len(token.content)
+                            .Values(lngTemp + i - 1) = AscW(Mid$(token.content, i, 1))
+                        Next
                     End If
                     .ValueCount = .ValueCount + Len(token.content)
                     Match TokenString
@@ -1830,16 +2436,13 @@ Private Function ParseRawData() As Boolean
                 Case Else:
                     SetError "Unexpected: " & token.content, udtInstr.Line, udtInstr.Section
                     Exit Function
-                    
             End Select
         Loop While Match(TokenSeparator)
     End With
     
     AddInstruction udtInstr
-    
     ParseRawData = True
 End Function
-
 
 Private Function ParseInstruction() As Boolean
     Dim udtInstr    As ASMInstruction
@@ -1847,12 +2450,12 @@ Private Function ParseInstruction() As Boolean
     ' instruction can have multiple keywords like "lock rep"
     Do While token.TType = TokenKeyword
         Select Case UCase$(token.content)
-            Case "REP":     udtInstr.flags = udtInstr.flags Or PrefixFlgRep
-            Case "REPE":    udtInstr.flags = udtInstr.flags Or PrefixFlgRepe
-            Case "REPZ":    udtInstr.flags = udtInstr.flags Or PrefixFlgRepz
-            Case "REPNE":   udtInstr.flags = udtInstr.flags Or PrefixFlgRepne
-            Case "REPNZ":   udtInstr.flags = udtInstr.flags Or PrefixFlgRepnz
-            Case "LOCK":    udtInstr.flags = udtInstr.flags Or PrefixFlgLock
+            Case "REP":     udtInstr.Flags = udtInstr.Flags Or PrefixFlgRep
+            Case "REPE":    udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepe
+            Case "REPZ":    udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepz
+            Case "REPNE":   udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepne
+            Case "REPNZ":   udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepnz
+            Case "LOCK":    udtInstr.Flags = udtInstr.Flags Or PrefixFlgLock
             Case Else:      SetError "Unknown keyword: " & token.content, token.Line, token.Section
                             Exit Function
         End Select
@@ -2782,13 +3385,13 @@ cont1231:
                             clsToken.content = clsToken.content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
                         Loop While IsAlphaNumeric(.Source(.Position))
-                        Dim P
-                            If IsNumberNew(Basestack1, Mid$(clsToken.content, 2), P, True) Then
-                                If MemInt(VarPtr(P)) = vbString Then
-                                    SwapVariant clsToken.content, P
+                        Dim p
+                            If IsNumberNew(Basestack1, Mid$(clsToken.content, 2), p, True) Then
+                                If MemInt(VarPtr(p)) = vbString Then
+                                    SwapVariant clsToken.content, p
                                     clsToken.TType = TokenString
                                 Else
-                                    clsToken.content = Trim(str$(CLng(P)))
+                                    clsToken.content = Trim(str$(CLng(p)))
                                     clsToken.TType = TokenValue
                                 End If
                             Else
@@ -2920,6 +3523,52 @@ Private Function IsAlphaNumeric(ByVal bt As Byte) As Boolean
                      (bt = CHAR_UNDERSCORE)
 End Function
 
+
+Private Function CalculatePECheckSum(ByVal ChecksumOffset As Long) As Long
+    Dim lngSum      As Currency
+    Dim i           As Long
+    Dim lngWord     As Long
+    Dim lngLength   As Long
+    
+    lngLength = m_lngOutSize
+    lngSum = 0
+    
+    ' Loop through the file data in 2-byte (Word) blocks
+    For i = 0 To lngLength - 1 Step 2
+        ' Skip the 4 bytes of the CheckSum field position during calculation
+        If i = ChecksumOffset Or i = ChecksumOffset + 2 Then
+            lngWord = 0
+        Else
+            ' Read 2 bytes as a 16-bit unsigned word
+            If i + 1 < lngLength Then
+                lngWord = m_btOutput(i) + (CLng(m_btOutput(i + 1)) * 256&)
+            Else
+                lngWord = m_btOutput(i) ' Handle odd file length boundary if any
+            End If
+        End If
+        
+        lngSum = lngSum + lngWord
+        
+        ' Handle the 16-bit standard Internet Checksum carry fold-back
+        If lngSum > 65535 Then
+            lngSum = (lngSum And 65535) + Int(lngSum / 65536)
+        End If
+    Next i
+    
+    ' Final fold-back adjustments for any remaining carryover
+    lngSum = (lngSum And 65535) + Int(lngSum / 65536)
+    lngSum = (lngSum And 65535) + Int(lngSum / 65536)
+    
+    ' The official PE Checksum is the 16-bit word sum plus the total file size
+    CalculatePECheckSum = CLng(lngSum) + lngLength
+End Function
+Public Sub AddExport(ByVal strFunctionName As String, ByVal strLabelName As String)
+    ReDim Preserve m_udtExports(m_lngExportCount) As ASMExport
+    m_udtExports(m_lngExportCount).Name = strFunctionName
+    m_udtExports(m_lngExportCount).LabelName = strLabelName
+    m_lngExportCount = m_lngExportCount + 1
+End Sub
+
 Public Property Get SizeOfStackReserve() As Long
 SizeOfStackReserve = m_SizeOfStackReserve
 End Property
@@ -2953,4 +3602,20 @@ Public Property Let SizeOfHeapCommit(ByVal vNewValue As Long)
 If vNewValue > m_SizeOfHeapReserve Then vNewValue = m_SizeOfHeapReserve
 If vNewValue < &H1000 Then vNewValue = &H1000
 m_SizeOfHeapCommit = vNewValue
+End Property
+Public Property Get PEDll() As Boolean
+    PEDll = m_blnWriteDLL
+End Property
+
+Public Property Let PEDll(ByVal blnValue As Boolean)
+    m_blnWriteDLL = blnValue
+    If blnValue Then m_blnWritePE = True
+End Property
+
+Public Property Get DLLName() As String
+    DLLName = m_strDLLName
+End Property
+
+Public Property Let DLLName(ByVal strValue As String)
+    m_strDLLName = strValue
 End Property

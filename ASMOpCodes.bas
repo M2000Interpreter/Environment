@@ -62,7 +62,7 @@ Public Const KEYWORDS       As String = _
     "LOCK REPNE REPNZ REPE REP"
 
 Public Const RAW_DATA       As String = _
-    "DB DW DD"
+    "DB DW DD ALIGN"
 
 Public Enum OpCodePrefixes
     PrefixNone = &H0&
@@ -823,7 +823,11 @@ Private Sub AddFlowCtrl()
     Instruction "CALL   ", "E8      ", SizeModOvrd, ExtNon, "rel16"
     Instruction "CALL   ", "FF /2   ", SizeModOvrd, ExtNon, "rem16"
     Instruction "CALL   ", "FF /2   ", SizeModNone, ExtNon, "rem32"
+    
+    ' ? FIX: Pseudo-instruction for safe Windows External API calls via IAT (OpCode FF /2)
+    Instruction "CALL_EXT", "FF /2  ", SizeModNone, ExtNon, "mem32"
     ' no far calls
+
 
     Instruction "INT    ", "CC      ", SizeModNone, ExtNon, "3    "
     Instruction "INT    ", "CD      ", SizeModNone, ExtNon, "imm08"
