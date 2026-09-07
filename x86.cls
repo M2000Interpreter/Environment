@@ -224,7 +224,7 @@ Private Type ASMInstruction
 End Type
 
 Private Type Scanner
-    Source()                    As Byte
+    Source()                    As Integer
     Length                      As Long
     Position                    As Long
     Line                        As Long
@@ -1330,7 +1330,7 @@ Private Function InstructionOutArgs(udtInstr As ASMInstruction) As Boolean
             
             ' Only register in .reloc table if it's a true global address
             If blnIsGlobalReloc Then
-                Debug.Print m_lngOutPos
+             '   Debug.Print m_lngOutPos
                 AddRelocation m_lngOutPos
             End If
         End If
@@ -2265,7 +2265,7 @@ Private Function ParseInstructions() As Boolean
                         Match TokenExtern
                         If Not ParseExtern() Then Exit Do
                     Else
-                        SetError "Externs only allowed in PE mode", token.Line, token.Section
+                        SetError "Externs only allowed in PE/DLL mode", token.Line, token.Section
                         Exit Function
                     End If
             
@@ -3085,6 +3085,7 @@ End Function
 
 
 Private Sub SetError(ByVal strMsg As String, ByVal lngLine As Long, ByVal Section As String)
+    MyEr strMsg & " at line " & lngLine & " at Section " & Section, strMsg & " στη γραμμή " & lngLine & " στο μέρος " & Section
     m_strLastError = strMsg
     m_lngLastErrLine = lngLine
     m_strLastErrorSection = Section
@@ -3187,7 +3188,10 @@ End Property
 
 Private Sub ScannerInit(Source As String)
     With m_udtScanner
-        .Source = StrConv(Source & vbCrLf, vbFromUnicode)
+        ReDim .Source(Len(Source) + 1)
+        MemCopy VarPtr(.Source(0)), StrPtr(Source), LenB(Source)
+        .Source(UBound(.Source) - 1) = 13
+        .Source(UBound(.Source)) = 10
         .Length = UBound(.Source) + 1
     
         .Position = 0
@@ -3398,7 +3402,7 @@ cont1231:
                                 clsToken.TType = TokenInvalid
                             End If
                             .Position = .Position - 1
-                        Case CHAR_AT, CHAR_ALPHA_UA To CHAR_ALPHA_UZ, CHAR_ALPHA_LA To CHAR_ALPHA_LZ:
+                        Case CHAR_AT, CHAR_ALPHA_UA To CHAR_ALPHA_UZ, CHAR_ALPHA_LA To CHAR_ALPHA_LZ, 128 To 32767:
                         Do
                             clsToken.content = clsToken.content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
@@ -3421,7 +3425,6 @@ cont1231:
                             
                         Else
                             If GetlocalVar(clsToken.content, i) Then
-                                'clsToken.content = Trim(str$(CLng(var(i))))
                                 If MemInt(VarPtr(var(i))) = vbString Then
                                     clsToken.content = var(i)
                                 
@@ -3502,25 +3505,25 @@ cont1231:
 End Sub
 
 
-Private Function IsDigit(ByVal bt As Byte) As Boolean
+Private Function IsDigit(ByVal bt As Integer) As Boolean
     IsDigit = (bt >= CHAR_NUMBER_0) And (bt <= CHAR_NUMBER_9)
 End Function
-Private Function IsOctChar(ByVal bt As Byte) As Boolean
+Private Function IsOctChar(ByVal bt As Integer) As Boolean
     IsOctChar = (bt >= CHAR_NUMBER_0) And (bt <= CHAR_NUMBER_7)
 End Function
 
-Private Function IsHexChar(ByVal bt As Byte) As Boolean
+Private Function IsHexChar(ByVal bt As Integer) As Boolean
     IsHexChar = ((bt >= CHAR_NUMBER_0) And (bt <= CHAR_NUMBER_9)) Or _
                 ((bt >= CHAR_ALPHA_UA) And (bt <= CHAR_ALPHA_UA + 5)) Or _
                 ((bt >= CHAR_ALPHA_LA) And (bt <= CHAR_ALPHA_LA + 5))
 End Function
 
 
-Private Function IsAlphaNumeric(ByVal bt As Byte) As Boolean
+Private Function IsAlphaNumeric(ByVal bt As Integer) As Boolean
     IsAlphaNumeric = ((bt >= CHAR_NUMBER_0) And (bt <= CHAR_NUMBER_9)) Or _
                      ((bt >= CHAR_ALPHA_UA) And (bt <= CHAR_ALPHA_UZ)) Or _
                      ((bt >= CHAR_ALPHA_LA) And (bt <= CHAR_ALPHA_LZ)) Or _
-                     (bt = CHAR_UNDERSCORE)
+                     (bt = CHAR_UNDERSCORE) Or (bt >= 128 And bt <= 32767)
 End Function
 
 

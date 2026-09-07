@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 40
+Global Const Revision = 41
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -6939,7 +6939,22 @@ cont123:
 
 End Function
 
+Function MyAny(bstack As basetask, a$, r) As Boolean
+    Dim p As Variant, anything As mStiva
 
+    Set anything = bstack.soros
+    If anything.Total = 0 Then
+        MyErMacro a$, "Stack item not found", "Δεν υπάρχει τιμή σωρού"
+        Exit Function
+    ElseIf anything.StackItemType(1&) = "*" Then
+        r = 0
+        Set bstack.lastobj = anything.StackPickRef(1&).ObjectRef
+    Else
+        r = anything.StackItem(1&)
+    End If
+    anything.drop 1&
+    MyAny = True
+End Function
 Function IsNumberNew(bstack As basetask, a$, r As Variant, flatobject) As Boolean
 Dim VR As Long, v$, V1&, w1 As Long, w2 As Long, p As Variant, s1$, dd As Long, dn As Long, w3 As Long
 Dim pp As Variant, pppp As mArray, ppppl As iBoxArray, nbstack As basetask, usehandler As mHandler, usebackup As Boolean
@@ -7017,10 +7032,13 @@ Else
     If w1 < 0 Then GoTo LOOKFORVARNUM
 End If
 findsecond:
-On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107, num108, num109, num110, num111, num112, num113, num114
+On w1 GoTo num1, num2, num3, num4, num5, num6, num7, num8, num9, num10, num11, num12, num13, num14, num15, num16, num17, num18, num19, num20, num21, num22, num23, num24, num25, num26, num27, num28, num29, num30, num31, num32, num33, num34, num35, num36, num37, num38, num39, num40, num41, num42, num43, num44, num45, num46, num47, num48, num49, num50, num51, num52, num53, num54, num55, num56, num57, num58, num59, num60, num61, num62, num63, num64, num65, num66, num67, num68, num69, num70, num71, num72, num73, num74, num75, num76, num77, num78, num79, num80, num81, num82, num83, num84, num85, num86, num87, num88, num89, num90, num91, num92, num93, num94, num95, num96, num97, num98, num99, num100, num101, num102, num103, num104, num105, num106, num107, num108, num109, num110, num111, num112, num113, num114, num115
 IsNumberNew = 0
 InternalError
 Exit Function
+num115:
+    IsNumberNew = MyAny(bstack, a$, r)
+    Exit Function
 num114:
         r = MyEax
         IsNumberNew = True: Exit Function
@@ -27919,9 +27937,13 @@ End If
 
 If ret Then
     If that.RetType <> vbString Then
+        If that.ConvertCstring2BSTR Then
+            bstack.soros.PushStr GetBStrFromPtr(CLng(rtype), that.ANSI)
+        Else
         bstack.soros.PushVal rtype    ' FEEDBACK TO STACK
-    Else
-        bstack.soros.PushStr GetBStrFromPtr(x1)
+        End If
+    ElseIf VarType(rtype) = vbString Then
+        bstack.soros.PushVal rtype
     End If
 End If
 
@@ -44349,7 +44371,12 @@ there:
 End Function
 Function StackItem(bstack As basetask, a$, r) As Boolean
 Dim p As Variant, w3 As Long, anything1 As Object, anything As mStiva
+Dim getany As Boolean
 w3 = 1
+
+
+If Left$(a$, 1) = "!" Then Mid$(a$, 1, 1) = " ": getany = True
+
 If IsExp(bstack, a$, p) Then
     If bstack.lastobj Is Nothing Then
         Set anything1 = bstack.soros
@@ -44370,6 +44397,16 @@ backitem:
         Set bstack.lastobj = Nothing
         StackItem = False: Exit Function
 
+    ElseIf getany Then
+        If anything.StackItemType(w3) = "*" Then
+        r = 0
+        Set bstack.lastobj = anything.StackPickRef(w3).ObjectRef
+        Else
+        r = anything.StackItem(w3)
+        End If
+        StackItem = FastSymbol(a$, ")", True)
+        Exit Function
+    
     ElseIf anything.StackItemType(w3) = "N" Then
     
     r = anything.StackItem(w3)
@@ -44384,17 +44421,15 @@ backitem:
     StackItem = FastSymbol(a$, ")", True)
     Exit Function
     ElseIf anything.StackItemType(w3) = "*" Then
-    r = 0
+        r = 0
+
+        Set bstack.lastobj = anything.StackPickRef(w3).ObjectRef
     
-    Set bstack.lastobj = anything.StackPickRef(w3).ObjectRef
-    
-    StackItem = FastSymbol(a$, ")", True)
-    Exit Function
+        StackItem = FastSymbol(a$, ")", True)
+        Exit Function
     Else
-     
-            MyErMacro a$, "Stack item isn't number at position " + CStr(w3), "Η τιμή του σωρού δεν είναι αριθμός στη θέση " + CStr(w3)
-  
-    StackItem = False
+        MyErMacro a$, "Stack item isn't number at position " + CStr(w3), "Η τιμή του σωρού δεν είναι αριθμός στη θέση " + CStr(w3)
+        StackItem = False
     End If
     Exit Function
 

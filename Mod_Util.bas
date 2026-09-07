@@ -23304,6 +23304,24 @@ contLib:
                     stdFunc.RetType = CLng(vbInteger)
                 ElseIf IsLabelSymbolNewExp(rest$, "атупос", "VARIANT", Lang, s1$) Then
                     stdFunc.RetType = CLng(vbVariant)
+                ElseIf IsLabelSymbolNewExp(rest$, "цяалла", "STRING", Lang, s1$) Then
+                    If IsLabelSymbolNewExp(rest$, "деийтгс", "POINTER", Lang, s1$) Then
+                        stdFunc.ConvertCstring2BSTR = True
+                        stdFunc.RetType = CLng(vbLong)
+                        x1 = 3
+                    Else
+                        stdFunc.RetType = CLng(vbString)
+                    End If
+                    If Fast2LabelNoNum(rest$, "ANSI", 4, "", 0, 4) Then
+                        stdFunc.ConvertCstring2BSTR = True
+                        stdFunc.ANSI = True
+                        stdFunc.RetType = CLng(vbLong)
+                        x1 = 3
+                    End If
+                    
+                ElseIf Fast2LabelNoNum(rest$, "ANSI", 4, "", 0, 4) Then
+                        stdFunc.ConvertCstring2BSTR = True
+                        stdFunc.ANSI = True
                 Else
                     If groupok And s1$ <> "" Then
                         If GetVar(bstack, bstack.GroupName + s1$, i, True) Then
@@ -23354,37 +23372,28 @@ entry10:
             Set var(i) = stdFunc
             s$ = W$
             If groupok Then
-'            If Left$(s$, 1) = ChrW(&HFFBF) Then Mid$(s$, 1, 1) = " ": W$ = s$
-                If x1 = 3 Then
-                    rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = LETTER$'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
+               If x1 = 3 Then
+                    If stdFunc.RetType = 0 Then stdFunc.ConvertCstring2BSTR = True
+                    
+                    rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = @LETTER$'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
                 Else
-                    If stdFunc.RetType = 9 Or stdFunc.RetType = 13 Then
-                        rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = STACKITEM() : DROP'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
-                    Else
-                        rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = NUMBER'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
-                    End If
+                    rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = @ANY'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
                 End If
                 Exit Function
             Else
                 If x1 = 3 Then
+                    '
+                    If stdFunc.RetType = 0 Then stdFunc.ConvertCstring2BSTR = True
                     If here$ = vbNullString Or y1 Then
-                        y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = LETTER$'" & ChrW(&H1FFD))
+                        y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = @LETTER$'" & ChrW(&H1FFD))
                     Else
-                        y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = LETTER$'" & ChrW(&H1FFD))
+                        y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = @LETTER$'" & ChrW(&H1FFD))
                     End If
                 Else
                     If here$ = vbNullString Or y1 Then
-                        If stdFunc.RetType = 9 Or stdFunc.RetType = 13 Then
-                            y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = STACKITEM():DROP'" & ChrW(&H1FFD))
-                        Else
-                            y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = NUMBER'" & ChrW(&H1FFD))
-                        End If
+                        y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = @ANY'" & ChrW(&H1FFD))
                     Else
-                        If stdFunc.RetType = 9 Or stdFunc.RetType = 13 Then
-                            y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = STACKITEM() : DROP'" & ChrW(&H1FFD))
-                        Else
-                            y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = NUMBER'" & ChrW(&H1FFD))
-                        End If
+                        y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = @ANY'" & ChrW(&H1FFD))
                     End If
                 End If
             End If
@@ -23393,7 +23402,6 @@ entry10:
             Set stdFunc = Nothing
             Exit Function
         Else
-        
         
             BadObjectDecl
             MyDeclare = False

@@ -5884,7 +5884,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 27 and above"
+	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 41 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -50317,7 +50317,7 @@ method form1,"MenuItem","Clear Background", IdD:=900
 method form1,"MenuItem",""
 method form1,"MenuItem","Close", IdD:=2000
 
-With form1, "titleheight" as titleheight, "id" as Id(), "MenuEnabled" as MenuEnabled(), "ListSelected" as Checked()
+With form1, "titleheight" as titleheight, "id" as Id(), "MenuEnabled" as MenuEnabled(), "ListSelected" as Checked(), "previewKey", true
 long ret
 module EnableRotation {
 	ToolTip$="Click to Start"
@@ -54087,7 +54087,7 @@ main:
    mov dword [esp+32], 0                   ; lpzszMenuName = 0
    mov dword [esp+36], AppName             ; lpszClassName = AppName
 
-   mov eax, esp                            ; Αντί για push esp, αποθηκεύουμε τη διεύθυνση στον eax
+   mov eax, esp 
    push eax                                ; register the window class
    call RegisterClassW
 
@@ -55584,5 +55584,88 @@ Function MachineCode(assembly as string)
 	End if
 	error Assembler=>LastErrorMessage 
 End Function
+}
+MODULE ASM5 {print "chapter 1"
+print "strings returned as BSTR, as is or in a VARIANT"
+print "We use SysAllocStringLen from oleaut32.dll"
+Declare SysAllocStringLen Lib "oleaut32.SysAllocStringLen" {
+	Long OleStr, Long BLen
+} As Long
+Print "  - using Variant - Calling with variant as return value M2000 automatic pass an empty variant"
+mycode=assembly({
+		push dword 14 			; Length of "Hello World"
+		lea eax, [data1]        
+		push eax
+		call @SysAllocStringLen 	 ; @ read address of SysAllocStringLen()
+		mov edx, [esp + 4]      		 ; get the address of hidden empty variant 
+		mov word [edx], 8       		 ; vt type = 8 (string)
+		mov dword [edx + 2], 0  	 ; Clear reserved fields (Offset 2)
+		mov dword [edx + 6], 0  	 ; Clear reserved fields (Offset 6)
+		mov [edx + 8], eax      		 ; Place the BSTR pointer into the Variant data (Offset 8)
+		mov dword [edx + 12], 0 	 ; Clear reserved fields (Offset 12)
+		; so now 16bytes returned via edx 
+		ret 4
+align 4
+data1:	dw "Hello World 𐐷" ; no need 0
+})
+declare HelloWorld code mycode(0) as variant
+Print HelloWorld()
+Print "  - using String - just return pointer to BSTR in eax"
+mycode2=assembly({
+		push dword 14  ; Length of "Hello World"
+		lea eax, [data1]
+		push eax
+		call @SysAllocStringLen
+		; string BSTR pointer is in EAX
+		ret
+align 4
+data1:	dw "Hello World 𐐷"
+})
+
+mycode2=assembly({
+		push dword 14  ; Length of "Hello World"
+		lea eax, [data1]
+		push eax
+		call @SysAllocStringLen
+		; string BSTR pointer is in EAX
+		ret
+align 4
+data1:	dw "Hello World 𐐷"
+})
+
+declare HelloWorld2 code mycode2(0) as string
+Print HelloWorld2()
+
+print "chapter 2 - no need for SysAllocStringLen"
+print "strings returned as pointer which have length depend of position of zero"
+print "M2000 automatic produce BSTR from pointers"
+print "1 - unicode string returned"
+mycode3=assembly({
+	lea eax, [data1]
+	ret
+align 4
+data1: dw "بيانات Hello World 𐐷", 0
+})
+print "declared only by name of function HelloWorld3$"
+declare HelloWorld3$ code mycode3(0)
+Print HelloWorld3$()
+	
+print "declared as string pointer"
+declare HelloWorld4 code mycode3(0) as string pointer
+Print HelloWorld4()
+
+print "2 - ansi string returned - name of function HelloWorld3"
+mycode4=assembly({
+	lea eax, [بيانات] ; we can use arabic also...
+	ret
+align 4
+بيانات:	db "Hello World", 0  ; we use db not dw for ansi
+})
+print "  delcared as string pointer ansi"
+declare HelloWorld5 code mycode4(0) as string pointer ansi
+Print HelloWorld5()
+print "  delcared as ansi"
+declare HelloWorld6 code mycode4(0) as ansi
+Print HelloWorld6()
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

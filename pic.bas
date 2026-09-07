@@ -1,8 +1,8 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -4149,7 +4149,7 @@ ismine = True
 a$ = myUcase(a$, True)
 Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
-Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
+Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "ANY", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
 Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASSEMBLY(", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
 Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BIGINTEGER(", "BIGINTEGER[", "BINARY", "BINARY.ADD(", "BIT64.ADD(", "BINARY.AND(", "BIT64.AND(", "BIT64.NEG(", "BINARY.NEG(", "BIT64.NOT(", "BINARY.NOT("
 Case "BINARY.OR(", "BIT64.OR(", "BIT64.RESET(", "BINARY.RESET(", "BIT64.ROTATE(", "BINARY.ROTATE(", "BIT64.SHIFT(", "BINARY.SHIFT(", "BIT64.SET(", "BINARY.SET(", "BIT64.SUB(", "BINARY.SUB(", "BIT64.TEST(", "BINARY.TEST(", "BIT64.XOR(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
@@ -4235,7 +4235,7 @@ Case "епикене.ояцамо", "епикене.вяыла", "епикоцес", "епикоцес$(", "епикоцес.жаме
 Case "епистяожг", "епижамеиа", "еполемо", "еполема(", "етийета.жоялас", "етоило(", "еуяеиа", "еуяесг", "еуяиа", "ежап(", "ежаялоцг.аявеиоу$(", "ежаялоцг.йат$", "ежаялоцг"
 Case "евеи(", "еыс", "г", "гл(", "глеяа$(", "глеяа(", "глеяолгмиа", "гво$(", "гвоцяажгсг", "гвоцяажгсгс.епипедо"
 Case "гвои", "гвос", "хесе", "хесе(", "хесг", "хесг(", "хесг.ь", "хесг.у", "хесг.в", "хесгдениа(", "идиотгта", "идиотгта(", "идиотгта$("
-Case "идиотгтес", "идиотгтес$", "идиытийо", "исвмг", "исвмг$(", "ивмос", "йахаяг", "йахаяо", "йахаяисе", "йахе", "йахетг", "йахе(", "йаи", "йакесе", "йалпукг"
+Case "идиотгтес", "идиотгтес$", "идиытийо", "исвмг", "исвмг$(", "ивмос", "йати", "йахаяг", "йахаяо", "йахаяисе", "йахе", "йахетг", "йахе(", "йаи", "йакесе", "йалпукг"
 Case "йаме", "йамомийа", "йат", "йат$", "йатакоцои", "йатакоцос", "йатастасг", "йатастасг.таимиас$", "йатавыягсг", "йаты"
 Case "йатылисо(", "йатылисо64(", "йеилемо", "йемг", "йемо", "йемтяо", "йеж$(", "йеж(", "йимгсг", "йимгсг.п", "йимгсг.пу"
 Case "йимгсг.пв", "йимгсг.у", "йимгсг.уп", "йимгсг.ь", "йимгсг.ьп", "йимгсг.в", "йимгсг.вп", "йкасг", "йкеиди", "йкеисе", "йкилан.у", "йкилан.ь"
@@ -5204,7 +5204,7 @@ myid() = Array("THIS", 1, "ауто", 1, "RND", 2, "туваиос", 2, "PEN", 3, "пема", 3
 , "MENU", 78, "епикоцг", 78, "NUMBER", 79, "аяихлос", 79, "тилг", 79, "LAMBDA", 80, "калда", 81, "GROUP", 83, "олада", 83, "ARRAY", 84, "пимайас", 84, "[]", 85 _
 , "сыяос", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "охомг", 88, "OSBIT", 89, "WINDOW", 90, "сусйеуг", 90, "MONITOR.STACK", 91, "екецвос.сыяоу", 91, "MONITOR.STACK.SIZE", 92, "екецвос.лецехос.сыяоу", 92, "?", 93, "диаяхяысг", 94, "BUFFER", 94, "йатастасг", 95, "INVENTORY", 95, "LIST", 96, "киста", 96, "QUEUE", 97, "оуяа", 97, "INFINITY", 82, "апеияо", 82, "еккгмийа", 98, "GREEK", 98 _
 , "INTERNET", 99, "диадийтуо", 99, "CLIPBOARD.IMAGE", 100, "пяовеияо.еийома", 100, "CLIPBOARD.DRAWING", 101, "пяовеияо.сведио", 101, "MONITORS", 102, "охомес", 102, "DOS", 103, "йомсока", 103, "SOUNDREC.LEVEL", 104, "гвоцяажгсгс.епипедо", 104, "ADDRESSOF", 105, "диеухумсгапо", 105, "пкатос.таимиас", 106, "MOVIE.WIDTH", 106, "уьос.таимиас", 107, "MOVIE.HEIGHT", 107, "PAGE.WIDTH", 108, "пкатос.секидас", 108, "PAGE.HEIGHT", 109, "уьос.секидас", 109, "PRINTING", 110, "ейтупысг", 110 _
-, "SOUNDREC", 111, "гвоцяажгсг", 111, "PRINTER.QUALITY", 112, "поиотгта.ейтупысгс", 112, "SYMBOL", 113, "сулбоко", 113, "EAX", 114, "еав", 114)
+, "SOUNDREC", 111, "гвоцяажгсг", 111, "PRINTER.QUALITY", 112, "поиотгта.ейтупысгс", 112, "SYMBOL", 113, "сулбоко", 113, "EAX", 114, "еав", 114, "ANY", 115, "йати", 115)
 If Not ahashbackup Is Nothing Then
 For i = 0 To UBound(myid()) Step 2
     ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))

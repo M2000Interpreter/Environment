@@ -1,128 +1,94 @@
 M2000 Interpreter and Environment
-Version 15 Revision 40
+Version 15 Revision 41
 
-Athens, September 6, 2026
+Athens, September 7, 2026
 
-Upgrade Assembler:
-1: Align 4 add noop to move address to modulo 4.
-2: Call_ext is an immediate call (not relative). Used from (3)
-3: Make a dll (so now we can make Exe, Dll, or internal code for using by M2000)
+1. New read only variable ANY read strings or numbers or objects from stack. 
 
-' example
-' no use of Assembly() functio  because we have to prepare Assembler first
-' these are the steps to make a dll using 3 exported functions and one inported
-' also this use relocarion table
+2. Upgrade Assembler (now we can pass unicode literals (not only with a variable) and we may have lables in any almost any language):
 
-name$="TESTASM7.DLL"
-Static Function MachineCode
-Enum PESubsystem {
-    Subsystem_GUI = 2
-    Subsystem_CUI = 3
-}
-Assembler =getobject("","m2000.x86")
-Assembler=>Subsystem=Subsystem_GUI
-Assembler=>PEDll=true 
-Assembler=>DLLName = name$
-Assembler=>AddExport "AddNumbers", "MyFunction"
-Assembler=>AddExport "Time", "MyTime"
-' we use a space so this sortrd to first place - ordinal 1
-Assembler=>AddExport " 01", "MyTick"
-
-Buffer2export=MachineCode({
-
-extern "winmm", timeGetTime
-
-; =========================================================================
-; STANDARD WIN32 DLL ENTRY POINT (DLLMAIN)
-; =========================================================================
-DllMain:
-    push ebp
-    mov ebp, esp
-    mov eax, 1
-    leave
-    ret 0xC
-
-; =========================================================================
-; EXPORTED FUNCTION (MyFunction to Addnumbers)
-; =========================================================================
+print "chapter 1"
+print "strings returned as BSTR, as is or in a VARIANT"
+print "We use SysAllocStringLen from oleaut32.dll"
+Declare SysAllocStringLen Lib "oleaut32.SysAllocStringLen" {
+	Long OleStr, Long BLen
+} As Long
+Print "  - using Variant - Calling with variant as return value M2000 automatic pass an empty variant"
+mycode=assembly({
+		push dword 14 			; Length of "Hello World"
+		lea eax, [data1]        
+		push eax
+		call @SysAllocStringLen 	 ; @ read address of SysAllocStringLen()
+		mov edx, [esp + 4]      		 ; get the address of hidden empty variant 
+		mov word [edx], 8       		 ; vt type = 8 (string)
+		mov dword [edx + 2], 0  	 ; Clear reserved fields (Offset 2)
+		mov dword [edx + 6], 0  	 ; Clear reserved fields (Offset 6)
+		mov [edx + 8], eax      		 ; Place the BSTR pointer into the Variant data (Offset 8)
+		mov dword [edx + 12], 0 	 ; Clear reserved fields (Offset 12)
+		; so now 16bytes returned via edx 
+		ret 4
 align 4
-MyFunction:
-    push ebp
-    mov ebp, esp
-    
-    mov eax, dword [ebp + 8]   ; First parameter (a)
-    add eax, dword [ebp + 0xC]  ; Second parameter (b)
-    leave
-;    mov esp, ebp ; same as leave
-;    pop ebp
-    ret 8                ; Clean up 2 arguments (2 * 4 bytes = 8) and return
-    	
-; =========================================================================
-; EXPORTED FUNCTION (MyTime to Time)
-; =========================================================================
-	align 4
-MyTime:
-	call_ext timeGetTime   ; new directive for absolute call
-	; so the code can be moved and the timeGetTime works fine
-	ret
-
-; =========================================================================
-; EXPORTED FUNCTION (MyTick to #1 - no name)
-; =========================================================================
-	align 4 ; new directive for alignment
-MyTick:
-	call SomethingElse
-	ret
-align 16
-SomethingElse:	
-	push ebp
-	mov ebp, esp
-	mov eax, [data1]
-	inc eax
-	mov [data1], eax
-	leave
-	ret
-data1:
-	dd 0x20304050
+data1:	dw "Hello World ??" ; no need 0
 })
-Print "File name: ";name$
-Print "Assembler Output Size: "; assembler=>outputsize
-open name$ for output as #f
-	put #f, Buffer2export
-close #f
-Print  "Saved ok. length:"; filelen(name$)
-check$=file.name.only$(name$)
-declare add2 lib dir$+check$+".AddNumbers" {long a, long b} as long
-declare mytime lib dir$+check$+".Time" as long
-' using ordinal number:
-declare mytick lib dir$+check$+".#1" as long
+declare HelloWorld code mycode(0) as variant
+Print HelloWorld()
+Print "  - using String - just return pointer to BSTR in eax"
+mycode2=assembly({
+		push dword 14  ; Length of "Hello World"
+		lea eax, [data1]
+		push eax
+		call @SysAllocStringLen
+		; string BSTR pointer is in EAX
+		ret
+align 4
+data1:	dw "Hello World ??"
+})
 
-try ok {
-	? add2(1022322,22340) = 1022322+22340,  mytime(), mytick()
-	? add2(1022322,-22340) = 1022322-22340,  mytime(), mytick()
-	? add2(-1022322,22340) = -1022322+22340,  mytime(), mytick()
-	? add2(10222,-2240) = 10222-2240, mytime(), mytick()
-}
-if ok then remove dir$+check$ else print error$
+mycode2=assembly({
+		push dword 14  ; Length of "Hello World"
+		lea eax, [data1]
+		push eax
+		call @SysAllocStringLen
+		; string BSTR pointer is in EAX
+		ret
+align 4
+data1:	dw "Hello World ??"
+})
 
-' this is the function for preparing the two pass assembler.
+declare HelloWorld2 code mycode2(0) as string
+Print HelloWorld2()
 
-Function MachineCode(assembly as string)
-	if Assembler=>assemble(assembly, true) then
-		local OutPutSize=Assembler=>OutputSize
-		local mc
-		buffer code mc as byte*OutputSize
-		' feed the base address to Assembler
-		Assembler=>BaseAddress=&h10000000 		
-		if Assembler=>assemble(assembly) then
-			' get a copy of final machine code
-			mc=>FillDataFromMem Assembler=>GetOutPtr
-			=mc
-			exit function
-		End if
-	End if
-	error Assembler=>LastErrorMessage 
-End Function
+print "chapter 2 - no need for SysAllocStringLen"
+print "strings returned as pointer which have length depend of position of zero"
+print "M2000 automatic produce BSTR from pointers"
+print "1 - unicode string returned"
+mycode3=assembly({
+	lea eax, [data1]
+	ret
+align 4
+data1: dw "?????? Hello World ??", 0
+})
+print "declared only by name of function HelloWorld3$"
+declare HelloWorld3$ code mycode3(0)
+Print HelloWorld3$()
+	
+print "declared as string pointer"
+declare HelloWorld4 code mycode3(0) as string pointer
+Print HelloWorld4()
+
+print "2 - ansi string returned - name of function HelloWorld3"
+mycode4=assembly({
+	lea eax, [??????] ; we can use arabic also...
+	ret
+align 4
+??????:	db "Hello World", 0  ; we use db not dw for ansi
+})
+print "  delcared as string pointer ansi"
+declare HelloWorld5 code mycode4(0) as string pointer ansi
+Print HelloWorld5()
+print "  delcared as ansi"
+declare HelloWorld6 code mycode4(0) as ansi
+Print HelloWorld6()
 
 
 

@@ -117,7 +117,7 @@ On Error GoTo poulos
     mYspace = CCur(Values(1)) '
     mycode = CStr(Values(2))
     myholdtime = CCur(Values(3)) ' για το after μονο
-    m_duration = CLng(uintnew(CCur(timeGetTime)) + myholdtime)
+    m_duration = uintnew(CCur(timeGetTime)) + myholdtime
     If Err Then
     myDone = True
     End If
