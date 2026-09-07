@@ -1,11 +1,5 @@
-M2000 Interpreter and Environment
+﻿eM2000 Interpreter and Environment
 Version 15 Revision 41
-
-Athens, September 7, 2026
-
-1. New read only variable ANY read strings or numbers or objects from stack. 
-
-2. Upgrade Assembler (now we can pass unicode literals (not only with a variable) and we may have lables in any almost any language):
 
 print "chapter 1"
 print "strings returned as BSTR, as is or in a VARIANT"
@@ -28,7 +22,7 @@ mycode=assembly({
 		; so now 16bytes returned via edx 
 		ret 4
 align 4
-data1:	dw "Hello World ??" ; no need 0
+data1:	dw "Hello World 𐐷" ; no need 0
 })
 declare HelloWorld code mycode(0) as variant
 Print HelloWorld()
@@ -41,7 +35,7 @@ mycode2=assembly({
 		; string BSTR pointer is in EAX
 		ret
 align 4
-data1:	dw "Hello World ??"
+data1:	dw "Hello World 𐐷"
 })
 
 mycode2=assembly({
@@ -52,7 +46,7 @@ mycode2=assembly({
 		; string BSTR pointer is in EAX
 		ret
 align 4
-data1:	dw "Hello World ??"
+data1:	dw "Hello World 𐐷"
 })
 
 declare HelloWorld2 code mycode2(0) as string
@@ -66,7 +60,7 @@ mycode3=assembly({
 	lea eax, [data1]
 	ret
 align 4
-data1: dw "?????? Hello World ??", 0
+data1: dw "بيانات Hello World 𐐷", 0
 })
 print "declared only by name of function HelloWorld3$"
 declare HelloWorld3$ code mycode3(0)
@@ -78,10 +72,10 @@ Print HelloWorld4()
 
 print "2 - ansi string returned - name of function HelloWorld3"
 mycode4=assembly({
-	lea eax, [??????] ; we can use arabic also...
+	lea eax, [بيانات] ; we can use arabic also...
 	ret
 align 4
-??????:	db "Hello World", 0  ; we use db not dw for ansi
+بيانات:	db "Hello World", 0  ; we use db not dw for ansi
 })
 print "  delcared as string pointer ansi"
 declare HelloWorld5 code mycode4(0) as string pointer ansi
