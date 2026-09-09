@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 42
+Global Const Revision = 43
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -8328,11 +8328,11 @@ againfunc1:
                         w1 = globalvar(useFast2.Tag, 0&, , True, , True)
                         Set var(w1) = usehandler
                         Set bstack.lastobj = Nothing
-                        
-                        GlobalSub "A_()", s$, Trim$(s$)
-                        bstack.tmpstr = "A_(" + Left$(a$, 1)
+                        s1$ = ChrW(&HFFBF) + s1$
+                        GlobalSub s1$ + ")", s$, Trim$(s$)
+                        bstack.tmpstr = s1$ + Left$(a$, 1)
                         BackPort a$
-                        IsNumberNew = IsNumberNew(bstack, a$, r, False)
+                        IsNumberNew = logical(bstack, a$, r)
                         PopStage bstack
                         If Not IsNumberNew Then Exit Function
                         If lookOne(a$, "#") Then
@@ -36856,9 +36856,9 @@ beta:
                     
                     If InStr(s1$, "' ") > 0 Then s1$ = GetStrUntil("' ", s1$)
                     If Left$(s1$, 10) = "'11001EDIT" Then
-                    s1$ = s1$ + str(-(Len(b$) + Len(rest$) - 1)) + vbCrLf
+                    s1$ = s1$ + str(-(Len(b$) + Len(rest$)) - 1) + vbCrLf
                     Else
-                    s1$ = "'11001EDIT " + GetModuleName(basestack, here$) + ", " + str(-(Len(b$) + Len(rest$) - 1)) + vbCrLf
+                    s1$ = "'11001EDIT " + GetModuleName(basestack, here$) + ", " + str(-(Len(b$) + Len(rest$)) - 1) + vbCrLf
                     End If
                     If Not FastSymbol(b$, "}", True) Then
                         StructPage = False
@@ -44115,7 +44115,11 @@ Public Function CallEventFromCOM1(evCom As ComShinkEvent, aString$, what$, NumVa
                     End Select
                 End If
             Next k
+            If Len(what$) = 0 Then
+            bb.DataStr (aString$)
+            Else
             bb.DataStr (what$)
+            End If
             bb.DataObj MakeitObjectGeneric(evCom.VarIndex)
             here$ = evCom.modulenameonly
             If FastCallModule(bstack, klm) <> 1 Then

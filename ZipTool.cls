@@ -174,9 +174,9 @@ Private Sub Zip_ExtractComplete(ByVal FileIdx As Long, File As Variant)
     RaiseEvent ExtractComplete(FileIdx, File)
 End Sub
 
-Private Sub Zip_Progress(ByVal FileIdx As Long, ByVal Current As Long, ByVal Total As Long, mCancel As Boolean)
+
+Private Sub Zip_Progress(ByVal FileIdx As Long, ByVal Current As Currency, ByVal Total As Currency, mCancel As Boolean)
     RaiseEvent Progress(FileIdx, Current, Total, mCancel)
-    
 End Sub
 
 Private Sub Zip_TotalSize(aSize As Double)

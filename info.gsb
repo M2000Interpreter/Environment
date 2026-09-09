@@ -47040,7 +47040,21 @@ Function TestInvalid()
          =number=infinity
 End Function
 }
-MODULE TAXICAB {module TaxiCab (f as long){
+MODULE TAXICAB {
+rem {
+https://rosettacode.org/wiki/Taxicab_numbers
+https://rosettacode.org/wiki/Taxicab_numbers#M2000_Interpreter
+
+A   taxicab number   (the definition that is being used here)   is a positive integer that can be expressed as the sum of two positive cubes in more than one way.
+
+The first taxicab number is   1729,   which is:
+
+13   +   123       and also
+93   +   103.
+}
+module TaxiCab (f as long){
+	static function Proc
+	static sub Display
 	cls,0
 	Print Part "Taxicab numbers"
 	Print Under
@@ -47049,8 +47063,8 @@ MODULE TAXICAB {module TaxiCab (f as long){
 	var st=0, en=1200
 	st=Proc(0, en)
 	sort ret as number
-	Display(1, 25)
-	Display(2000, 2006)
+	Display 1, 25
+	Display 2000, 2006
 	Print timecount
 	print "done"
 	end
