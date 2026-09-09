@@ -5884,7 +5884,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 41 and above"
+	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 42 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -55667,5 +55667,94 @@ Print HelloWorld5()
 print "  delcared as ansi"
 declare HelloWorld6 code mycode4(0) as ansi
 Print HelloWorld6()
+}
+MODULE RLE {' https://rosettacode.org/wiki/Run-length_encoding#M2000_Interpreter
+' old progeam use $ for string names. This is the new one 
+if version<15 or (version=15 and revision<42) then
+Print  "This module use String() as String$() and current version or revision not supported, just change the function name and remove this warning"
+break
+end if
+Module RLE_example {
+	inp="WWWWWWWWWWWWBWWWWWWWWWWWWBBBWWWWWWWWWWWWWWWWWWWWWWWWBWWWWWWWWWWWWWW"
+	Print "Input: ";inp
+	Function RLE(r){
+		Function rle_run(&r) {
+			if len(r)=0 then exit
+			p=1
+			c=left(r,1)
+			while c=mid(r, p, 1) {p++}
+			=format("{0}{1}",p-1, c)
+			r=mid(r, p)
+		}
+		repl=""
+		while len(r)>0 {repl+=rle_run(&r)}
+		=repl
+	}
+	RLE_encode=RLE(inp)
+	Print "RLE Encoded: ";RLE_encode
+	Function RLE_decode(r) {
+		repl=""
+		long m, many=1
+		while r<>"" and many>0 {
+			many=val(r, "INT", &m)	
+			repl+=string(mid(r, m, 1), many)
+			r=mid(r,m+1)
+		}
+		=repl
+	}
+	RLE_decode=RLE_decode(RLE_encode)
+	Print "RLE Decoded: ";RLE_decode
+	Print "Checked: ";RLE_decode=inp
+}
+RLE_example
+}
+MODULE VER15 {' revision 42 version 15
+' functions for structures
+structure alfa {
+	x as double,
+	y as double
+	function mul(a) {
+		alfa|x=alfa|x*a
+		alfa|y=alfa|y*a
+		=alfa
+	}
+	function new(a=100, b=200) {
+		alfa|x=a
+		alfa|y=b
+		=alfa
+	}
+	function str() {
+		="("+(alfa|x)+", "+(alfa|y)+")"
+	}
+}
+alfa kappa[20]#new(30,40)#mul(3)
+print kappa[3]#str()="(90, 120)", kappa=>items=20, len(kappa)=320 ' bytes
+alfa kappa[200]#new(31,41)#mul(3)
+print kappa[19]#str()="(90, 120)"
+print kappa[20]#str()="(93, 123)", kappa=>items=200, len(kappa)=3200 ' bytes
+
+class beta {
+	structure alfa {
+		x as double,
+		y as double
+		function mul(a) {
+			alfa|x=alfa|x*a
+			alfa|y=alfa|y*a
+			=alfa
+		}
+		function new(a=100, b=200) {
+			alfa|x=a
+			alfa|y=b
+			=alfa
+		}
+		function str() {
+			="("+(alfa|x)+", "+(alfa|y)+")"
+		}
+	}
+	{read many}
+	alfa kappa[many]#new(30,40)#mul(3)
+}
+beta=beta(10)
+print beta.kappa[3]#str()="(90, 120)", beta.kappa=>items=10, len(beta.kappa)=160 ' bytes
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

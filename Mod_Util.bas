@@ -34021,7 +34021,14 @@ makeitnow:
         comhash.ItemCreator3 what$, 0, 44, usehandler.objref
     End If
     Set usehandler = var(i)
+    If usehandler.t1 = 2 Then
+    MyEr "not a structure", "‰ÂÌ ÂﬂÌ·È ‰ÔÏﬁ"
+    makestruct = False
+    'Set offsetlist = usehandler.objref.structref
+    Exit Function
+    Else
     Set offsetlist = usehandler.objref
+    End If
     Dim mm As Long, oo As StructCollection
     If Fast2LabelNoNum(rest$, "APPEND", 6, "–—œ”»« «", 8, 8) Then
         offsetlist.CopyCollection oo
@@ -38258,7 +38265,9 @@ foundit:
         If uni Then
         
     Else
-        If prv Then W$ = ChrW(&HFFBF) + W$
+        If prv Then
+        W$ = ChrW(&HFFBF) + W$
+        End If
     End If
     End If
 Else
@@ -38275,6 +38284,11 @@ If uni Then
 Else
     If prv Then W$ = ChrW(&HFFBF) + W$
 End If
+End If
+If CheckStruct(bstack, rest$, W$, here$ = "", False, "") Then
+
+ GoTo continuehere
+
 End If
 VarOnly:
 W$ = ohere$ + "." + W$

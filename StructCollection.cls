@@ -16,6 +16,7 @@ Option Explicit
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)
 ' We get this from tlb (see reference)
+Private structfun As FastCollection
 Private Type item  ' if you add change swapb (check with lenb() function)
     Key As String
     struct As Object
@@ -288,7 +289,7 @@ End If
 End If
 
 End Function
-Private Function Find2(RHS, Parndx As Long, nDx As Long) As Boolean
+Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
 Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
@@ -297,7 +298,7 @@ k = Hash(HashFunc(Key)) - 1
 k1 = -2
 If k >= 0 Then
 Do
-    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+    If PriveSpace(k).Key = Key Then Find2 = True: ndx = k: Exit Function
      Parndx = k
      k1 = k
      k = PriveSpace(k).Pleft - 1
@@ -308,7 +309,7 @@ k = Hash(HashFunc(Key)) - 1
 k1 = -2
 If k >= 0 Then
 Do
-    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+    If PriveSpace(k).Key = Key Then Find2 = True: ndx = k: Exit Function
      Parndx = k
      k1 = k
      k = PriveSpace(k).Pleft - 1
@@ -585,6 +586,9 @@ Friend Sub CopyCollection(this As StructCollection)
         D = D + 1
     Wend
     this.ExpandHash
+    If Not structfun Is Nothing Then
+        Set this.CopyFunc = CopyFunc
+    End If
     ' do not forget to fix Tag outside
     this.structLen = structLen
 End Sub
@@ -600,6 +604,35 @@ Friend Sub MergeCollection(this As StructCollection, Offset As Long, lasthead$)
         End With
         b = b + 1
     Wend
+    ' functions not merged.
     this.ExpandHash
 End Sub
+Friend Property Set CopyFunc(RHS As FastCollection)
+Set structfun = RHS
+End Property
+Friend Property Get CopyFunc() As FastCollection
+If Not structfun Is Nothing Then
+Set CopyFunc = structfun.CopyFast()
+End If
+End Property
+Friend Property Let PlaceFunc(FuncName As String, FuncCode As String)
+    If structfun Is Nothing Then
+        Set structfun = New FastCollection
+    End If
+    If structfun.ExistKey(FuncName) Then
+        structfun.Value = CVar(FuncCode)
+    Else
+        structfun.AddKey CVar(FuncName), CVar(FuncCode)
+    End If
+End Property
+
+Public Function FunctionCode(FuncName As String) As String
+If Not structfun Is Nothing Then
+    If structfun.ExistKey(FuncName) Then
+        FunctionCode = structfun.Value
+    End If
+End If
+End Function
+
+
 

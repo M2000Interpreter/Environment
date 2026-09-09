@@ -13,7 +13,7 @@ Private Type PeekArrayType
 End Type
 Private Declare Function CompareString Lib "kernel32" Alias "CompareStringW" (ByVal Locale As Long, ByVal dwCmpFlags As Long, ByVal lpString1 As Long, ByVal cchCount1 As Long, ByVal lpString2 As Long, ByVal cchCount2 As Long) As Long
 
-Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (Arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
+Private Declare Function PeekArray Lib "kernel32" Alias "RtlMoveMemory" (arr() As Any, Optional ByVal Length As Long = 4) As PeekArrayType
 Private Declare Function SafeArrayGetDim Lib "OleAut32.dll" (ByVal Ptr As Long) As Long
 Private Declare Function vbaVarLateMemSt Lib "msvbvm60" _
                          Alias "__vbaVarLateMemSt" ( _
@@ -1595,7 +1595,7 @@ End Function
 ' ExpEnvirStr(string) as string  exist
 Public Function URLEncodeEsc(cc As String, Optional space_as_plus As Boolean = False, Optional typedata As Long = 0) As String
    cc = StrConv(utf8encode(cc), vbUnicode)
-    Dim slen As Long, m$: slen = Len(cc)
+    Dim slen As Long, M$: slen = Len(cc)
     Dim i As Long
     
     If slen > 0 Then
@@ -1958,7 +1958,7 @@ againarray:
     If ppppAny Is Nothing Then
         GoTo err000
     End If
-    If Not ppppAny.Arr Then
+    If Not ppppAny.arr Then
         If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , True, idx) Then GoTo errorarr
     ElseIf FastSymbol(b$, ")") Then
         'need to found an expression
@@ -1993,7 +1993,7 @@ NotArray1:
                 Else
                     Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
                     pppp1.SerialItem 0, 2, 9
-                    pppp1.Arr = True
+                    pppp1.arr = True
                     If bstack.lastobj Is Nothing Then
                         pppp1.item(0) = p
                     Else
@@ -2025,7 +2025,7 @@ errorarr:
     ElseIf MaybeIsSymbol(b$, ":+-*/~|") Or v = -2 Then
         With ppppAny
             If ppppAny.Final Then CantAssignValue: GoTo err000
-            If Not .Arr Then
+            If Not .arr Then
                 If v = -2 Then GoTo con123
                 If IsGroup(.item(v)) Then GoTo a1297654
                 If .IsObj Then
@@ -2171,7 +2171,7 @@ a1297654:
                         GoTo err000
                         End If
                     Else
-                        If Not .Arr And Not (.myarrbase = 9 Or .MyTypeToBe = 13) Then
+                        If Not .arr And Not (.myarrbase = 9 Or .MyTypeToBe = 13) Then
                             NullObject
                             Exit Function
                         End If
@@ -2184,7 +2184,7 @@ a1297654:
         'With ppppAny
 contEmptyObject:
             If FastSymbol(b$, ":=", , 2) Then
-                If Not .Arr Then GoTo NotArray1
+                If Not .arr Then GoTo NotArray1
     ' new on rev 20
 contassignhere:
                 If GetData(bstack, b$, myobject) Then
@@ -2748,7 +2748,7 @@ If Not bstack.lastobj Is Nothing Then
 EguFirst:
 
     If IsObjGroup(bstack.lastobj) Then
-        If bstack.lastobj.IamApointer Or Not ppppAny.Arr Then
+        If bstack.lastobj.IamApointer Or Not ppppAny.arr Then
             If IsObjProp(ppppAny.GroupRef) Then
                 Set myProp = ppppAny.GroupRef
                 myProp.PushIndexes idx
@@ -2786,7 +2786,7 @@ EguFirst:
             Else
                 If Not bstack.lastobj Is Nothing Then
                     If TypeOf bstack.lastobj Is iBoxArray Then
-                        If bstack.lastobj.Arr Then
+                        If bstack.lastobj.arr Then
                             Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                         Else
                             Set ppppAny.item(v) = bstack.lastobj
@@ -2818,7 +2818,7 @@ EguFirst:
         End If
         Set bstack.lastobj = Nothing
      Else
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If IsArrayGroup(ppppAny, v) Then
 here12500:
                 If ppppAny.item(v).IamApointer Then
@@ -2856,7 +2856,7 @@ here65654:
             myProp.PushIndexes idx
             myProp.Value = p
             Set myProp = Nothing
-        ElseIf Not ppppAny.Arr Then
+        ElseIf Not ppppAny.arr Then
             If IsmHandler(ppppAny.GroupRef) Then
                 Set usehandler = ppppAny.GroupRef
                 If usehandler.t1 = 1 Then
@@ -2947,6 +2947,520 @@ NewCheck2:
     Else
     SyntaxError
     End If
+End Function
+Function CheckStruct(bstack As basetask, rest$, className$, isglobal As Boolean, islocal As Boolean, ohere$) As Boolean
+Dim i As Long, W$, v As Long, useType As Boolean, r, part$, ret As Boolean, exist As Boolean, ww$, ss$
+Dim isStruct As Boolean, useBuffer As MemBlock, usehandler As mHandler, usehandlerBuffer As mHandler, j As Long
+Dim structLen As Long, startitem As Long
+If GetVar3(bstack, bstack.GroupName + className$, v) Then
+    If IsExp(bstack, bstack.GroupName + className$, r) Then
+        If Not bstack.lastobj Is Nothing Then
+            If TypeOf bstack.lastobj Is mHandler Then
+                Set usehandler = bstack.lastobj
+                Set bstack.lastobj = Nothing
+                If usehandler.t1 = 5 Then
+                    If TypeOf usehandler.objref Is StructCollection Then
+                        If Not usehandler.objref.structLen = 0 Then
+                            isStruct = True
+                        Else
+                            MyEr "Zero Length Structure", "Μηδενικού Μήκους Δομή"
+                            Exit Function
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End If
+End If
+If isStruct Then
+    Do
+        startitem = 0
+        exist = False
+        useType = False
+        j = -1
+        i = IsLabelAnew("", rest$, W$, j)
+        If j > 0 Then rest$ = Mid$(rest$, j)
+        If Len(rest$) = 0 Then
+            If i = 0 Then SyntaxError: Exit Function
+        End If
+        CheckStruct = True
+        If i = 1 Or i = 8 Then
+            If i = 8 Then
+                Mid$(rest$, 1, 1) = " "
+                If Not IsExp(bstack, rest$, r) Then
+                End If
+                If Not Left$(rest$, 1) = "]" Then
+                End If
+                Mid$(rest$, 1, 1) = " "
+            Else
+                r = 1
+            End If
+            If r < 1& Then r = 1&
+            If isglobal Or islocal Then
+                GoTo CONTGLO
+            ElseIf GetVar(bstack, bstack.GroupName + W$, i, , , True, ww$, useType) Then
+                If Typename(var(i)) = "mHandler" Then
+                    Set usehandlerBuffer = var(i)
+                    If usehandlerBuffer.t1 = 2 And Not usehandlerBuffer.ReadOnly Then
+                        Set useBuffer = usehandlerBuffer.objref
+                        If useBuffer.structref Is Nothing Then
+                        ElseIf useBuffer.structref Is usehandler.objref Then
+                            v = useBuffer.items
+                            If v <> r Then
+                                ret = useBuffer.items < r
+                                useBuffer.ResizeItems CLng(r)
+                                ' fill zero
+                                If ret Then
+                                    startitem = v
+                                    Dim k() As Byte
+                                    ReDim k(useBuffer.ItemSize) As Byte
+                                    For i = v To CLng(r) - 1&
+                                        j = useBuffer.GetPtr(v)
+                                        If j > 0 Then
+                                            CopyMemory ByVal j, ByVal VarPtr(k(0)), useBuffer.ItemSize
+                                        End If
+                                    Next i
+                                End If
+                            End If
+                            GoTo cont111
+                        ElseIf useBuffer.structref.Tag = usehandler.objref.Tag Then
+                            GoTo cont111
+                        End If
+                    End If
+                End If
+                WrongType
+                Exit Function
+            Else
+CONTGLO:
+                i = globalvar(bstack.GroupName + W$, Empty, , isglobal, , True)
+                MakeitObjectBuffer var(i)
+                Set usehandlerBuffer = var(i)
+                Set useBuffer = usehandlerBuffer.objref
+                v = usehandler.objref.structLen
+                Set useBuffer.structref = usehandler.objref
+                useBuffer.UseStruct = True
+                useBuffer.ClearError
+                useBuffer.Construct v, CLng(r), CLng(8)
+                If lookOne(rest$, "#") Then
+                    i = MyTrimL(rest$)
+                    ww$ = usehandler.objref.Tag
+                    If i > 1 Then
+                        bstack.tmpstr = ww$
+                        BackPort rest$
+                    Else
+                        bstack.tmpstr = ww$ + Left$(rest$, 1)
+                        BackPort rest$
+                    End If
+                    PushStage bstack, False
+                    i = globalvar((ww$), 0, , , , True)
+                    Set usehandler = New mHandler
+                    usehandler.t1 = 2
+                    Set usehandler.objref = useBuffer.CopyItem(0, CheckStruct)
+                    Set var(i) = usehandler
+                    If IsNumberNew(bstack, rest$, r, False) Then
+                        On Error Resume Next
+                        Err.Clear
+                        Set usehandlerBuffer = bstack.lastobj
+                        If Err.Number Then
+                            WrongObject
+                            Exit Function
+                        End If
+                        If usehandlerBuffer.objref.structref Is useBuffer.structref Then
+                            If usehandlerBuffer.objref.items Then
+                                Dim pp As Long
+                                pp = usehandlerBuffer.objref.SizeByte
+                                If useBuffer.ValidArea2(0, pp) Then
+                                    Dim w2 As Long
+                                    Dim otherBuffer As MemBlock
+                                    Set otherBuffer = usehandlerBuffer.objref
+                                    For i = 0 To useBuffer.items - 1
+                                        w2 = useBuffer.GetPtr(i)
+                                        If useBuffer.ItemsHaveStrings Then
+                                            useBuffer.ClearStringPartial w2, pp
+                                        End If
+                                        MemCopy w2, otherBuffer.GetPtr(0), pp
+                                        If otherBuffer.ItemsHaveStrings Then
+                                            otherBuffer.copyStringsPartial useBuffer, w2, otherBuffer.GetPtr(0), pp
+                                        End If
+                                    Next
+                                End If
+                            End If
+                        End If
+                    End If
+                    PopStage bstack
+                End If
+                Set usehandlerBuffer = Nothing
+                Set useBuffer = Nothing
+    
+            End If
+cont111:
+            GoTo loophere
+        Else
+            SyntaxError
+            Exit Function
+        End If
+loophere:
+    Loop Until Not FastSymbol(rest$, ",")
+Else
+    CheckStruct = False
+End If
+End Function
+Function AddGroupFromClass(bstack As basetask, rest$, className$, isglobal As Boolean, islocal As Boolean, ohere$) As Boolean
+Dim i As Long, W$, v As Long, useType As Boolean, r, part$, ret As Boolean, exist As Boolean, ww$, ss$
+Dim isStruct As Boolean, useBuffer As MemBlock, usehandler As mHandler, usehandlerBuffer As mHandler, j As Long
+Dim structLen As Long, startitem As Long
+
+If GetVar3(bstack, bstack.GroupName + className$, v) Then
+    If IsExp(bstack, bstack.GroupName + className$, r) Then
+        If Not bstack.lastobj Is Nothing Then
+            If TypeOf bstack.lastobj Is mHandler Then
+                Set usehandler = bstack.lastobj
+                Set bstack.lastobj = Nothing
+                If usehandler.t1 = 5 Then
+                    If TypeOf usehandler.objref Is StructCollection Then
+                        If Not usehandler.objref.structLen = 0 Then
+                            isStruct = True
+                        Else
+                            MyEr "Zero Length Structure", "Μηδενικού Μήκους Δομή"
+                            Exit Function
+                        End If
+                    End If
+                End If
+            End If
+        End If
+    End If
+End If
+Do
+startitem = 0
+exist = False
+useType = False
+j = -1
+i = IsLabelAnew("", rest$, W$, j)
+If (i <> 8 Or isStruct) And j > 0 Then rest$ = Mid$(rest$, j)
+If Len(rest$) = 0 Then
+If i = 0 Then SyntaxError: Exit Function
+End If
+AddGroupFromClass = True
+If isStruct Then
+If i = 1 Or i = 8 Then
+If i = 8 Then
+    Mid$(rest$, 1, 1) = " "
+    If Not IsExp(bstack, rest$, r) Then
+    
+    End If
+    If Not Left$(rest$, 1) = "]" Then
+    
+    End If
+    Mid$(rest$, 1, 1) = " "
+Else
+r = 1
+End If
+If r < 1& Then r = 1&
+    If isglobal Or islocal Then
+        GoTo CONTGLO
+    ElseIf GetVar(bstack, bstack.GroupName + W$, i, , , True, ww$, useType) Then
+        If Typename(var(i)) = "mHandler" Then
+            Set usehandlerBuffer = var(i)
+            If usehandlerBuffer.t1 = 2 And Not usehandlerBuffer.ReadOnly Then
+                Set useBuffer = usehandlerBuffer.objref
+                If useBuffer.structref Is Nothing Then
+                    
+                ElseIf useBuffer.structref Is usehandler.objref Then
+                v = useBuffer.items
+                If v <> r Then
+                
+                    ret = useBuffer.items < r
+                        useBuffer.ResizeItems CLng(r)
+                        ' fill zero
+                If ret Then
+                    startitem = v
+                    Dim k() As Byte
+                    ReDim k(useBuffer.ItemSize) As Byte
+                    For i = v To CLng(r) - 1&
+                        j = useBuffer.GetPtr(v)
+                        If j > 0 Then
+                        CopyMemory ByVal j, ByVal VarPtr(k(0)), useBuffer.ItemSize
+                        End If
+                    Next i
+                End If
+                End If
+                    If lookOne(rest$, "#") Then
+                        If useBuffer.UseStruct Then
+                        GoTo jump001
+                        End If
+                    End If
+                    GoTo cont111
+                ElseIf useBuffer.structref.Tag = usehandler.objref.Tag Then
+                    GoTo cont111
+                End If
+            End If
+        End If
+        WrongType
+        Exit Function
+    Else
+CONTGLO:
+    
+        i = globalvar(bstack.GroupName + W$, Empty, , isglobal, , True)
+        MakeitObjectBuffer var(i)
+        Set usehandlerBuffer = var(i)
+        Set useBuffer = usehandlerBuffer.objref
+        v = usehandler.objref.structLen
+        Set useBuffer.structref = usehandler.objref
+        useBuffer.UseStruct = True
+        
+        useBuffer.ClearError
+        useBuffer.Construct v, CLng(r), CLng(8)
+        If lookOne(rest$, "#") Then
+jump001:
+            i = MyTrimL(rest$)
+            ww$ = usehandler.objref.Tag
+            If i > 1 Then
+             bstack.tmpstr = ww$
+             BackPort rest$
+            Else
+             bstack.tmpstr = ww$ + Left$(rest$, 1)
+             BackPort rest$
+            End If
+            
+             PushStage bstack, False
+             i = globalvar((ww$), 0, , , , True)
+             Set usehandler = New mHandler
+             usehandler.t1 = 2
+             Set usehandler.objref = useBuffer.CopyItem(0, AddGroupFromClass)
+             Set var(i) = usehandler
+            
+             
+             
+             If IsNumberNew(bstack, rest$, r, False) Then
+
+             On Error Resume Next
+             Err.Clear
+             Set usehandlerBuffer = bstack.lastobj
+             If Err.Number Then
+                WrongObject
+                Exit Function
+             End If
+             If usehandlerBuffer.objref.structref Is useBuffer.structref Then
+             If usehandlerBuffer.objref.items Then
+             Dim pp As Long
+             pp = usehandlerBuffer.objref.SizeByte
+             If useBuffer.ValidArea2(0, pp) Then
+             Dim w2 As Long
+             Dim otherBuffer As MemBlock
+             Set otherBuffer = usehandlerBuffer.objref
+
+             For i = startitem To useBuffer.items - 1
+                w2 = useBuffer.GetPtr(i)
+                If useBuffer.ItemsHaveStrings Then
+                    useBuffer.ClearStringPartial w2, pp
+                End If
+                MemCopy w2, otherBuffer.GetPtr(0), pp
+                If otherBuffer.ItemsHaveStrings Then
+                    otherBuffer.copyStringsPartial useBuffer, w2, otherBuffer.GetPtr(0), pp
+                End If
+             Next
+             End If
+             End If
+             End If
+             End If
+             
+             PopStage bstack
+        End If
+        Set usehandlerBuffer = Nothing
+        Set useBuffer = Nothing
+        
+    End If
+cont111:
+GoTo loophere
+
+Else
+SyntaxError
+Exit Function
+End If
+ElseIf i = 1 Then
+part$ = className$ + "()"
+ElseIf i = 3 Then
+part$ = className$ + "$()"
+W$ = Left$(W$, Len(W$) - 1)
+ElseIf i = 5 Then
+W$ = Left$(W$, Len(W$) - 1)
+part$ = className$ + "("
+ElseIf i = 6 Then
+W$ = Left$(W$, Len(W$) - 2)
+part$ = className$ + "$("
+ElseIf i = 8 Then
+part$ = className$ + "()"
+Else
+SyntaxError
+AddGroupFromClass = False
+Exit Function
+End If
+
+    If isglobal Or islocal Then
+        GoTo CONTGLO1
+    ElseIf GetVar(bstack, bstack.GroupName + W$, v, True, , , ww$, useType) Then
+    If i = 8 Then
+        GoTo A112233
+    ElseIf Typename(var(v)) <> "Group" Then
+        WrongType
+        AddGroupFromClass = False
+        Exit Function
+    End If
+    If useType Then
+        Dim mm As Group
+        Set mm = var(v)
+        If Not mm.TypeGroup(className$) Then
+            WrongType
+            AddGroupFromClass = False
+            Exit Function
+        End If
+    End If
+    exist = True
+Else
+CONTGLO1:
+    If i = 1 Then
+        v = globalvar(bstack.GroupName + W$, 0, , here$ = "", , True)
+    ElseIf i = 8 Then
+A112233:
+        If IsExp(bstack, part$, r) Then
+            Set r = bstack.lastobj
+            Set bstack.lastobj = Nothing
+            If Not MyAnyType(bstack, rest$, (0&), islocal, 9, Not (islocal Or isglobal), r) Then
+                WrongType
+                Exit Function
+            End If
+            GoTo loophere
+        End If
+    Else
+    v = globalvar(bstack.GroupName + W$, 0, , here$ = "", , True)
+    'ret = globalvar(bstack.GroupName + W$, (v), True, here$ = "", , True)
+    End If
+End If
+If i = 1 Then
+    If lookOne(rest$, "=") Then
+    ret = IsExp(bstack, part$, r)
+    Else
+    bstack.tmpstr = part$ + Left$(rest$, 1)
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
+    ret = IsExp(bstack, rest$, r)
+    End If
+ElseIf i = 3 Then
+    If lookOne(rest$, "=") Then
+    ret = IsStrExp(bstack, (part$), ss$)
+    If Not ret Then
+    ret = IsExp(bstack, className$ + "()", r)
+    End If
+    Else
+    bstack.tmpstr = part$ + Left$(rest$, 1)
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
+    ret = IsStrExp(bstack, rest$, ss$)
+    If ret = False Then
+    bstack.tmpstr = className$ + "()" + Left$(rest$, 1)
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
+    ret = IsExp(bstack, rest$, r)
+    End If
+    End If
+ElseIf i = 5 Then
+    bstack.tmpstr = part$ + Left$(rest$, 1)
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
+    ret = IsExp(bstack, rest$, r)
+ElseIf i = 6 Then
+    bstack.tmpstr = part$ + Left$(rest$, 1)
+    'BackPort rest$
+    If Len(rest$) = 0 Then rest$ = Chr(8) Else Mid$(rest$, 1, 1) = Chr(8)
+    ret = IsStrExp(bstack, rest$, ss$)
+Else
+WrongType
+Exit Function
+End If
+If isglobal Or islocal Then exist = False
+If ret Then
+    If Not bstack.lastobj Is Nothing Then
+        If TypeOf bstack.lastobj Is Group Then
+            Set mm = bstack.lastobj
+            Set bstack.lastobj = Nothing
+            If useType Then
+                If Not mm.TypeGroup(className$) Then
+                WrongType
+                AddGroupFromClass = False
+                Exit Function
+                End If
+            End If
+            If exist Then
+ 
+                    ss$ = bstack.GroupName
+                    If ww$ <> "" Then W$ = ww$
+                    If Len(var(v).GroupName) > Len(W$) Then
+                        Dim sw$
+                            sw$ = here$
+                            here$ = vbNullString
+                            UnFloatGroupReWriteVars bstack, var(v).Patch, v, mm
+                            here = sw$
+                            mm.ToDelete = True
+                        Else
+                            bstack.GroupName = Left$(W$, Len(W$) - Len(var(v).GroupName) + 1)
+                            If Len(var(v).GroupName) > 0 Then
+                                W$ = Left$(var(v).GroupName, Len(var(v).GroupName) - 1)
+                                sw$ = here$
+                                here$ = vbNullString
+                                UnFloatGroupReWriteVars bstack, W$, v, mm
+                                here = sw$
+                                mm.ToDelete = True
+                            ElseIf var(v).IamApointer Then
+                                WrongType
+                                Exit Function
+                            Else
+                                Set mm = Nothing
+                                bstack.GroupName = ss$
+                                If var(v).IamApointer Then
+                                    UseArrow
+                                Else
+                                    GroupWrongUse
+                                End If
+                                Exit Function
+                            End If
+                        End If
+                        bstack.GroupName = ss$
+                        Set mm = Nothing
+            
+            Else
+            mm.ToDelete = True
+            UnFloatGroup bstack, W$, v, mm, here$ = "" Or isglobal, myVarType(var(v), vbEmpty), islocal           ' global??
+            If Len(bstack.UseGroupname) <> 0 Then
+                var(v).IamRef = True
+                If here$ <> "" Then globalvar W$, CVar(v), True, True
+               
+            End If
+            End If
+            Set mm = Nothing
+            If lookOne(rest$, "=") Then
+                If i = 3 Then
+                    ExecuteVar3 i, bstack, W$ + "$", rest$, v, 1, isglobal, islocal, 0, "", 0, ohere$, True
+                ElseIf i = 1 Then
+                    ExecuteVar1 i, bstack, W$, rest$, v, 1, isglobal, islocal, 0, "", 0, ohere$, True
+                ElseIf i = 4 Then
+                    ExecuteVar4 i, bstack, W$, rest$, v, 1, isglobal, islocal, 0, "", 0, ohere$, True
+                ElseIf i = 5 Then
+                    ExecuteVar5 i, bstack, W$, rest$, v, 1, isglobal, islocal, 0, "", 0, ohere$, True
+                ElseIf i = 6 Then
+                    ExecuteVar6 i, bstack, W$, rest$, v, 1, isglobal, islocal, 0, "", 0, ohere$, True
+                Else
+                    ExecuteVar i, (i), bstack, W$, rest$, v, 1, isglobal, islocal, 0, "", 0, ohere$, True
+                End If
+            End If
+        End If
+        Set bstack.lastobj = Nothing
+    End If
+Else
+    WrongType
+End If
+loophere:
+Loop Until Not FastSymbol(rest$, ",")
+className$ = ""
 End Function
 
 Public Function ExecuteVar(Exec1 As Long, ByVal jumpto As Long, bstack As basetask, W$, b$, v As Long, Lang As Long, VarStat As Boolean, NewStat As Boolean, nchr As Integer, ss$, sss As Long, temphere$, noVarStat As Boolean) As Long
@@ -3199,7 +3713,7 @@ entry00022:
                                     End If
                                     Dim pp1 As ppppLight
                                     Set pp1 = New ppppLight
-                                    pp1.Arr = False
+                                    pp1.arr = False
                                     Set pp1.GroupRef = myobject
                                   
                                     
@@ -3726,7 +4240,7 @@ If neoGetArray(bstack, W$, ppppAny) Then
 againintarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
-If IsArrayArray(ppppAny, v) And ppppAny.Arr Then
+If IsArrayArray(ppppAny, v) And ppppAny.arr Then
 If FastSymbol(b$, "(") Then
 Set ppppAny = ppppAny.item(v)
 GoTo againintarr
@@ -3816,7 +4330,7 @@ End If
     If Not IsExp(bstack, b$, p) Then MissNumExpr: GoTo err000
     If Not bstack.lastobj Is Nothing Then
         If IsobjArray(bstack.lastobj) Then
-            If bstack.lastobj.Arr Then
+            If bstack.lastobj.arr Then
                 Set ppppAny.item(v) = CopyArray(bstack.lastobj)
             Else
                 Set ppppAny.item(v) = bstack.lastobj
@@ -3915,7 +4429,7 @@ MakeArray bstack, W$, 6, b$, ppppAny, NewStat, VarStat
         sss = Len(b$): ExecuteVar6 = 4: Exit Function
 End If
 If neoGetArray(bstack, W$, ppppAny, , , , True) Then
-    If Not ppppAny.Arr Then
+    If Not ppppAny.arr Then
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$, , , , , idx) Then GoTo err000
 
 GoTo there12567
@@ -3997,7 +4511,7 @@ NotArray1:
                 Else
             Set pppp1 = New mArray: pppp1.PushDim (1): pppp1.PushEnd
             pppp1.SerialItem 0, 2, 9
-            pppp1.Arr = True
+            pppp1.arr = True
             If bstack.lastobj Is Nothing Then
                 pppp1.item(0) = vbNullString
             Else
@@ -4020,7 +4534,7 @@ againstrarr:
 If Not NeoGetArrayItem(ppppAny, bstack, W$, v, b$) Then GoTo err000
 'On Error Resume Next
 there12567:
-    If ppppAny.Arr Then
+    If ppppAny.arr Then
         If IsArrayArray(ppppAny, v) Then
             If FastSymbol(b$, "(") Then
                 Set ppppAny = ppppAny.item(v)
@@ -4063,7 +4577,7 @@ checkpar:
         If Not TypeOf ppppAny Is mArray Then
             GoTo WrongObj
         End If
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If FastSymbol(b$, ":=", , 2) Then
                 If GetData(bstack, b$, myobject) Then
                     FeedArray ppppAny, v, myobject
@@ -4182,14 +4696,14 @@ jmp1112:
     
     If TypeOf ppppAny Is mArray Then
 contfromtuple:
-        If ppppAny.Arr Then
+        If ppppAny.arr Then
             If ppppAny.Count = 0 Then
                 ppppAny.GroupRef.Value = ss$
             ElseIf bstack.lastobj Is Nothing Then
                 ppppAny.ItemStr(v) = ss$
             Else
                 If IsobjArray(bstack.lastobj) Then
-                    If bstack.lastobj.Arr Then
+                    If bstack.lastobj.arr Then
                         Set ppppAny.item(v) = CopyArray(bstack.lastobj)
                     Else
                         Set ppppAny.item(v) = bstack.lastobj.GroupRef
@@ -5078,7 +5592,13 @@ cont12987:
 noisnotAclass:
                 If comhash.Find2(W$, (0), v) Then
                     If v = 44 Then
+                        If Not lookOne(b$, "|") Then
+                
                         GoTo cont12987
+                        ElseIf GetGlobalVar(W$, v) Then
+                        GoTo somethingelse
+                        
+                        End If
                     End If
                 End If
                 v = globalvar(W$, p, , VarStat, temphere$)
@@ -6949,7 +7469,7 @@ Function MyRead7(bstack As basetask, rest$, Lang As Long, namedArg) As Boolean
 Dim what$
 Dim pp, ps As mStiva, bs As basetask, ohere$, ok As Boolean
 Dim s$, ss$, pa$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
-Dim m As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, look As Boolean, ByPass As Boolean
+Dim M As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, look As Boolean, ByPass As Boolean
 Dim usehandler As mHandler, ff As Long, usehandler1 As mHandler, ar As refArray, jumpAs As Boolean, Mark As Long, cv As Constant
 Dim enumpad As Enumeration
 Const mHdlr = "mHandler"
@@ -7790,12 +8310,12 @@ existAs07:
                                 End If
                             End If
                             If var(i).HasSet Then
-                                Set m = bstack.soros
+                                Set M = bstack.soros
                                 Set bstack.Sorosref = NewmStiva
                                 bstack.soros.PushVal p
                                 NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                                Set bstack.Sorosref = m
-                                Set m = Nothing
+                                Set bstack.Sorosref = M
+                                Set M = Nothing
                             End If
                         Else
                             GoTo er103
@@ -8776,12 +9296,12 @@ contenumok:
                         ElseIf TypeOf var(i) Is Group Then
 checkenum:
                             If var(i).HasSet Then
-                                Set m = bstack.soros
+                                Set M = bstack.soros
                                 Set bstack.Sorosref = NewmStiva
                                 bstack.soros.PushVal p
                                 NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                                Set bstack.Sorosref = m
-                                Set m = Nothing
+                                Set bstack.Sorosref = M
+                                Set M = Nothing
                             Else
                                 GoTo there18274
                             End If
@@ -9657,7 +10177,7 @@ a39439494:
                         MyRead7 = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -9754,7 +10274,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -9952,7 +10472,7 @@ End Sub
 Function MyRead8(jump As Long, bstack As basetask, rest$, Lang As Long, Optional ByVal what$, Optional usex1 As Long, Optional exist As Boolean = False) As Boolean
 Dim pp, ps As mStiva, bs As basetask, ohere$, flag2 As Boolean, ok As Boolean
 Dim s$, ss$, pa$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
-Dim m As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, ByPass As Boolean
+Dim M As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, ByPass As Boolean
 Dim usehandler As mHandler, ff As Long, usehandler1 As mHandler, ar As refArray, jumpAs As Boolean, Mark As Long, cv As Constant
 Const mHdlr = "mHandler"
 Const mGroup = "Group"
@@ -11614,12 +12134,12 @@ contenumok:
                     ElseIf TypeOf var(i) Is Group Then
 checkenum:
                         If var(i).HasSet Then
-                            Set m = bstack.soros
+                            Set M = bstack.soros
                             Set bstack.Sorosref = NewmStiva
                             bstack.soros.PushVal p
                             NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                            Set bstack.Sorosref = m
-                            Set m = Nothing
+                            Set bstack.Sorosref = M
+                            Set M = Nothing
                         Else
                             GoTo there18274
                         End If
@@ -12212,13 +12732,13 @@ contstrhere:
                                 MyRead8 = False
                                 Exit Function
                             ElseIf TypeOf var(i) Is Group Then
-                                Set m = bstack.soros
+                                Set M = bstack.soros
                                 Set bstack.Sorosref = NewmStiva
                                 bstack.soros.PushStr s$
                                 If Right$(what$, 1) = "$" Then what$ = Left$(what$, Len(what$) - 1)
                                 NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                                Set bstack.Sorosref = m
-                                Set m = Nothing
+                                Set bstack.Sorosref = M
+                                Set M = Nothing
                             ElseIf checktype Then
                                 ok = True
                                 CheckVar var(i), s$, , ok
@@ -12543,7 +13063,7 @@ a39439494:
                         MyRead8 = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -12640,7 +13160,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -13031,7 +13551,7 @@ End Function
 Function MyRead(jump As Long, bstack As basetask, rest$, Lang As Long, Optional ByVal what$, Optional usex1 As Long, Optional exist As Boolean = False) As Boolean
 Dim pp, ps As mStiva, bs As basetask, f As Boolean, ohere$, par As Boolean, flag As Boolean, flag2 As Boolean, ok As Boolean
 Dim s$, ss$, pa$, x1 As Long, y1 As Long, i As Long, myobject As Object, it As Long, useoptionals As Boolean, optlocal As Boolean
-Dim m As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, ByPass As Boolean
+Dim M As mStiva, checktype As Boolean, allowglobals As Boolean, isAglobal As Boolean, ByPass As Boolean
 Dim usehandler As mHandler, ff As Long, usehandler1 As mHandler, ar As refArray, jumpAs As Boolean, Mark As Long, cv As Constant
 Dim enumpad As Enumeration
 Const mHdlr = "mHandler"
@@ -13285,12 +13805,12 @@ itisinumber:
               
                 If TypeOf var(i) Is Group Then
                     If var(i).HasSet Then
-                        Set m = bstack.soros
+                        Set M = bstack.soros
                         Set bstack.Sorosref = NewmStiva
                         bstack.soros.PushVal p
                         NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                        Set bstack.Sorosref = m
-                        Set m = Nothing
+                        Set bstack.Sorosref = M
+                        Set M = Nothing
                     Else
                         GoTo there182741
                     End If
@@ -13371,13 +13891,13 @@ jump001:
                         MyRead = False
                         Exit Function
                     ElseIf TypeOf var(i) Is Group Then
-                        Set m = bstack.soros
+                        Set M = bstack.soros
                         Set bstack.Sorosref = NewmStiva
                         bstack.soros.PushStr s$
                         If Right$(what$, 1) = "$" Then what$ = Left$(what$, Len(what$) - 1)
                         NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                        Set bstack.Sorosref = m
-                        Set m = Nothing
+                        Set bstack.Sorosref = M
+                        Set M = Nothing
                     ElseIf checktype Then
                         ok = True
                         CheckVar var(i), s$, , ok
@@ -13516,7 +14036,7 @@ Case 5, 7
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -13587,7 +14107,7 @@ Case 6
                     Set ppppl.item(it) = myobject
                     Set myobject = Nothing
                 ElseIf TypeOf myobject Is iBoxArray Then
-                    If myobject.Arr Then
+                    If myobject.arr Then
                         Set ppppl.item(it) = CopyArray(myobject)
                     Else
                         Set ppppl.item(it) = myobject
@@ -15656,12 +16176,12 @@ contenumok:
                     ElseIf TypeOf var(i) Is Group Then
 checkenum:
                         If var(i).HasSet Then
-                            Set m = bstack.soros
+                            Set M = bstack.soros
                             Set bstack.Sorosref = NewmStiva
                             bstack.soros.PushVal p
                             NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                            Set bstack.Sorosref = m
-                            Set m = Nothing
+                            Set bstack.Sorosref = M
+                            Set M = Nothing
                         Else
                             GoTo there18274
                         End If
@@ -16321,13 +16841,13 @@ contstrhere:
                                 MyRead = False
                                 Exit Function
                             ElseIf TypeOf var(i) Is Group Then
-                                Set m = bstack.soros
+                                Set M = bstack.soros
                                 Set bstack.Sorosref = NewmStiva
                                 bstack.soros.PushStr s$
                                 If Right$(what$, 1) = "$" Then what$ = Left$(what$, Len(what$) - 1)
                                 NeoCall2 bstack, what$ + "." + ChrW(&H1FFF) + ":=()", ok
-                                Set bstack.Sorosref = m
-                                Set m = Nothing
+                                Set bstack.Sorosref = M
+                                Set M = Nothing
                             ElseIf checktype Then
                                 ok = True
                                 CheckVar var(i), s$, , ok
@@ -16523,7 +17043,7 @@ a39439494:
                         MyRead = True
                         GoTo loopcont123
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject
@@ -16620,7 +17140,7 @@ a39439494:
                         Set ppppl.item(it) = myobject
                         Set myobject = Nothing
                     ElseIf TypeOf myobject Is iBoxArray Then
-                        If myobject.Arr Then
+                        If myobject.arr Then
                             Set ppppl.item(it) = CopyArray(myobject)
                         Else
                             Set ppppl.item(it) = myobject

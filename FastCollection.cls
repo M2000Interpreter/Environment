@@ -316,22 +316,22 @@ End If
 End Sub
 Public Sub Remove(RHS)
 If AllowSameKey Then Exit Sub
-Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, nDx As Long, Parndx As Long
+Dim k As Long, k1 As Long, vvv As Variant, top1 As Long, ndx As Long, Parndx As Long
 If toplim < 0 Then Exit Sub
 top1 = toplim
-If Find2(RHS, Parndx, nDx) Then
+If Find2(RHS, Parndx, ndx) Then
         Sorted = False
         Done = True
-        index = nDx
+        index = ndx
         ' here we make a clean to pointers to PriveSpace, so we exclude the removing item
         If Parndx > -1 Then
             ' if we have a parent then just push to parent the Pleft pointer
             ' Pleft is always +1 (so Pleft 0 give -1 null for this context)
-            PriveSpace(Parndx).Pleft = PriveSpace(nDx).Pleft
+            PriveSpace(Parndx).Pleft = PriveSpace(ndx).Pleft
 
         Else
         ' so we have no parent, just out Pleft to Hash
-        Hash(PriveSpace(nDx).lastpos) = PriveSpace(nDx).Pleft
+        Hash(PriveSpace(ndx).lastpos) = PriveSpace(ndx).Pleft
 
         End If
         ' we don't have to see Hash() any more for RHS
@@ -340,21 +340,21 @@ If Find2(RHS, Parndx, nDx) Then
         ' We have to get change top1 to ndx, maybe we remove top1
         ' we can check this but it is faster to not check this (more often top1 isn't ndx)
         ' Using SwapVariant we can swap any kind of Variant, including objects (swaping pointers only)
-        If top1 = nDx Then
+        If top1 = ndx Then
         PriveSpace(top1) = new_item
         Else
         SwapVariant vvv, PriveSpace(top1).iValue
-        PriveSpace(nDx).iValue = -1 ' is good to pass a number - so we break any pointer to object
-        PriveSpace(nDx) = PriveSpace(top1) ' now we perform a copy (no objects included)
+        PriveSpace(ndx).iValue = -1 ' is good to pass a number - so we break any pointer to object
+        PriveSpace(ndx) = PriveSpace(top1) ' now we perform a copy (no objects included)
         PriveSpace(top1) = new_item
         ' so now we put back iValue (maybe is an object)
-        SwapVariant vvv, PriveSpace(nDx).iValue
+        SwapVariant vvv, PriveSpace(ndx).iValue
         End If
         ' here Lastpos is from previous PriveSpace(top1) which is PriveSpace(ndx)
-        k = Hash(PriveSpace(nDx).lastpos) - 1
+        k = Hash(PriveSpace(ndx).lastpos) - 1
         If k = top1 Then
             ' we have to give the new position to Hash()
-            Hash(PriveSpace(nDx).lastpos) = nDx + 1
+            Hash(PriveSpace(ndx).lastpos) = ndx + 1
         Else
          
          Do While k >= 0 And k <> top1 And k <> k1
@@ -364,7 +364,7 @@ If Find2(RHS, Parndx, nDx) Then
          If k = k1 Then
             Rehash
          ElseIf k = top1 Then
-            PriveSpace(k1).Pleft = nDx + 1
+            PriveSpace(k1).Pleft = ndx + 1
          End If
         End If
   
@@ -631,27 +631,47 @@ Friend Sub passItem(ByVal where As Long, firsthash1, iValue1, Key1, KeyType1, sV
     End With
     toplim = where
 End Sub
-Function Copy() As Variant
-Dim M As FastCollection, H As mHandler
-Set M = New FastCollection
-Set H = New mHandler
- H.t1 = 1
-Set H.objref = M
-Set Copy = H
+Function CopyFast() As FastCollection
+Set CopyFast = New FastCollection
 If AllowSameKey Then
-    M.AllowAnyKey
+    CopyFast.AllowAnyKey
 End If
-M.UcaseKeys = UseUcaseKeys
+CopyFast.UcaseKeys = UseUcaseKeys
 If Count > 0 Then
-M.MakeSpace MaxSpace, mSortstyle
+CopyFast.MakeSpace MaxSpace, mSortstyle
 
 Dim i As Long
 For i = 0 To Count - 1
 With PriveSpace(i)
-    M.passItem i, .firsthash, .iValue, .Key, .KeyType, .sValue
+    CopyFast.passItem i, .firsthash, .iValue, .Key, .KeyType, .sValue
 End With
 Next
-M.ExpandHash
+CopyFast.ExpandHash
+End If
+
+End Function
+
+Function Copy() As Variant
+Dim m As FastCollection, H As mHandler
+Set m = New FastCollection
+Set H = New mHandler
+ H.t1 = 1
+Set H.objref = m
+Set Copy = H
+If AllowSameKey Then
+    m.AllowAnyKey
+End If
+m.UcaseKeys = UseUcaseKeys
+If Count > 0 Then
+m.MakeSpace MaxSpace, mSortstyle
+
+Dim i As Long
+For i = 0 To Count - 1
+With PriveSpace(i)
+    m.passItem i, .firsthash, .iValue, .Key, .KeyType, .sValue
+End With
+Next
+m.ExpandHash
 End If
 
 End Function
@@ -850,7 +870,7 @@ End If
 End If
 
 End Function
-Private Function Find2(RHS, Parndx As Long, nDx As Long) As Boolean
+Private Function Find2(RHS, Parndx As Long, ndx As Long) As Boolean
 Dim k As Long, Key As String, k1 As Long
 Key = Normalize(RHS)
 If Len(Key) = 0 Then Key = Chr$(0) + Chr$(0) + Chr$(0) + Chr$(0)
@@ -859,7 +879,7 @@ k = Hash(HashFunc(Key)) - 1
 k1 = -2
 If k >= 0 Then
 Do
-    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+    If PriveSpace(k).Key = Key Then Find2 = True: ndx = k: Exit Function
      Parndx = k
      k1 = k
      k = PriveSpace(k).Pleft - 1
@@ -870,7 +890,7 @@ k = Hash(HashFunc(Key)) - 1
 k1 = -2
 If k >= 0 Then
 Do
-    If PriveSpace(k).Key = Key Then Find2 = True: nDx = k: Exit Function
+    If PriveSpace(k).Key = Key Then Find2 = True: ndx = k: Exit Function
      Parndx = k
      k1 = k
      k = PriveSpace(k).Pleft - 1
@@ -1992,7 +2012,7 @@ Private Sub iBoxArray_GetPorp(aProp As PropReference, curitem As Long)
 '
 End Sub
 
-Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional nDx As Variant) As Variant
+Private Function iBoxArray_GetUDTValue(ByVal p As Long, Name As String, Optional ndx As Variant) As Variant
 '
 End Function
 
@@ -2185,7 +2205,7 @@ Private Function iBoxArray_PlaceValue2UDTArray(p As Long, Name As String, v As V
 '
 End Function
 
-Private Sub iBoxArray_processAppend(M As Object)
+Private Sub iBoxArray_processAppend(m As Object)
 '
 End Sub
 

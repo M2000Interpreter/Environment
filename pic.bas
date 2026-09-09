@@ -4200,7 +4200,7 @@ Case "SEEK", "SEEK(", "SELECT", "SEQUENTIAL", "SET", "SETTINGS", "SGN(", "SHIFT"
 Case "SHOW", "SHOW$(", "SIN(", "SINGLE", "SINGLE[", "SINT(", "SIZE", "SIZE.X(", "SIZE.Y(", "SLICE(", "SLOW", "SMOOTH"
 Case "SND$(", "SORT", "SORT(", "SOUND", "SOUNDREC", "SOUNDREC.LEVEL", "SOUNDS", "SPEECH", "SPEECH$(", "SPLIT", "SPRITE"
 Case "SPRITE$", "SQRT(", "STACK", "STACK(", "STACK$(", "STACK.SIZE", "STACKITEM$(", "STACKITEM(", "STACKTYPE$(", "START", "START(", "STATIC"
-Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STR(", "STREAM", "STRING", "STRING[", "STRING$(", "STRREV$(", "STRUCTURE", "STUFF(", "SUB", "SUBDIR", "SUM(", "SUPERCLASS", "SYMBOL"
+Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STR(", "STREAM", "STRING", "STRING(", "STRING$(", "STRREV$(", "STRUCTURE", "STUFF(", "SUB", "SUBDIR", "SUM(", "SUPERCLASS", "SYMBOL"
 Case "SWAP", "SWEEP", "SWITCHES", "TAB", "TAB(", "TABLE", "TAN(", "TARGET"
 Case "TARGETS", "TASK.MAIN", "TEMPNAME$", "TEMPORARY$", "TEST", "TEST(", "TEXT", "THEN", "THIS"
 Case "THREAD", "THREAD.PLAN", "THREADS", "THREADS$", "TICK", "TIME$(", "TIME(", "TIMECOUNT", "TITLE", "TITLE$(", "TITLE("
@@ -5168,7 +5168,7 @@ myfun() = Array("FORMAT$(", 1, "лояжг$(", 1, "EVAL$(", 2, "ейжя$(", 2, "ейжяасг$
 , "RTRIM$(", 69, "апой.де$(", 69, "LTRIM$(", 70, "апой.ая$(", 70, "STACKITEM(", 1, "тилгсыяоу(", 1, "ARRAY(", 2, "пимайас(", 2, "CONS(", 3, "емысг(", 3, "CAR(", 4, "пяыто(", 4, "CDR(", 5, "еполема(", 5, "VAL(", 6, "тилг(", 6, "аниа(", 6, "EVAL(", 7 _
 , "ейжя(", 7, "ейжяасг(", 7, "MID(", 8, "лес(", 8, "LEFT(", 9, "аяис(", 9, "RIGHT(", 10, "дени(", 10 _
 , "RIGHTPART(", 12, "аяистеяолеяос(", 12, "LEFTPART(", 11, "денилеяос(", 11, "STR(", 13, "цяажг(", 13, "CHR(", 14, "вая(", 14, "FORMAT(", 15, "лояжг(", 15, "TRIM(", 16, "апой(", 16, "RTRIM(", 17, "апой.де(", 17, "LTRIM(", 18, "апой.ая(", 18 _
-, "HEX(", 19, "дейаен(", 19, "REPLACE(", 20, "аккацг(", 20, "FILTER(", 21, "жиктяо(", 21, "UCASE(", 22, "йеж(", 22, "LCASE(", 23, "пеф(", 23, "TYPE(", 24, "тупос(", 24, "TITLE(", 25, "титкос(", 25)
+, "HEX(", 19, "дейаен(", 19, "REPLACE(", 20, "аккацг(", 20, "FILTER(", 21, "жиктяо(", 21, "UCASE(", 22, "йеж(", 22, "LCASE(", 23, "пеф(", 23, "TYPE(", 24, "тупос(", 24, "TITLE(", 25, "титкос(", 25, "STRING(", 26, "епам(", 26)
 
 
 If Not bhashbackup Is Nothing Then
@@ -5232,7 +5232,7 @@ myfun() = Array("PARAM(", 1, "паяал(", 1, "STACKITEM(", 2, "тилгсыяоу(", 2, "SGN
 , "HEX(", 144, "дейаен(", 144, "REPLACE(", 145, "аккацг(", 145, "FILTER(", 146, "жиктяо(", 146, "UCASE(", 147, "йеж(", 147, "LCASE(", 148, "пеф(", 148, "TYPE(", 149, "тупос(", 149, "TITLE(", 150, "титкос(", 150, "BIT64.XOR(", 151, "дуад64.апо(", 151, "BIT64.AND(", 152, "дуад64.йаи(", 152, "BIT64.OR(", 153, "дуад64.г(", 153 _
 , "BIT64.ADD(", 154, "дуад64.пяо(", 154, "дуад64.пяосхесг(", 154, "BIT64.SHIFT(", 155, "дуад64.окисхгсг(", 155, "BIT64.ROTATE(", 156, "дуад64.пеяистяожг(", 156, "BIT64.NOT(", 157, "дуад64.ови(", 157, "BIT64.NEG(", 158, "дуад64.амти(", 158, "дуад64.амтистяожо(", 158 _
 , "HILOWLONG(", 159, "дуолиса64(", 159, "HILONG(", 160, "памылисо64(", 160, "HIGHLONG(", 160, "LOLONG(", 161, "LOWLONG(", 161, "йатылисо64(", 161, "BINARY.TEST(", 162, "дуадийо.евеи(", 162, "BINARY.SET(", 163, "дуадийо.баке(", 163, "BINARY.RESET(", 164, "дуадийо.бцаке(", 164, "BIT64.TEST(", 165, "дуад64.евеи(", 165, "BIT64.SET(", 166, "дуад64.баке(", 166, "BIT64.RESET(", 167, "дуад64.бцаке(", 167 _
-, "BINARY.SUB(", 168, "дуадийо.ажаияесг(", 168, "дуадийо.аж(", 168, "дуад64.аж(", 169, "дуад64.ажаияесг(", 169, "BIT64.SUB(", 169, "дуад64(", 170, "дуадийо.айеяаио64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "амтицяажо.пим(", 171, "MIDI.OUT(", 172, "енодос.MIDI(", 172, "йыдийас(", 173, "ASSEMBLY(", 173)
+, "BINARY.SUB(", 168, "дуадийо.ажаияесг(", 168, "дуадийо.аж(", 168, "дуад64.аж(", 169, "дуад64.ажаияесг(", 169, "BIT64.SUB(", 169, "дуад64(", 170, "дуадийо.айеяаио64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "амтицяажо.пим(", 171, "MIDI.OUT(", 172, "енодос.MIDI(", 172, "йыдийас(", 173, "ASSEMBLY(", 173, "STRING(", 174, "епам(", 174)
 
 
 

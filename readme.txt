@@ -1,91 +1,62 @@
 ﻿eM2000 Interpreter and Environment
-Version 15 Revision 41
+Version 15 Revision 42
 
-print "chapter 1"
-print "strings returned as BSTR, as is or in a VARIANT"
-print "We use SysAllocStringLen from oleaut32.dll"
-Declare SysAllocStringLen Lib "oleaut32.SysAllocStringLen" {
-	Long OleStr, Long BLen
-} As Long
-Print "  - using Variant - Calling with variant as return value M2000 automatic pass an empty variant"
-mycode=assembly({
-		push dword 14 			; Length of "Hello World"
-		lea eax, [data1]        
-		push eax
-		call @SysAllocStringLen 	 ; @ read address of SysAllocStringLen()
-		mov edx, [esp + 4]      		 ; get the address of hidden empty variant 
-		mov word [edx], 8       		 ; vt type = 8 (string)
-		mov dword [edx + 2], 0  	 ; Clear reserved fields (Offset 2)
-		mov dword [edx + 6], 0  	 ; Clear reserved fields (Offset 6)
-		mov [edx + 8], eax      		 ; Place the BSTR pointer into the Variant data (Offset 8)
-		mov dword [edx + 12], 0 	 ; Clear reserved fields (Offset 12)
-		; so now 16bytes returned via edx 
-		ret 4
-align 4
-data1:	dw "Hello World 𐐷" ; no need 0
-})
-declare HelloWorld code mycode(0) as variant
-Print HelloWorld()
-Print "  - using String - just return pointer to BSTR in eax"
-mycode2=assembly({
-		push dword 14  ; Length of "Hello World"
-		lea eax, [data1]
-		push eax
-		call @SysAllocStringLen
-		; string BSTR pointer is in EAX
-		ret
-align 4
-data1:	dw "Hello World 𐐷"
-})
+1. Now String() can be used as String$()
+2. Upgrade Interpreter:
+ 2.1functions for structures
+ 2.2 We can use name of structure to define memory buffers in a class
+ 2.3 We can apply a series of functions to all items of a buffer when we use the struct_name buffer_name statement
+ The exampe bellow has three functions for structure alfa.
+In statement alfa kappa[200]#new(30,40) the value of new(30,40) applied to all items
+in  print beta.kappa[3]#str()  we pass in alfa  kappa[3]  as a copy (one item only)
+All structures funcrions works for one item only. 
+ 
+structure alfa {
+	x as double,
+	y as double
+	function mul(a) {
+		alfa|x=alfa|x*a
+		alfa|y=alfa|y*a
+		=alfa
+	}
+	function new(a=100, b=200) {
+		alfa|x=a
+		alfa|y=b
+		=alfa
+	}
+	function str() {
+		="("+(alfa|x)+", "+(alfa|y)+")"
+	}
+}
+alfa kappa[20]#new(30,40)#mul(3)
+print kappa[3]#str()="(90, 120)", kappa=>items=20, len(kappa)=320 ' bytes
+alfa kappa[200]#new(31,41)#mul(3) ' append more items, applied to that items only
+print kappa[19]#str()="(90, 120)"
+print kappa[20]#str()="(93, 123)", kappa=>items=200, len(kappa)=3200 ' bytes
 
-mycode2=assembly({
-		push dword 14  ; Length of "Hello World"
-		lea eax, [data1]
-		push eax
-		call @SysAllocStringLen
-		; string BSTR pointer is in EAX
-		ret
-align 4
-data1:	dw "Hello World 𐐷"
-})
-
-declare HelloWorld2 code mycode2(0) as string
-Print HelloWorld2()
-
-print "chapter 2 - no need for SysAllocStringLen"
-print "strings returned as pointer which have length depend of position of zero"
-print "M2000 automatic produce BSTR from pointers"
-print "1 - unicode string returned"
-mycode3=assembly({
-	lea eax, [data1]
-	ret
-align 4
-data1: dw "بيانات Hello World 𐐷", 0
-})
-print "declared only by name of function HelloWorld3$"
-declare HelloWorld3$ code mycode3(0)
-Print HelloWorld3$()
-	
-print "declared as string pointer"
-declare HelloWorld4 code mycode3(0) as string pointer
-Print HelloWorld4()
-
-print "2 - ansi string returned - name of function HelloWorld3"
-mycode4=assembly({
-	lea eax, [بيانات] ; we can use arabic also...
-	ret
-align 4
-بيانات:	db "Hello World", 0  ; we use db not dw for ansi
-})
-print "  delcared as string pointer ansi"
-declare HelloWorld5 code mycode4(0) as string pointer ansi
-Print HelloWorld5()
-print "  delcared as ansi"
-declare HelloWorld6 code mycode4(0) as ansi
-Print HelloWorld6()
-
-
-
+class beta {
+	structure alfa {
+		x as double,
+		y as double
+		function mul(a) {
+			alfa|x=alfa|x*a
+			alfa|y=alfa|y*a
+			=alfa
+		}
+		function new(a=100, b=200) {
+			alfa|x=a
+			alfa|y=b
+			=alfa
+		}
+		function str() {
+			="("+(alfa|x)+", "+(alfa|y)+")"
+		}
+	}
+	{read many}
+	alfa kappa[many]#new(30,40)#mul(3)
+}
+beta=beta(10)
+print beta.kappa[3]#str()="(90, 120)", beta.kappa=>items=10, len(beta.kappa)=160 ' bytes
 
 
 
