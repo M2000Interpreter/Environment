@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 43
+Global Const Revision = 44
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -5355,6 +5355,9 @@ jumpbad:
                                     Else
                                         bb$ = Mid$(ec$, i)
                                     End If
+                                    If bstack.UseofIf > 0 Then
+                                        DropMark2 bstack, Len(ec$) - i
+                                    End If
                                 Else
                                     S3 = subsfc.sValue
                                     If S3 < 0 Then
@@ -5388,6 +5391,9 @@ jumpbad:
                                     Else
                                         subsfc.ItemCreator2 bb$, i, 0
                                         bb$ = Mid$(ec$, i)
+                                        If bstack.UseofIf > 0 Then
+                                            DropMark2 bstack, Len(ec$) - i
+                                        End If
                                         GoTo subsentry10
                                     End If
                                 End If
@@ -5427,18 +5433,20 @@ AGAINGOTOLAMBDA:
                                     subsfc.ItemCreator2 bb$, i, S3
 AGAINGOTO:
                                     If bstack.SubLevel > 0 Then
-                                                If Len(sbf(S3).sb) - i > sbi Then
-                                                    bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
-                                                Else
-                                                    bb$ = Mid$(sbf(S3).sb, i)
-                                                    sbi = 0
-                                                End If
-                                            Else
-                                                bb$ = Mid$(sbf(S3).sb, i)
-                                                sbi = 0
-                                            End If
+                                        If Len(sbf(S3).sb) - i > sbi Then
+                                            bb$ = Mid$(sbf(S3).sb, i, Len(sbf(S3).sb) - i - sbi)
+                                        Else
+                                            bb$ = Mid$(sbf(S3).sb, i)
+                                            sbi = 0
+                                        End If
+                                    Else
+                                        bb$ = Mid$(sbf(S3).sb, i)
+                                        sbi = 0
+                                    End If
                                 End If
-                                
+                                If bstack.UseofIf > 0 Then
+                                    DropMark2 bstack, Len(ec$) - i
+                                End If
                                 GoTo subsentry10
                             End If
                         End If
@@ -19294,7 +19302,7 @@ findEndif:
                     Else
                     ' no other else.if
                     DropMark bstack
-                    MarkIf bstack, 0, False
+                    MarkIf bstack, 0, False, Len(b$)
                     End If
                   GoTo loopcontinue
                 End If
@@ -19608,13 +19616,13 @@ contThenElseIf:
                                             If i = 0 Then
                                                 bstack.UseofIf = bstack.UseofIf - 1
                                                 Else
-                                                MarkIf bstack, 1, True
+                                                MarkIf bstack, 1, True, Len(b$) - x1
                                             End If
                                             b$ = Mid$(b$, x1)
                                       Else
                                       Mid$(b$, 1, x1) = space(x1)
                                        DropMark bstack
-                                        MarkIf bstack, 2, True
+                                        MarkIf bstack, 2, True, Len(b$) - x1
                                       End If
                                   End Select
                               End Select
@@ -20031,16 +20039,12 @@ contif:
                             If ok Then
                                 If lookB123(b$) Then
                                     i = SetNextLineCLR(b$)
-                                    MarkIf bstack, 1, ok
-                                    bstack.UseofIf = bstack.UseofIf + 1
+                                    'MarkIf bstack, 1, ok, Len(b$)
+                                    'bstack.UseofIf = bstack.UseofIf + 1
                                     x1 = 1
                                     aheadstatusELSEIF b$, i, Lang, ok, x1, (ok)
-                                    DropMark bstack
-                                    If x1 = 0 Then
-                                        bstack.UseofIf = bstack.UseofIf - 1
-                                    Else
-                                        MarkIf bstack, 1, True
-                                    End If
+'                                    DropMark bstack
+                                   
                                     b$ = Mid$(b$, i)
                                     IFCTRL = 0
                                     jump = False
@@ -20049,6 +20053,10 @@ contif:
                                         If Left$(b$, 2) = vbCrLf Then lbl = True
                                     End If
                                     sss = Len(b$)
+                                    If x1 <> 0 Then
+                                        MarkIf bstack, 1, True, sss
+                                        bstack.UseofIf = bstack.UseofIf + 1
+                                    End If
                                     GoTo loopcontinue
                             ElseIf FastSymbol(b$, "{") Then
                                 W$ = block(b$)
@@ -20124,7 +20132,8 @@ contif22:
                         Else
                             If lookB123(b$) Then
                                 i = SetNextLineCLR(b$)
-                                MarkIf bstack, 2, jump
+                                
+                                MarkIf bstack, 2, jump, Len(b$)
                                 bstack.UseofIf = bstack.UseofIf + 1
                                 jump = False
                                 IFCTRL = 0
@@ -20270,17 +20279,19 @@ contif22:
                     If lookB123(b$) Then
                         If Not ok Then
                                 ' find END IF
-                            MarkIf bstack, 1, ok
+                            MarkIf bstack, 1, ok, 0
                             bstack.UseofIf = bstack.UseofIf + 1
                             GoTo findEndif
                         Else
-                            MarkIf bstack, 0, ok
+                            MarkIf bstack, 0, ok, Len(b$)
                             bstack.UseofIf = bstack.UseofIf + 1
                             jump = False
                             IFCTRL = 0
                             lbl = True
                         End If
                         i = SetNextLineCLR(b$)
+                        sss = Len(b$)
+                        GoTo loopcontinue
                     ElseIf Not ok Then       ' JUMP FALSE SKIP ELSE
                         If FastSymbol(b$, "{") Then
                             If once = True Then Execute = 0: Exit Function
@@ -21813,6 +21824,9 @@ therebad:
                                             bb$ = Mid$(ec$, i)
                                             sbi = 0 ' ???? CHECK THIS
                                         End If
+                                        If mystack.UseofIf > 0 Then
+                                            DropMark2 mystack, Len(ec$) - i
+                                        End If
                                     Else
                                         S3 = subsfc.sValue
                                         If S3 < 0 Then
@@ -21864,6 +21878,9 @@ AGAINGOTO:
                                             subsfc.ItemCreator2 bb$, i, 0
                                             bb$ = Mid$(ec$, i)
                                             sbi = 0
+                                            If mystack.UseofIf > 0 Then
+                                                DropMark2 mystack, Len(ec$) - i
+                                            End If
                                             GoTo subsentry10
                                         End If
                                     End If
@@ -32512,6 +32529,7 @@ therebad:
             ElseIf bb$ = "BREAK" Then
                     GoTo thh1
             Else
+            
                 If sbf(S3).subs Is Nothing Then
                     Set sbf(S3).subs = New FastCollection
                 End If
@@ -32523,11 +32541,19 @@ therebad:
                         i = val(Split(sbf(S3).subs.Value)(0))
                         x1 = val(Split(sbf(S3).subs.Value)(1))
                     End If
+                    If bs.UseofIf > 0 Then
+                        DropMark2 bs, Len(sbf(S3).sb) - i
+                    End If
                    
                 Else
                     If InStr(bb$, vbCr) > 0 Then
                         i = rinstr(sbf(S3).sb, bb$)
                         If i = 0 Then i = Len(sbf(S3).sb) + 1
+                        If bs.UseofIf > 0 Then
+                            If HaveMark2(bs) Then
+                                bs.UseofIf = bs.UseofIf - 1
+                            End If
+                        End If
                     Else
                         i = PosLabel(bb$, sbf(S3).sb)
                         If i = 0 Or i > Len(sbf(S3).sb) Then
@@ -32536,16 +32562,11 @@ therebad:
                             unknownLabel rest$, bb$
                             SwapStrings rest$, bb$
                             GoTo myerror1
+                        ElseIf bs.UseofIf > 0 Then
+                            DropMark2 bs, Len(sbf(S3).sb) - i
                         End If
                     End If
                     sbf(S3).subs.AddKey bb$, i
-                 
-                        
-                    If bs.UseofIf > 0 Then
-                        If HaveMark2(bs) Then
-                            bs.UseofIf = bs.UseofIf - 1
-                        End If
-                    End If
                     x1 = S3
                 End If
                 If trace Then
@@ -33667,6 +33688,9 @@ jumphere1:
                                 If bb$ = vbCrLf Then bb$ = vbNullString: w3 = 1: GoTo cont111
                                 If bb$ = " " Then bb$ = vbNullString: w3 = 1: GoTo cont111
                             End If
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         Else
                             bb$ = Mid$(b$, p + 1, ex2 - p)
@@ -33944,6 +33968,9 @@ AGAINGOTO:
                             Exit Do
                         Else
                             bb$ = Mid$(b$, i, ex2 - i + 1)
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         End If
                     Else
@@ -33969,6 +33996,9 @@ AGAINGOTO:
                         
                             subs.ItemCreator2 bb$, i, 0
                             bb$ = Mid$(b$, i, ex2 - i + 1)
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         End If
                     End If
@@ -34271,6 +34301,9 @@ jumphere1:
                                 If bb$ = vbCrLf Then bb$ = vbNullString: w3 = 1: GoTo cont111
                                 If bb$ = " " Then bb$ = vbNullString: w3 = 1: GoTo cont111
                             End If
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         Else
                             bb$ = Mid$(b$, p + 1, ex2 - p)
@@ -34559,6 +34592,9 @@ AGAINGOTO:
                             Exit Do
                         Else
                             bb$ = Mid$(b$, i, ex2 - i + 1)
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         End If
                     Else
@@ -34577,6 +34613,9 @@ AGAINGOTO:
                         Else
                             subs.ItemCreator2 bb$, i, 0
                             bb$ = Mid$(b$, i, ex2 - i + 1)
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         End If
                     End If
@@ -52836,11 +52875,11 @@ ex1:
     Set basestack.lastpointer = Nothing
     
 End Sub
-Sub MarkIf(bstack As basetask, a As Long, b As Boolean)
+Sub MarkIf(bstack As basetask, a As Long, b As Boolean, blockstart As Long)
 Dim s As mStiva2
 Set s = bstack.RetStack
 s.PushVal b
-s.PushVal a
+s.Push2long a, blockstart
 s.PushVal -3  ' mark for IF
 End Sub
 Sub MarkSel(bstack As basetask, Lang As Long)

@@ -1,58 +1,101 @@
-﻿
-eM2000 Interpreter and Environment
-Version 15 Revision 43
+﻿M2000 Interpreter and Environment
+Version 15 Revision 44
 
-1. Update cZipArchive
-We use cZipArchive through ZipTool (which return buffers)
-We can use directly cZipArchive
+1. Upgrade Assembler.
+Look Asm2 in Info file we make an exe file. Now we place Icon and a manifest (resources),
 
-' Compressor (ZipTool) drive cZipArchive
-declare WithEvents simpleZip Compressor
-//	declare simpleZip Compressor
-//	simpleZip=GetObject("","m2000.ZipTool")
-declare WithEvents Zip "m2000.cZipArchive"
-//	declare Zip "m2000.cZipArchive"  ' without events
-//	Zip=GetObject("","m2000.cZipArchive") ' without events
-Print Type(SimpleZip)="ZipTool"
-Print Type(Zip)="cZipArchive"
-Print Zip=>SemVersion="0.3.2"
-Print Zip=>ThunkBuildDate="12.1.2018 17:15:52"
-// TotalSize event write by me
-function Zip_TotalSize() {
-	Print "Stack of values:"
-	stack	
-	read new &zipsize
-	print zipsize
+
+2. I found a way to take account the END IF error, from a goto (in module when we didn't use exit to exit the module). Goto to back the code block of last "running" part of an IF flow structure, checked if go inside or outside, so if go outside erase the "open" if counter. We can't do that for a jump forward because for IF THEN multiline and without using block {} we not check the "end if" mark until found it as the execution of code advance to next statements. But we can use a block { } and put inside the "if structure" with forward goto (out of the structure). Although using labels are not for every day programming, M2000 have these for using it by pupils to find out why are difficult to program with that.
+
+
+ 
+1.1 The example bellow has a double loop inside a case of a select case and another try without select case. It works.
+
+//	TEST CODE
+	SELECT CASE 10
+	CASE 10
+			B=1
+ONE:		
+		IF B<10 THEN
+			A=1
+ALFA:
+			IF A<10 THEN
+				PRINT A,
+				A++
+				GOTO ALFA
+			ELSE
+				PRINT
+				B++	
+				GOTO ONE	
+			END IF	
+		END IF
+	END SELECT
+	
+	B=1
+TWO:
+	IF B<10 THEN
+		A=1
+BETA:
+		IF A<10 THEN
+			PRINT A,
+			A++
+			GOTO BETA
+		ELSE
+			PRINT
+			B++	
+			GOTO TWO	
+		END IF	
+	END IF
+
+1.2 This example has four parts. Part one has a forward jump and we use a block. The second part has a While End While (this has a hidden block so forward jump is ok). The last two parts are for backward jump, one inside a While End While.
+ 
+' forward jump passing end if need a block
+' or a loop which have hidden block like While and Do/Repeat
+{
+	if true then
+		if true then
+			if true then
+				goto 5000
+			end if
+		end if
+	end if
 }
-Zip=>AddFile Dir$ + "info.gsb"
-Zip=>CompressArchive Dir$ + "test.zip"
-print filelen("test.zip")
-function simpleZip_TotalSize() {
-	Print "Stack of values:"
-	stack	
-	read new zipsize
-	print zipsize
-}
-simpleZip=>AddFile Dir$ + "info.gsb"
-simpleZip=>CreateZipFile Dir$ + "test1.zip"
-print filelen("test1.zip")
+5000 ? "ok"
+//	end ' normal exit - check END IF
+//	' using EXIT no check for END IF
+while true
+	if true then
+		if true then
+			goto 5020
+		end if
+	end if
+end while
+5020 ? "ok"
 
-
-2. Update functions for structures.
-Now if we get an error we get right message and using shift+F1 open the specific source with the cursor at the error point.
-Try this code (Write Edit A then Paste this code Press Esc Write A and Press enter)
-structure alfa {
-	x as double
-	y as double
-	function inc {
-		alfa|x++
-		z = 1/0 ' division by zero
-		alfa|y++
-		=alfa
-	}
-}
-alfa something[20]#inc()
-
+a=1
+goto 5040
+alfa:
+5040 ' no need for block
+	if a=1 then
+		if true then
+			a=0
+			? "goto alfa"
+			goto alfa ' back jump, now M2000 check if is inside code block.
+		end if
+	end if
+print "ok"
+a=1
+while a<>0
+5050
+	if a=1 then
+		if true then
+			a=0
+			? "goto 5050"
+			goto 5050
+		end if
+	end if
+end while
+print "ok"
 
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

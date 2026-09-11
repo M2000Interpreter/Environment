@@ -54025,13 +54025,111 @@ print
 
 
 }
-MODULE ASM2 {Static Function MachineCode
+MODULE ASM2 {
+' ====================================================================
+' DYNAMIC RESOURCE LOADING USING INLINE BASE64 AND STRINGS
+' ====================================================================
+' Define and load the icon using inline Base64 Binary block
+Binary {
+      AAABAAMAICAQAAAAAADoAgAANgAAACAgAgAAAAAAMAEAAB4DAAAQEBAAAAAAACgB
+      AABOBAAAKAAAACAAAABAAAAAAQAEAAAAAACAAgAAAAAAAAAAAAAAAAAAAAAAAAAA
+      AAAAAIAAAIAAAACAgACAAAAAgACAAICAAADAwMAAgICAAAAA/wAA/wAAAP//AP8A
+      AAD/AP8A//8AAP///wAAAAAAAAAAD/////////8AAAAAAAAAAP//////////8AAA
+      AAAAAA/8zMzMzMzMzP8AAAAAAAAPzMzM///3fMzPAA////8AD8zMz/d3d3zMzwDx
+      ERER8A/MzP93zMfMzM8PGZmZkRAPzM/3zMzMzMzPD5mZmZkfD8z/fMzMzMzMzw+Z
+      mZmZH//M93zMzM/8fM8PmZmZmRKvzHfMzMzH/MfPD5mZmZkSL8x8zMzMzMx3zw+f
+      +ZmZEq/MfMzMzMzHfM8Pn/mZmRIvzMfM/8zMzMzPD5/5mZkSr8zMzH/HzMzMzw+f
+      +ZmZEq/MzMfMd8zMzM8Pn/mZmRIvzMzHd3fMzMzPD5mZmZkSr/zMzMzMzMzM/w+Z
+      mZmZEiL///////////APEZkRERKiqiqiKiqqL/AAD7N5u7syqqoqKqqiqi8AAA+z
+      d7u7MiIiIiIiIiIvAAAPOZu7uzKiqqqqoqKqLwAADzebu7syIiIiIiIiIi8AAA83
+      e7u7MqqiqiqqqqovAAAPmbu7uzIiIiIiIiIiLwAAD3m7u7syqioqqqIqIq8AAA93
+      +7u7MiIiIiIiIiIvAAD5n/+7uzMzMz///////wAA958P/7u7u7v/AAAAAAAAAPd/
+      AA//+7//8AAAAAAAAAD//wAAAP//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//
+      //////////4AA//8AAH//AAB4DwAAcAcAAHAHAABwBwAAcAEAAHABAABwAQAAcAE
+      AAHABAABwAQAAcAEAAHABgADwAP//8AAAB/AAAAfwAAAH8AAAB/AAAAfwAAAH8AA
+      AB/AAAAfyAAAH5wAf/+fAP//n+f/////////////KAAAACAAAABAAAAAAQABAAAA
+      AAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///8AAAH//AAD//4ABgADAAQPgR/E
+      GAEvpDABQMRgAUB0wAFAPIBpQCQAKUAkAAlYJAABWCQMAVgkBAFYJAABWCQHAUA0
+      AANAaAACc9VVWEoKqrBOEFBQRAiosFQVVVBcCqqwSBEREHgKqrB4FVVQnAB/8PcA
+      wADx54AA8DwAAAAAAAD////////////+AAP//AAB//wAAeA8AAHAHAABwBwAAcAc
+      AAHABAABwAQAAcAEAAHABAABwAQAAcAEAAHABAABwAAAA8AAAAPAAAAfwAAAH8AA
+      AB/AAAAfwAAAH8AAAB/AAAAfwAAAH8gAAB+MAH//jwD//5/n/////////////ygA
+      AAAQAAAAIAAAAAEABAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAACA
+      AAAAgIAAgAAAAIAAgACAgAAAwMDAAICAgAAAAP8AAP8AAAD//wD/AAAA/wD/AP//
+      AAD///8AAAAAD/////AP///8zMzMz/EREfzP//zP+ZmR/P/M/8/5mZH8zMzMz/+Z
+      kfzMzMzP/5mR/P/M/8//mZH393z3f/mZkfzMzMzP8XERL/////D/m7sqoqKi8Peb
+      uyIiIiLw93u7KqKqovB5e7siIiIi8Hn/+7u////wdwD///8AAAD//wAA/gEAAIIB
+      AACCAQAAggEAAIIBAACCAQAAggEAAIIBAACB/wAAwAMAAIADAACAAwAAAAMAADh/
+      AAA//wAA
+} As buffer1
+
+icoCount= Eval(buffer1, 4 as Integer)
+
+Buffer grpIconData as Byte*(6 + (icoCount * 14))
+grpIconData[0] = buffer1[0, 6]
+Assembler =getobject("","m2000.x86")
+' Register the binary icon resource data (Type 3 = Icon Group, ID = 1)
+Assembler=>ClearResources
+' Loop through each image inside the .ico file
+'Local i, entryOffset, bytesInRes, imageOffset, targetID
+buffer targetID as integer
+For i = 0 to icoCount - 1
+    entryOffset = 6 + (i * 16) ' Each ICO entry in file is 16 bytes
+    targetID[0] = i + 1           ' We link each image to a sequential Resource ID (1, 2, 3...)
+    
+    ' Extract width, height, colors, planes, bitcount and size from the file entry (first 12 bytes)
+    grpIconData[6 + (i * 14)] = buffer1[entryOffset, 12] 
+    ' Write the Target Resource ID into the group descriptor (last 2 bytes of GRPICONDIRENTRY)
+    grpIconData[6 + (i * 14) + 12]=targetID
+    
+    ' Extract layout markers to pull the raw bitmap bytes
+    bytesInRes = Eval(buffer1, entryOffset + 8 as long)  ' dwBytesInRes
+    imageOffset = Eval(buffer1, entryOffset + 12 as long) ' dwImageOffset
+    
+    ' 3. Extract the pure raw bitmap stream for this specific resolution
+    'Buffer rawBitmap as Byte*bytesInRes
+    'rawBitmap = buffer1[imageOffset, bytesInRes]
+    
+    ' Register this raw image slice as Type 3 (RT_ICON) with its unique ID
+    Assembler=>AddRawResource 3, targetID[0], buffer1(imageOffset), bytesInRes
+Next
+
+' 4. Register the full compiled group header as Type 14 (RT_GROUP_ICON), ID 1
+Assembler=>AddRawResource 14, 1, grpIconData(0), Len(grpIconData)
+
+' (Το υπόλοιπο κομμάτι για το Manifest παραμένει ακριβώς το ίδιο...)
+' ====================================================================
+
+
+' Inject the Application Manifest XML String (Type 24 = Manifest, ID = 1)
+manifest$ = {<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <requestedExecutionLevel level="asInvoker" uiAccess="false"/>
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+  <dependency>
+    <dependentAssembly>
+      
+    </dependentAssembly>
+  </dependency>
+</assembly>}
+Buffer manifestData as Byte*Len(manifest$)
+manifestData[0]=STR$(manifest$)  ' UTF16LE TO ANSI 
+
+Static Function MachineCode
 SplitHor(7/10)
 Enum PESubsystem {
     Subsystem_GUI = 2
     Subsystem_CUI = 3
 }
-Assembler =getobject("","m2000.x86")
+'Assembler=>AddRawResource 3, 1, buffer1(0), Len(buffer1)
+Assembler=>AddRawResource 24, 1, manifestData(0), Len(manifestData)
+
 Assembler=>Subsystem=Subsystem_GUI
 Assembler=>PEHeader=true
 long WM_SETTEXT = &HC
@@ -54052,6 +54150,8 @@ extern "user32",   TranslateMessage
 extern "user32",   DispatchMessageW
 extern "user32",   DefWindowProcW
 extern "user32",   PostQuitMessage
+extern "user32",   LoadIconW
+
 
 AppName:           dW AppNameL, 0   ; use dw for unicode strings
 WindowTitle:       dW WindowTitleCaption, 0
@@ -54092,7 +54192,15 @@ main:
    mov eax, [hInstance]
    mov dword [esp+16], eax                 ; hInstance
 
-   mov dword [esp+20], 0                   ; hIcon = 0
+   ; --- Load Icon from Resources ID = 1 ---
+   push dword 1                            ; Resource ID = 1
+   push dword [hInstance]                  ; hInstance
+   call LoadIconW                          ; Returns hIcon in EAX
+   mov dword [esp+20], eax                 ; Set hIcon = EAX
+
+   ; mov dword [esp+16], eax                 ; hInstance
+
+   ; mov dword [esp+20], 0                   ; hIcon = 0
 
    mov eax, [hCursor]
    mov dword [esp+24], eax                 ; hCursor
@@ -54193,15 +54301,15 @@ WndProcNext:
 })
 
 killit()
-open "testAsm2.exe" for output as #f
+open "testAsm3.exe" for output as #f
 	put #f, Buffer2export
 close #f
 //	Declare ShellExecute Lib "shell32.ShellExecuteW" {Long hWnd, Long lpszOp, lpszFile$, long lpszParams, long LpszDir, Long FsShowCmd }
-//	Print ShellExecute(0, 0, dir$+"testAsm2.exe", 0, 0, 1&)
+//	Print ShellExecute(0, 0, dir$+"testAsm3.exe", 0, 0, 1&)
 //	
-win dir$+"testAsm2.exe"
+win dir$+"testAsm3.exe"
 
-Sub killit(name$="testAsm2.exe")
+Sub killit(name$="testAsm3.exe")
 	local out$=quote$(dir$+"out.txt")
 	Dos "del "+out$, 500;
 	name$=lcase(name$)

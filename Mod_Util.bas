@@ -17315,13 +17315,30 @@ If s.LookTopVal = -5 Then s.drop 2
 End If
 End Sub
 
+Sub DropMark2(bstack As basetask, jumpto As Long)
 
+Dim s As mStiva2, blockstart As Long ' from the end
+Set s = bstack.RetStack
+Do While s.Total >= 3
+    If s.LookTopVal = -3 Then
+        s.LookPop2LongAt 2, blockstart
+        If blockstart < jumpto Then
+            s.drop 3
+            bstack.UseofIf = bstack.UseofIf - 1
+        Else
+            Exit Do
+        End If
+    Else
+        Exit Do
+    End If
+Loop
+End Sub
 Function HaveMark(bstack As basetask, a As Long, b As Boolean) As Boolean
-Dim s As mStiva2
+Dim s As mStiva2, dummy As Long
 Set s = bstack.RetStack
 If s.Total >= 3 Then
 HaveMark = s.LookTopVal = -3
-a = s.StackItem(2)
+a = s.LookPop2LongAt(2, dummy)
 b = s.StackItem(3)
 End If
 End Function

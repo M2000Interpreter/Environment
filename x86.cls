@@ -24,6 +24,57 @@ Option Explicit
 '       * more complex expressions for all arguments
 '       * Unsigned values (only possible with hex)
 
+Private Type IMAGE_RESOURCE_DIRECTORY
+    Characteristics       As Long
+    TimeDateStamp         As Long
+    MajorVersion          As Integer
+    MinorVersion          As Integer
+    NumberOfNamedEntries  As Integer
+    NumberOfIdEntries     As Integer
+End Type
+
+Private Type IMAGE_RESOURCE_DIRECTORY_ENTRY
+    NameOrId              As Long
+    OffsetToDataOrDir     As Long
+End Type
+
+Private Type IMAGE_RESOURCE_DATA_ENTRY
+    OffsetToData          As Long ' ?? RVA t?? p?a?µat???? ded?µ???? (p.?. t?? bitmaps)
+    Size                  As Long ' ???e??? se bytes
+    CodePage              As Long
+    Reserved              As Long
+End Type
+
+' ??µ?? ??a t? d??ßasµa t?? a??e??? .ico
+Private Type ICONDIR
+    idReserved            As Integer
+    idType                As Integer
+    idCount               As Integer
+End Type
+
+Private Type ICONDIRENTRY
+    bWidth                As Byte
+    bHeight               As Byte
+    bColorCount           As Byte
+    bReserved             As Byte
+    wPlanes               As Integer
+    wBitCount             As Integer
+    dwBytesInRes          As Long
+    dwImageOffset         As Long
+End Type
+
+' ??µ? p?? ???feta? ??S? st? Resource ??a t? Group Icon (RT_GROUP_ICON)
+Private Type GRPICONDIRENTRY
+    bWidth                As Byte
+    bHeight               As Byte
+    bColorCount           As Byte
+    bReserved             As Byte
+    wPlanes               As Integer
+    wBitCount             As Integer
+    dwBytesInRes          As Long
+    nID                   As Integer ' ?? ID t?? Icon Resource (RT_ICON) p?? a?t?st???e?
+End Type
+
 
 Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" ( _
     pDst As Any, pSrc As Any, ByVal cBytes As Long _
@@ -406,6 +457,195 @@ Private m_SizeOfStackReserve    As Long
 Private m_SizeOfStackCommit     As Long
 Private m_SizeOfHeapReserve     As Long
 Private m_SizeOfHeapCommit      As Long
+' --- Dynamic Resource Storage Structures ---
+Private Type RegisteredResource
+    ResourceType   As Long
+    ResourceID     As Long
+    DataPtr        As Long
+    DataSize       As Long
+End Type
+
+Private m_udtResources() As RegisteredResource
+Private m_lngResourceCount As Long
+
+' --- Resource PE Engine Constants ---
+Private Const szDir As Long = 16
+Private Const szEntry As Long = 8
+Private Const szData As Long = 16
+Public Sub AddRawResource(ByVal lngType As Long, ByVal lngID As Long, ByVal ptrData As Long, ByVal lngSize As Long)
+    ' Append a new resource into the internal dynamic storage array
+    ReDim Preserve m_udtResources(m_lngResourceCount) As RegisteredResource
+    With m_udtResources(m_lngResourceCount)
+        .ResourceType = lngType
+        .ResourceID = lngID
+        .DataPtr = ptrData
+        .DataSize = lngSize
+    End With
+    m_lngResourceCount = m_lngResourceCount + 1
+End Sub
+Public Function BuildCombinedResourceSection(ByVal lngTargetSectionRVA As Long, ByRef outSize As Long) As Byte()
+    If m_lngResourceCount = 0 Then
+        outSize = 0
+        Exit Function
+    End If
+
+    Dim i As Long, j As Long
+    Dim udtTemp As RegisteredResource
+    
+    ' 1. SORT resources by ResourceType (Mandatory requirement for Windows PE Loader)
+    For i = 0 To m_lngResourceCount - 2
+        For j = i + 1 To m_lngResourceCount - 1
+            If m_udtResources(i).ResourceType > m_udtResources(j).ResourceType Then
+                udtTemp = m_udtResources(i)
+                m_udtResources(i) = m_udtResources(j)
+                m_udtResources(j) = udtTemp
+            End If
+        Next
+    Next
+
+    ' 2. Count distinct/unique types to determine Root Entry count
+    Dim lngUniqueTypes As Long: lngUniqueTypes = 1
+    For i = 1 To m_lngResourceCount - 1
+        If m_udtResources(i).ResourceType <> m_udtResources(i - 1).ResourceType Then
+            lngUniqueTypes = lngUniqueTypes + 1
+        End If
+    Next
+
+    ' 3. Calculate exact layout Offsets for the Resource Directory Tree
+    Dim offsetRootDir As Long: offsetRootDir = 0
+    Dim offsetTypeDirs As Long: offsetTypeDirs = szDir + (lngUniqueTypes * szEntry)
+    
+    ' Count total entries across all sub-levels to allocate proper header space
+    Dim offsetIDDirs As Long: offsetIDDirs = offsetTypeDirs + (lngUniqueTypes * szDir) + (m_lngResourceCount * szEntry)
+    Dim offsetDataEntries As Long: offsetDataEntries = offsetIDDirs + (m_lngResourceCount * (szDir + szEntry))
+    
+    Dim lngTreeSize As Long
+    lngTreeSize = offsetDataEntries + (m_lngResourceCount * szData)
+
+    ' 4. Calculate total payload buffer size enforcing strict 4-byte DWORD alignment
+    Dim totalRawBytes As Long: totalRawBytes = 0
+    For i = 0 To m_lngResourceCount - 1
+        If (totalRawBytes Mod 4) <> 0 Then totalRawBytes = totalRawBytes + (4 - (totalRawBytes Mod 4))
+        totalRawBytes = totalRawBytes + m_udtResources(i).DataSize
+    Next
+
+    ' Allocate the final contiguous output buffer memory
+    Dim btOut() As Byte
+    ReDim btOut(lngTreeSize + totalRawBytes - 1)
+
+
+
+    ' --- WRITE TREE HEADERS (DIRECTORIES & ENTRIES) ---
+    ' --- WRITE TREE HEADERS (DIRECTORIES & ENTRIES WITH FIXED OFFSETS) ---
+    Dim dirTemp As IMAGE_RESOURCE_DIRECTORY
+    Dim entryTemp As IMAGE_RESOURCE_DIRECTORY_ENTRY
+    Dim dataTemp As IMAGE_RESOURCE_DATA_ENTRY
+    
+    ' A. Write Root Directory (Level 1 - Types)
+    dirTemp.NumberOfIdEntries = CInt(lngUniqueTypes)
+    CopyMemory btOut(offsetRootDir), dirTemp, szDir
+
+    Dim currentTypeStartIdx As Long: currentTypeStartIdx = 0
+    Dim ptrRootEntry As Long: ptrRootEntry = offsetRootDir + szDir
+    
+    ' Temporary arrays to track subdirectory dynamic positions
+    Dim typeDirOffsets() As Long: ReDim typeDirOffsets(lngUniqueTypes - 1)
+    Dim idDirOffsets() As Long: ReDim idDirOffsets(m_lngResourceCount - 1)
+    
+    ' Calculate absolute section-relative offsets for each sub-directory block
+    Dim nextTypeDirOffset As Long: nextTypeDirOffset = offsetTypeDirs
+    Dim nextIDDirOffset As Long: nextIDDirOffset = offsetIDDirs
+    
+    For i = 0 To lngUniqueTypes - 1
+        typeDirOffsets(i) = nextTypeDirOffset
+        nextTypeDirOffset = nextTypeDirOffset + szDir
+        
+        Dim idsInType As Long: idsInType = 0
+        Do While (currentTypeStartIdx + idsInType) < m_lngResourceCount
+            If m_udtResources(currentTypeStartIdx + idsInType).ResourceType <> m_udtResources(currentTypeStartIdx).ResourceType Then Exit Do
+            idsInType = idsInType + 1
+        Loop
+        nextTypeDirOffset = nextTypeDirOffset + (idsInType * szEntry)
+        currentTypeStartIdx = currentTypeStartIdx + idsInType
+    Next
+
+    ' B. Populate Level 1 (Types), Level 2 (IDs) and Level 3 (Languages) Trees
+    currentTypeStartIdx = 0
+    For i = 0 To lngUniqueTypes - 1
+        ' FIX: The offset to a subdirectory MUST be relative to the start of the resource section, NOT a full RVA
+        entryTemp.NameOrId = m_udtResources(currentTypeStartIdx).ResourceType
+        entryTemp.OffsetToDataOrDir = typeDirOffsets(i) Or &H80000000 ' Standard bit 31 flag for subdirectory
+        CopyMemory btOut(ptrRootEntry), entryTemp, szEntry
+        ptrRootEntry = ptrRootEntry + szEntry
+        
+        Dim itemsInGroup As Long: itemsInGroup = 0
+        Do While (currentTypeStartIdx + itemsInGroup) < m_lngResourceCount
+            If m_udtResources(currentTypeStartIdx + itemsInGroup).ResourceType <> m_udtResources(currentTypeStartIdx).ResourceType Then Exit Do
+            itemsInGroup = itemsInGroup + 1
+        Loop
+        
+        Dim dirType As IMAGE_RESOURCE_DIRECTORY
+        dirType.NumberOfIdEntries = CInt(itemsInGroup)
+        CopyMemory btOut(typeDirOffsets(i)), dirType, szDir
+        
+        Dim ptrTypeEntry As Long: ptrTypeEntry = typeDirOffsets(i) + szDir
+        For j = 0 To itemsInGroup - 1
+            Dim globalIdx As Long: globalIdx = currentTypeStartIdx + j
+            idDirOffsets(globalIdx) = nextIDDirOffset
+            nextIDDirOffset = nextIDDirOffset + szDir + szEntry
+            
+            ' FIX: Section-relative offset for the Language Subdirectory
+            entryTemp.NameOrId = m_udtResources(globalIdx).ResourceID
+            entryTemp.OffsetToDataOrDir = idDirOffsets(globalIdx) Or &H80000000
+            CopyMemory btOut(ptrTypeEntry), entryTemp, szEntry
+            ptrTypeEntry = ptrTypeEntry + szEntry
+            
+            Dim dirLang As IMAGE_RESOURCE_DIRECTORY
+            dirLang.NumberOfIdEntries = 1
+            CopyMemory btOut(idDirOffsets(globalIdx)), dirLang, szDir
+            
+            ' FIX: Section-relative offset pointing to the terminal Leaf Data Entry node
+            Dim entryLang As IMAGE_RESOURCE_DIRECTORY_ENTRY
+            entryLang.NameOrId = 0 ' Language Code 0 (Neutral)
+            entryLang.OffsetToDataOrDir = offsetDataEntries + (globalIdx * szData)
+            CopyMemory btOut(idDirOffsets(globalIdx) + szDir), entryLang, szEntry
+        Next
+        
+        currentTypeStartIdx = currentTypeStartIdx + itemsInGroup
+    Next
+
+    ' --- WRITE ACTUAL PAYLOAD BYTES AND DATA BLOCK DESCRIPTORS ---
+    Dim currentRawOffset As Long: currentRawOffset = lngTreeSize
+    
+    For i = 0 To m_lngResourceCount - 1
+        ' Enforce strict DWORD layout alignment check
+        If (currentRawOffset Mod 4) <> 0 Then currentRawOffset = currentRawOffset + (4 - (currentRawOffset Mod 4))
+        
+        ' Copy pure payload bytes directly from registered source memory block to output stream
+        If m_udtResources(i).DataPtr <> 0 And m_udtResources(i).DataSize > 0 Then
+            CopyMemory btOut(currentRawOffset), ByVal m_udtResources(i).DataPtr, m_udtResources(i).DataSize
+        End If
+        
+        ' Populate final individual Data Entry block property bounds
+        dataTemp.OffsetToData = lngTargetSectionRVA + currentRawOffset
+        dataTemp.Size = m_udtResources(i).DataSize
+        dataTemp.CodePage = 1 ' &H480
+        dataTemp.Reserved = 0
+        CopyMemory btOut(offsetDataEntries + (i * szData)), dataTemp, szData
+        
+        currentRawOffset = currentRawOffset + m_udtResources(i).DataSize
+    Next
+
+    outSize = UBound(btOut) + 1
+    BuildCombinedResourceSection = btOut
+End Function
+
+' Clean up routine to clear memory arrays between runs
+Public Sub ClearResources()
+    m_lngResourceCount = 0
+    Erase m_udtResources
+End Sub
+
 
 
 Private Sub Class_Initialize()
@@ -757,9 +997,599 @@ Private Function GetRelOfLibname(ByVal index As Long) As Long
     
     GetRelOfLibname = SZ
 End Function
-
-
 Private Function WritePEHeader() As Boolean
+    Dim mzHdr   As IMAGE_DOS_HEADER
+    Dim ntHdr   As IMAGE_NT_HEADERS
+    Dim scHdr   As IMAGE_SECTION_HEADER
+    Dim sdHdr   As IMAGE_SECTION_HEADER
+    Dim seHdr   As IMAGE_SECTION_HEADER
+    Dim srHdr   As IMAGE_SECTION_HEADER
+    Dim impTbl  As IMAGE_IMPORT_DIRECTORY
+    Dim lngImp  As Long
+    Dim btDOS() As Byte
+    Dim Sections As Integer
+    
+    Dim srsrcHdr As IMAGE_SECTION_HEADER
+    Dim btRsrcData() As Byte
+    Dim lngRsrcSize As Long
+    Dim lngRsrcRVA As Long
+
+    If m_blnWriteDLL Then
+        If GetLabelIndex("DLLMAIN") = -1 Then
+            SetError "Entrypoint ""dllMain"" not found.", 0, ""
+            Exit Function
+        End If
+        Sections = 3
+    ElseIf GetLabelIndex("MAIN") = -1 Then
+        SetError "Entrypoint ""Main"" not found.", 0, ""
+        Exit Function
+    Else
+        Sections = 2
+    End If
+    
+    lngImp = GetNeededImportsSize()
+    Dim skipImport As Boolean
+    If lngImp = 0 Then lngImp = 1: skipImport = True: Sections = Sections - 1
+    
+    If m_lngResourceCount > 0 Then
+        Dim lngCurrentVirtualSize As Long
+        lngCurrentVirtualSize = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * (Sections + 1))
+        lngCurrentVirtualSize = lngCurrentVirtualSize + RoundToSectionSize(m_lngPECodeSize)
+        If Not skipImport Then
+            lngCurrentVirtualSize = lngCurrentVirtualSize + RoundToSectionSize(lngImp)
+        End If
+        If m_blnWriteDLL Then
+            lngCurrentVirtualSize = lngCurrentVirtualSize + RoundToSectionSize(m_lngExportSize)
+        End If
+        lngRsrcRVA = lngCurrentVirtualSize
+        btRsrcData = BuildCombinedResourceSection(lngRsrcRVA, lngRsrcSize)
+        Sections = Sections + 1
+    End If
+    
+    With mzHdr
+        .Magic = IMAGE_DOS_HDR16_MAGIC
+        .BytesInLastPage = 144
+        .Pages = 3
+        .ParagraphsInHeader = 4
+        .MaxAlloc = &HFFFF
+        .InitialSP = &HB8
+        .RelocationTableFileAddress = &H40
+        .NewHeaderOffset = Len(mzHdr) + 64
+    End With
+    
+    Dim more As Long
+    With ntHdr
+        .Signature = IMAGE_DOS_HDR32_MAGIC
+        With .FileHeader
+            .Machine = IMAGE_FILE_MACHINE_I386
+            .NumberOfSections = Sections
+            .SizeOfOptionalHeader = Len(ntHdr.OptionalHeader)
+            If m_blnWriteDLL Then
+                .Characteristics = IMAGE_FILE_EXECUTABLE_IMAGE Or IMAGE_FILE_DEBUG_STRIPPED Or IMAGE_FILE_LINE_NUMS_STRIPPED Or IMAGE_FILE_LOCAL_SYMS_STRIPPED Or IMAGE_FILE_32BIT_MACHINE Or IMAGE_FILE_DLL
+            Else
+                .Characteristics = IMAGE_FILE_RELOCS_STRIPPED Or IMAGE_FILE_LINE_NUMS_STRIPPED Or IMAGE_FILE_LOCAL_SYMS_STRIPPED Or IMAGE_FILE_EXECUTABLE_IMAGE Or IMAGE_FILE_32BIT_MACHINE Or IMAGE_FILE_DEBUG_STRIPPED Or IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP Or IMAGE_FILE_NET_RUN_FROM_SWAP
+            End If
+        End With
+        
+        With .OptionalHeader
+            .Magic = IMAGE_NT_OPTIONAL_HDR32_MAGIC
+            .SizeOfCode = RoundToMinSize(m_lngPECodeSize)
+            
+            Dim lngTotalDataSize As Long
+            lngTotalDataSize = RoundToMinSize(lngImp)
+            If m_lngResourceCount > 0 Then
+                lngTotalDataSize = lngTotalDataSize + RoundToMinSize(lngRsrcSize)
+            End If
+            If m_blnWriteDLL Then
+                lngTotalDataSize = lngTotalDataSize + RoundToMinSize(m_lngExportSize)
+                If m_lngRelocSize > 0 Then
+                    lngTotalDataSize = lngTotalDataSize + RoundToMinSize(m_lngRelocSize)
+                End If
+            End If
+            .SizeOfInitializedData = lngTotalDataSize
+            
+            .BaseOfCode = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * Sections)
+            .BaseOfData = .BaseOfCode + RoundToSectionSize(.SizeOfCode)
+            If m_blnWriteDLL Then
+                .AddressOfEntryPoint = m_udtLabels(GetLabelIndex("DLLMAIN")).Offset - m_lngBaseAddress
+            Else
+                .AddressOfEntryPoint = m_udtLabels(GetLabelIndex("MAIN")).Offset - m_lngBaseAddress
+            End If
+            .ImageBase = m_lngBaseAddress
+            .SectionAlignment = MEM_SECTION_SIZE
+            .FileAlignment = FILE_SECTION_SIZE
+            .MajorOperatingSystemVersion = 4
+            .MajorSubsystemVersion = 4
+            
+            If skipImport Then
+                .SizeOfImage = .BaseOfData
+            Else
+                .SizeOfImage = .BaseOfData + RoundToSectionSize(lngImp)
+            End If
+            If m_lngResourceCount > 0 Then
+                .SizeOfImage = .SizeOfImage + RoundToSectionSize(lngRsrcSize)
+            End If
+            If m_blnWriteDLL Then
+                .SizeOfImage = .SizeOfImage + RoundToSectionSize(m_lngExportSize)
+            End If
+            .DllCharacteristics = 0
+            .SizeOfHeaders = GetPEHeaderSize(Sections)
+            .Subsystem = m_udeSubsystem
+            .SizeOfStackReserve = m_SizeOfStackReserve
+            .SizeOfStackCommit = m_SizeOfStackCommit
+            .SizeOfHeapReserve = m_SizeOfHeapReserve
+            .SizeOfHeapCommit = m_SizeOfHeapCommit
+            .NumberOfRvaAndSizes = 16
+            
+            Dim edataVirtualAddress As Long
+            Dim relocVirtualAddress As Long
+            
+            If Not skipImport Then
+                With .DataDirectory(ETableImport)
+                    .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode) + GetNeededIATSize()
+                    .Size = Len(impTbl)
+                End With
+                With .DataDirectory(ETableIAT)
+                    .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode)
+                    .Size = GetNeededIATSize()
+                End With
+                edataVirtualAddress = .DataDirectory(ETableIAT).VirtualAddress + RoundToSectionSize(.DataDirectory(ETableImport).Size + .DataDirectory(ETableIAT).Size)
+            Else
+                edataVirtualAddress = .BaseOfData
+            End If
+            
+            If m_blnWriteDLL Then
+                With .DataDirectory(ETableExport)
+                    .VirtualAddress = edataVirtualAddress
+                    .Size = m_lngExportSize
+                    relocVirtualAddress = RoundToSectionSize(.Size) + .VirtualAddress
+                End With
+                With .DataDirectory(ETableRelocation)
+                    .VirtualAddress = relocVirtualAddress
+                    .Size = m_lngRelocSize
+                    more = m_lngRelocSize
+                End With
+                .SizeOfHeaders = GetPEHeaderSize(Sections + 1)
+                Sections = Sections + 1
+            End If
+        End With
+        If .FileHeader.NumberOfSections < Sections Then
+            .OptionalHeader.SizeOfImage = .OptionalHeader.SizeOfImage + more
+            .FileHeader.NumberOfSections = Sections
+        End If
+    End With
+    
+    With scHdr
+        WriteSectionName scHdr, ".code"
+        .VirtSizePhysAddr = m_lngPECodeSize
+        .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode
+        .SizeOfRawData = RoundToMinSize(m_lngPECodeSize)
+        .PointerToRawData = GetPEHeaderSize(Sections)
+        .Characteristics = IMAGE_SCN_CNT_CODE Or IMAGE_SCN_CNT_INITIALIZED_DATA Or IMAGE_SCN_MEM_EXECUTE Or IMAGE_SCN_MEM_READ Or IMAGE_SCN_MEM_WRITE
+    End With
+    
+    If Not skipImport Then
+        With sdHdr
+            WriteSectionName sdHdr, ".rdata"
+            .VirtSizePhysAddr = lngImp
+            .VirtualAddress = ntHdr.OptionalHeader.BaseOfData
+            .SizeOfRawData = RoundToMinSize(lngImp)
+            .PointerToRawData = scHdr.PointerToRawData + scHdr.SizeOfRawData
+            .Characteristics = IMAGE_SCN_MEM_READ Or IMAGE_SCN_MEM_WRITE
+        End With
+    End If
+    
+    If m_lngResourceCount > 0 Then
+        With srsrcHdr
+            WriteSectionName srsrcHdr, ".rsrc"
+            .VirtSizePhysAddr = lngRsrcSize
+            .VirtualAddress = lngRsrcRVA
+            .SizeOfRawData = RoundToMinSize(lngRsrcSize)
+            If Not skipImport Then
+                .PointerToRawData = sdHdr.PointerToRawData + sdHdr.SizeOfRawData
+            Else
+                .PointerToRawData = scHdr.PointerToRawData + scHdr.SizeOfRawData
+            End If
+            .Characteristics = &H40000040
+        End With
+        
+        ' CRITICAL LOW-LEVEL SYNC: Force OptionalHeader to map srsrcHdr.VirtualAddress exactly!
+        ntHdr.OptionalHeader.DataDirectory(ETableResource).VirtualAddress = srsrcHdr.VirtualAddress
+    End If
+
+    If m_blnWriteDLL Then
+        With seHdr
+            WriteSectionName seHdr, ".edata"
+            .VirtSizePhysAddr = m_lngExportSize
+            .VirtualAddress = edataVirtualAddress
+            .SizeOfRawData = RoundToMinSize(m_lngExportSize)
+            If Not skipImport Then
+                .PointerToRawData = sdHdr.PointerToRawData + sdHdr.SizeOfRawData
+            Else
+                .PointerToRawData = scHdr.PointerToRawData + scHdr.SizeOfRawData
+            End If
+            If m_lngResourceCount > 0 Then
+                .PointerToRawData = srsrcHdr.PointerToRawData + srsrcHdr.SizeOfRawData
+            End If
+            .Characteristics = &H40000040
+        End With
+        With srHdr
+            WriteSectionName srHdr, ".reloc"
+            .VirtSizePhysAddr = m_lngRelocSize
+            .VirtualAddress = relocVirtualAddress
+            If m_lngRelocSize > 0 Then
+                .SizeOfRawData = RoundToMinSize(m_lngRelocSize)
+            Else
+                .SizeOfRawData = 0
+            End If
+            .PointerToRawData = seHdr.PointerToRawData + seHdr.SizeOfRawData
+            .Characteristics = &H42000040
+        End With
+    End If
+    
+    btDOS = HexToByte(DOS_CODE_RELOCATIONS)
+    
+    OutputMem VarPtr(mzHdr), Len(mzHdr)
+    OutputMem VarPtr(btDOS(0)), UBound(btDOS) + 1
+    OutputMem VarPtr(ntHdr), Len(ntHdr)
+    OutputMem VarPtr(scHdr), Len(scHdr)
+    If Not skipImport Then OutputMem VarPtr(sdHdr), Len(sdHdr)
+    If m_lngResourceCount > 0 Then OutputMem VarPtr(srsrcHdr), Len(srsrcHdr)
+    If m_blnWriteDLL Then
+        OutputMem VarPtr(seHdr), Len(seHdr)
+        OutputMem VarPtr(srHdr), Len(srHdr)
+    End If
+    OutputJumpTo RoundToMinSize(OutputPosition)
+    If m_lngResourceCount > 0 Then
+        OutputJumpTo srsrcHdr.PointerToRawData
+        
+        ' 1. Write the active resource payload bytes (3090 bytes)
+        OutputMem VarPtr(btRsrcData(0)), lngRsrcSize
+        
+        ' 2. FIX: Pad the remaining disk space with 0x00 bytes up to SizeOfRawData (3584 bytes)
+        ' This ensures the file sector on disk matches Windows structure alignment perfectly!
+        Dim lngPaddingCount As Long
+        Dim idxPadding As Long
+        lngPaddingCount = srsrcHdr.SizeOfRawData - lngRsrcSize
+        
+        If lngPaddingCount > 0 Then
+            For idxPadding = 1 To lngPaddingCount
+                OutputByte 0
+            Next idxPadding
+        End If
+    End If
+    
+    ' Safely return the cursor back to the code start as expected by Elster's engine
+    OutputJumpTo scHdr.PointerToRawData
+    
+'    OutputJumpTo RoundToMinSize(OutputPosition)
+'    If m_lngResourceCount > 0 Then
+'        OutputJumpTo srsrcHdr.PointerToRawData
+'        OutputMem VarPtr(btRsrcData(0)), lngRsrcSize
+'    End If
+'
+'    OutputJumpTo scHdr.PointerToRawData
+    WritePEHeader = True
+End Function
+
+
+'
+'
+Private Function WritePEHeader1() As Boolean
+    Dim mzHdr   As IMAGE_DOS_HEADER
+    Dim ntHdr   As IMAGE_NT_HEADERS
+    Dim scHdr   As IMAGE_SECTION_HEADER
+    Dim sdHdr   As IMAGE_SECTION_HEADER
+    Dim seHdr   As IMAGE_SECTION_HEADER
+    Dim srHdr   As IMAGE_SECTION_HEADER
+    Dim impTbl  As IMAGE_IMPORT_DIRECTORY
+    Dim lngImp  As Long
+    Dim btDOS() As Byte
+    
+    Dim Sections As Integer
+    
+    Dim srsrcHdr As IMAGE_SECTION_HEADER ' New Header for the Resource Section
+    Dim btRsrcData() As Byte
+    Dim lngRsrcSize As Long
+    Dim lngRsrcRVA As Long
+
+    
+    If m_blnWriteDLL Then
+        If GetLabelIndex("DLLMAIN") = -1 Then
+            SetError "Entrypoint ""dllMain"" not found.", 0, ""
+            Exit Function
+        End If
+        Sections = 3
+    ElseIf GetLabelIndex("MAIN") = -1 Then
+        SetError "Entrypoint ""Main"" not found.", 0, ""
+        Exit Function
+    Else
+        Sections = 2
+    End If
+    lngImp = GetNeededImportsSize()
+    Dim skipImport As Boolean
+    If lngImp = 0 Then lngImp = 1: skipImport = True: Sections = Sections - 1
+    ' Calculate where the .rsrc section will live in memory (RVA)
+    If m_lngResourceCount > 0 Then
+        Dim lngCurrentVirtualSize As Long
+        lngCurrentVirtualSize = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * (Sections + 1))
+        lngCurrentVirtualSize = lngCurrentVirtualSize + RoundToSectionSize(m_lngPECodeSize)
+        
+        If Not skipImport Then
+            lngCurrentVirtualSize = lngCurrentVirtualSize + RoundToSectionSize(lngImp)
+        End If
+        
+        If m_blnWriteDLL Then
+            lngCurrentVirtualSize = lngCurrentVirtualSize + RoundToSectionSize(m_lngExportSize)
+        End If
+        
+        lngRsrcRVA = lngCurrentVirtualSize
+        btRsrcData = BuildCombinedResourceSection(lngRsrcRVA, lngRsrcSize)
+        Sections = Sections + 1
+    End If
+
+        
+    With mzHdr
+        .Magic = IMAGE_DOS_HDR16_MAGIC
+        .BytesInLastPage = 144
+        .Pages = 3
+        .ParagraphsInHeader = 4
+        .MaxAlloc = &HFFFF
+        .InitialSP = &HB8
+        .RelocationTableFileAddress = &H40
+        .NewHeaderOffset = Len(mzHdr) + 64
+    End With
+    Dim more As Long
+    With ntHdr
+        .Signature = IMAGE_DOS_HDR32_MAGIC
+        
+        With .FileHeader
+            .Machine = IMAGE_FILE_MACHINE_I386
+            .NumberOfSections = Sections
+            .SizeOfOptionalHeader = Len(ntHdr.OptionalHeader)
+            
+            If m_blnWriteDLL Then
+                .Characteristics = IMAGE_FILE_EXECUTABLE_IMAGE Or IMAGE_FILE_DEBUG_STRIPPED Or IMAGE_FILE_LINE_NUMS_STRIPPED Or IMAGE_FILE_LOCAL_SYMS_STRIPPED Or IMAGE_FILE_32BIT_MACHINE Or IMAGE_FILE_DLL
+            Else
+            '  IMAGE_FILE_RELOCS_STRIPPED Or
+                .Characteristics = IMAGE_FILE_LINE_NUMS_STRIPPED Or _
+                               IMAGE_FILE_LOCAL_SYMS_STRIPPED Or IMAGE_FILE_EXECUTABLE_IMAGE Or _
+                               IMAGE_FILE_32BIT_MACHINE Or IMAGE_FILE_DEBUG_STRIPPED Or _
+                               IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP Or IMAGE_FILE_NET_RUN_FROM_SWAP
+            End If
+        End With
+        
+        With .OptionalHeader
+            .Magic = IMAGE_NT_OPTIONAL_HDR32_MAGIC
+            .SizeOfCode = RoundToMinSize(m_lngPECodeSize)  '
+            ' Secure computation for SizeOfInitializedData inside OptionalHeader
+            Dim lngTotalDataSize As Long
+            lngTotalDataSize = RoundToMinSize(lngImp)
+            
+            ' Add Resource section size if active
+            If m_lngResourceCount > 0 Then
+                lngTotalDataSize = lngTotalDataSize + RoundToMinSize(lngRsrcSize)
+            End If
+            
+            ' Add Export section size if compiling a DLL
+            If m_blnWriteDLL Then
+                lngTotalDataSize = lngTotalDataSize + RoundToMinSize(m_lngExportSize)
+                If m_lngRelocSize > 0 Then
+                    lngTotalDataSize = lngTotalDataSize + RoundToMinSize(m_lngRelocSize)
+                End If
+            End If
+            
+            .SizeOfInitializedData = lngTotalDataSize
+
+
+            
+            .BaseOfCode = RoundToSectionSize(Len(ntHdr) + Len(scHdr) * Sections)
+            .BaseOfData = .BaseOfCode + RoundToSectionSize(.SizeOfCode)
+            If m_blnWriteDLL Then
+                .AddressOfEntryPoint = m_udtLabels(GetLabelIndex("DLLMAIN")).Offset - m_lngBaseAddress
+            Else
+                .AddressOfEntryPoint = m_udtLabels(GetLabelIndex("MAIN")).Offset - m_lngBaseAddress
+            End If
+            .ImageBase = m_lngBaseAddress
+            .SectionAlignment = MEM_SECTION_SIZE
+            .FileAlignment = FILE_SECTION_SIZE
+            .MajorOperatingSystemVersion = 4
+            .MajorSubsystemVersion = 4
+            ' here add size of export round to scection size
+            If skipImport Then
+            .SizeOfImage = .BaseOfData
+            Else
+            .SizeOfImage = .BaseOfData + RoundToSectionSize(lngImp)
+            End If
+            If m_lngResourceCount > 0 Then
+                .SizeOfImage = .SizeOfImage + RoundToSectionSize(lngRsrcSize)
+            End If
+
+            If m_blnWriteDLL Then
+                .SizeOfImage = .SizeOfImage + RoundToSectionSize(m_lngExportSize)
+               ' If False Then
+                    If m_lngRelocSize > 0 Then
+                       ' Sections = Sections + 1
+                        '.BaseOfCode = .BaseOfCode + Len(scHdr)
+                      '  .SizeOfImage = .SizeOfImage + RoundToSectionSize(m_lngRelocSize)
+                    End If
+               ' End If
+            End If
+            .DllCharacteristics = 0
+            .SizeOfHeaders = GetPEHeaderSize(Sections)
+            .Subsystem = m_udeSubsystem
+            .SizeOfStackReserve = m_SizeOfStackReserve
+            .SizeOfStackCommit = m_SizeOfStackCommit
+            .SizeOfHeapReserve = m_SizeOfHeapReserve
+            .SizeOfHeapCommit = m_SizeOfHeapCommit
+            .NumberOfRvaAndSizes = 16
+            Dim edataVirtualAddress As Long
+            Dim relocVirtualAddress As Long
+            
+            If Not skipImport Then
+                With .DataDirectory(ETableImport)
+                    .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + _
+                                      RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode) + _
+                                      GetNeededIATSize()
+                                      
+                    .Size = Len(impTbl)
+                End With
+                
+                With .DataDirectory(ETableIAT)
+                    .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode + _
+                                      RoundToSectionSize(ntHdr.OptionalHeader.SizeOfCode)
+                                      
+                    .Size = GetNeededIATSize()
+                    
+                End With
+                edataVirtualAddress = .DataDirectory(ETableIAT).VirtualAddress + RoundToSectionSize(.DataDirectory(ETableImport).Size + .DataDirectory(ETableIAT).Size)
+            Else
+                edataVirtualAddress = .BaseOfData
+                
+            End If
+            
+            If m_blnWriteDLL Then
+                With .DataDirectory(ETableExport)
+                    .VirtualAddress = edataVirtualAddress
+                    .Size = m_lngExportSize
+                    relocVirtualAddress = RoundToSectionSize(.Size) + .VirtualAddress
+                End With
+               'If False Then
+                    With .DataDirectory(ETableRelocation)
+                        .VirtualAddress = relocVirtualAddress
+                        .Size = m_lngRelocSize
+                    more = m_lngRelocSize
+                    End With
+                    .SizeOfHeaders = GetPEHeaderSize(Sections + 1)
+                    
+                    Sections = Sections + 1
+                
+               ' End If
+            End If
+            If m_lngResourceCount > 0 Then
+                With .DataDirectory(ETableResource) ' Index 2
+                    .VirtualAddress = lngRsrcRVA
+                    .Size = lngRsrcSize
+                End With
+            End If
+
+        End With
+        If .FileHeader.NumberOfSections < Sections Then
+       .OptionalHeader.SizeOfImage = .OptionalHeader.SizeOfImage + more
+        
+        .FileHeader.NumberOfSections = Sections
+        
+        End If
+    End With
+    
+    With scHdr
+        WriteSectionName scHdr, ".code"
+        .VirtSizePhysAddr = m_lngPECodeSize
+        .VirtualAddress = ntHdr.OptionalHeader.BaseOfCode
+        .SizeOfRawData = RoundToMinSize(m_lngPECodeSize)
+        .PointerToRawData = GetPEHeaderSize(Sections)
+        .Characteristics = IMAGE_SCN_CNT_CODE Or _
+                           IMAGE_SCN_CNT_INITIALIZED_DATA Or _
+                           IMAGE_SCN_MEM_EXECUTE Or _
+                           IMAGE_SCN_MEM_READ Or _
+                           IMAGE_SCN_MEM_WRITE
+    End With
+     If Not skipImport Then
+    With sdHdr
+        WriteSectionName sdHdr, ".rdata"
+        .VirtSizePhysAddr = lngImp
+        .VirtualAddress = ntHdr.OptionalHeader.BaseOfData
+        .SizeOfRawData = RoundToMinSize(lngImp)
+        .PointerToRawData = scHdr.PointerToRawData + scHdr.SizeOfRawData
+        .Characteristics = IMAGE_SCN_MEM_READ Or _
+                           IMAGE_SCN_MEM_WRITE
+    End With
+    End If
+    If m_lngResourceCount > 0 Then
+        With srsrcHdr
+            WriteSectionName srsrcHdr, ".rsrc"
+            .VirtSizePhysAddr = lngRsrcSize
+            .VirtualAddress = lngRsrcRVA
+            .SizeOfRawData = RoundToMinSize(lngRsrcSize)
+            
+            If Not skipImport Then
+                .PointerToRawData = sdHdr.PointerToRawData + sdHdr.SizeOfRawData
+            Else
+                .PointerToRawData = scHdr.PointerToRawData + scHdr.SizeOfRawData
+            End If
+            .Characteristics = &H40000040 ' INITIALIZED_DATA | READ
+        End With
+    End If
+
+    If m_blnWriteDLL Then
+        With seHdr
+            WriteSectionName seHdr, ".edata"
+            .VirtSizePhysAddr = m_lngExportSize
+            .VirtualAddress = edataVirtualAddress
+            .SizeOfRawData = RoundToMinSize(m_lngExportSize)
+            If Not skipImport Then
+            .PointerToRawData = sdHdr.PointerToRawData + sdHdr.SizeOfRawData
+            Else
+            .PointerToRawData = scHdr.PointerToRawData + scHdr.SizeOfRawData
+            End If
+            If m_lngResourceCount > 0 Then
+                .PointerToRawData = .PointerToRawData + srsrcHdr.PointerToRawData + srsrcHdr.SizeOfRawData
+            End If
+            .Characteristics = &H40000040 ' INITIALIZED_DATA | READ
+        End With
+        With srHdr
+            WriteSectionName srHdr, ".reloc"
+            
+            ' ? FIX: VirtualSize must represent the exact, non-aligned data size in memory.
+            ' Using the precise m_lngRelocSize ensures Windows validation passes during ASLR relocation.
+            .VirtSizePhysAddr = m_lngRelocSize
+            
+            .VirtualAddress = relocVirtualAddress
+            
+            ' ? FIX: Ensure SizeOfRawData is perfectly aligned to the disk sector size (FILE_SECTION_SIZE = 512).
+            ' If there are no relocations, set it to 0 so the loader knows it's empty.
+            If m_lngRelocSize > 0 Then
+                .SizeOfRawData = RoundToMinSize(m_lngRelocSize)
+            Else
+                .SizeOfRawData = 0
+            End If
+            
+            .PointerToRawData = seHdr.PointerToRawData + seHdr.SizeOfRawData
+            .Characteristics = &H42000040 ' IMAGE_SCN_CNT_INITIALIZED_DATA | IMAGE_SCN_MEM_DISCARDABLE | IMAGE_SCN_MEM_READ
+        End With
+        
+    End If
+    btDOS = HexToByte(DOS_CODE_RELOCATIONS)
+    
+    OutputMem VarPtr(mzHdr), Len(mzHdr) '
+    OutputMem VarPtr(btDOS(0)), UBound(btDOS) + 1
+    OutputMem VarPtr(ntHdr), Len(ntHdr)
+    OutputMem VarPtr(scHdr), Len(scHdr)
+    If Not skipImport Then
+        OutputMem VarPtr(sdHdr), Len(sdHdr)
+    End If
+     If m_lngResourceCount > 0 Then
+        OutputMem VarPtr(srsrcHdr), Len(srsrcHdr)
+    End If
+    If m_blnWriteDLL Then
+        OutputMem VarPtr(seHdr), Len(seHdr)
+        'If False Then
+            OutputMem VarPtr(srHdr), Len(srHdr)
+        'End If
+    End If
+    
+    OutputJumpTo RoundToMinSize(OutputPosition)
+    If m_lngResourceCount > 0 Then
+        OutputJumpTo srsrcHdr.PointerToRawData
+        OutputMem VarPtr(btRsrcData(0)), lngRsrcSize
+        OutputJumpTo scHdr.PointerToRawData
+    End If
+    OutputJumpTo scHdr.PointerToRawData
+    WritePEHeader1 = True
+End Function
+
+
+Private Function WritePEHeader2() As Boolean
     Dim mzHdr   As IMAGE_DOS_HEADER
     Dim ntHdr   As IMAGE_NT_HEADERS
     Dim scHdr   As IMAGE_SECTION_HEADER
@@ -996,8 +1826,9 @@ Private Function WritePEHeader() As Boolean
     End If
     OutputJumpTo RoundToMinSize(OutputPosition)
     
-    WritePEHeader = True
+    WritePEHeader2 = True
 End Function
+
 
 
 Private Sub WriteSectionName(sc As IMAGE_SECTION_HEADER, ByVal strName As String)
@@ -1687,13 +2518,13 @@ Private Function ParsePointer(Ptr As Pointer) As Boolean
             Select Case token.TType
                 Case TokenRegister:
                     blnReg = True
-                    lngReg = RegToIdx(RegStrToReg(token.content))
+                    lngReg = RegToIdx(RegStrToReg(token.Content))
                     Match TokenRegister
                 Case TokenValue:
                     lngTms = lngTms * token.Value
                     Match TokenValue
                 Case tokensymbol:
-                    lngTms = lngTms * m_udtLabels(GetLabelIndex(token.content)).Offset
+                    lngTms = lngTms * m_udtLabels(GetLabelIndex(token.Content)).Offset
                     Match tokensymbol
             End Select
         Loop While Match(TokenOpMul)
@@ -1728,7 +2559,16 @@ Private Function GetInstructionSizes(Optional ByVal Sections As Integer = 2) As 
     Dim Size        As Long
     Dim lngImpSz    As Long
     Dim blnFoundI   As Boolean
-
+    Dim lngTempRsrcSize As Long
+    If m_lngResourceCount > 0 Then
+        ' We temporarily increment Sections to account for the .rsrc header space
+        Sections = Sections + 1
+        
+        ' CRITICAL: Call the builder with 0 RVA to calculate the exact size (2194 bytes)
+        ' into our local variable lngTempRsrcSize before the file allocation occurs
+        Dim btDummy() As Byte
+        btDummy = BuildCombinedResourceSection(0, lngTempRsrcSize)
+    End If
     For i = 0 To m_lngInstrCount - 1                ' all instructions in the source
         If m_udtInstrs(i).Data.Size <> BitsUnknown Then
             With m_udtInstrs(i)
@@ -1909,12 +2749,32 @@ Private Function GetInstructionSizes(Optional ByVal Sections As Integer = 2) As 
                           RoundToSectionSize(m_lngPECodeSize)
             End If
     End If
+'    If m_lngOutSize = 0 Then Exit Function
+'    ReDim m_btOutput(m_lngOutSize - 1) As Byte
+        ' =============================================================
+    ' FIX: Include Resource layout sizes in the total file size boundary
+    ' =============================================================
+    If m_lngResourceCount > 0 Then
+        ' 1. Align current file structure to the next clean page boundary
+        m_lngOutSize = RoundToSectionSize(m_lngOutSize)
+        
+        ' 2. Append the actual calculated dynamic resource payload bytes
+        m_lngOutSize = m_lngOutSize + lngTempRsrcSize
+        
+        ' 3. Align the ultimate file size buffer to structural disk sector constraints
+        m_lngOutSize = RoundToMinSize(m_lngOutSize)
+    End If
+    ' =============================================================
+
     If m_lngOutSize = 0 Then Exit Function
     ReDim m_btOutput(m_lngOutSize - 1) As Byte
 
+
+
+
     GetInstructionSizes = True
 End Function
-Private Function BuildRelocationSection(ByVal Sections As Integer, ByVal BaseRVA As Long, ByRef OutSize As Long) As Byte()
+Private Function BuildRelocationSection(ByVal Sections As Integer, ByVal BaseRVA As Long, ByRef outSize As Long) As Byte()
     Dim lngPageRVA As Long, lngPageStartPos As Long
     Dim lngWord As Integer
     
@@ -1924,7 +2784,7 @@ Private Function BuildRelocationSection(ByVal Sections As Integer, ByVal BaseRVA
         lngWord = 8
         CopyMemory btDummy(0), lngPageRVA, 4
         CopyMemory btDummy(4), lngWord, 4
-        OutSize = 8
+        outSize = 8
         BuildRelocationSection = btDummy
         Exit Function
     End If
@@ -1992,11 +2852,11 @@ Private Function BuildRelocationSection(ByVal Sections As Integer, ByVal BaseRVA
     Loop
     
     ReDim Preserve btOut(lngPos - 1) As Byte
-    OutSize = lngPos
+    outSize = lngPos
     BuildRelocationSection = btOut
 End Function
 
-Private Function BuildExportSection(ByVal BaseRVA As Long, ByRef OutSize As Long) As Byte()
+Private Function BuildExportSection(ByVal BaseRVA As Long, ByRef outSize As Long) As Byte()
     If m_lngExportCount = 0 Then Exit Function
     Dim i As Long, j As Long
     Dim udtTemp As ASMExport
@@ -2071,7 +2931,7 @@ Private Function BuildExportSection(ByVal BaseRVA As Long, ByRef OutSize As Long
         .AddressOfNameOrdinals = BaseRVA + 40 + (4 * m_lngExportCount) + (4 * m_lngExportCount)
     End With
     CopyMemory btOut(0), expDir, 40
-    OutSize = lngTotalSize
+    outSize = lngTotalSize
     BuildExportSection = btOut
 End Function
 
@@ -2235,11 +3095,11 @@ Private Function FindLabels() As Boolean
     For i = 1 To m_lngTokenCount - 2
         If m_clsTokens(i).TType = tokensymbol Then
             If m_clsTokens(i + 1).TType = TokenOpColon Then
-                If GetLabelIndex(m_clsTokens(i).content) > -1 Then
-                    SetError "ambigious names: " & m_clsTokens(i).content, m_clsTokens(i).Line, m_clsTokens(i).Section
+                If GetLabelIndex(m_clsTokens(i).Content) > -1 Then
+                    SetError "ambigious names: " & m_clsTokens(i).Content, m_clsTokens(i).Line, m_clsTokens(i).Section
                     Exit Function
                 End If
-                AddLabel m_clsTokens(i).content, lngInstrCnt
+                AddLabel m_clsTokens(i).Content, lngInstrCnt
             End If
         ElseIf m_clsTokens(i).TType = TokenOperator Then
             lngInstrCnt = lngInstrCnt + 1
@@ -2284,7 +3144,7 @@ Private Function ParseInstructions() As Boolean
                     
                 Case Else:
                     If token.TType <> TokenEndOfInstruction Then
-                        SetError "Unexpected symbol: " & token.content, token.Line, token.Section
+                        SetError "Unexpected symbol: " & token.Content, token.Line, token.Section
                         Exit Do
                     End If
                     
@@ -2348,7 +3208,7 @@ Private Function ParseExtern() As Boolean
         SetError "Expected: string identifier for library name", token.Line, token.Section
         Exit Function
     Else
-        strLib = token.content
+        strLib = token.Content
         Match TokenString
         
         If Not Match(TokenSeparator) Then
@@ -2359,7 +3219,7 @@ Private Function ParseExtern() As Boolean
                 SetError "Expected: Name of the exporte function", token.Line, token.Section
                 Exit Function
             Else
-                strFnc = token.content
+                strFnc = token.Content
                 Match tokensymbol
                 
                 If GetLabelIndex(strFnc) > -1 Then
@@ -2379,7 +3239,7 @@ Private Function ParseRawData() As Boolean
     Dim lngTemp     As Long
     Dim strOp       As String
     
-    strOp = UCase$(token.content)
+    strOp = UCase$(token.Content)
     
     ' Configure size based on data type
     Select Case strOp
@@ -2420,21 +3280,21 @@ Private Function ParseRawData() As Boolean
                     
                 Case TokenString:
                     lngTemp = .ValueCount
-                    ReDim Preserve .Values(.ValueCount + Len(token.content) - 1) As Long
+                    ReDim Preserve .Values(.ValueCount + Len(token.Content) - 1) As Long
                     If udtInstr.Data.Size = Bits8 Then
-                        For i = 1 To Len(token.content)
-                            .Values(lngTemp + i - 1) = Asc(Mid$(token.content, i, 1))
+                        For i = 1 To Len(token.Content)
+                            .Values(lngTemp + i - 1) = Asc(Mid$(token.Content, i, 1))
                         Next
                     Else
-                        For i = 1 To Len(token.content)
-                            .Values(lngTemp + i - 1) = AscW(Mid$(token.content, i, 1))
+                        For i = 1 To Len(token.Content)
+                            .Values(lngTemp + i - 1) = AscW(Mid$(token.Content, i, 1))
                         Next
                     End If
-                    .ValueCount = .ValueCount + Len(token.content)
+                    .ValueCount = .ValueCount + Len(token.Content)
                     Match TokenString
                     
                 Case Else:
-                    SetError "Unexpected: " & token.content, udtInstr.Line, udtInstr.Section
+                    SetError "Unexpected: " & token.Content, udtInstr.Line, udtInstr.Section
                     Exit Function
             End Select
         Loop While Match(TokenSeparator)
@@ -2449,14 +3309,14 @@ Private Function ParseInstruction() As Boolean
     
     ' instruction can have multiple keywords like "lock rep"
     Do While token.TType = TokenKeyword
-        Select Case UCase$(token.content)
+        Select Case UCase$(token.Content)
             Case "REP":     udtInstr.Flags = udtInstr.Flags Or PrefixFlgRep
             Case "REPE":    udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepe
             Case "REPZ":    udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepz
             Case "REPNE":   udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepne
             Case "REPNZ":   udtInstr.Flags = udtInstr.Flags Or PrefixFlgRepnz
             Case "LOCK":    udtInstr.Flags = udtInstr.Flags Or PrefixFlgLock
-            Case Else:      SetError "Unknown keyword: " & token.content, token.Line, token.Section
+            Case Else:      SetError "Unknown keyword: " & token.Content, token.Line, token.Section
                             Exit Function
         End Select
         
@@ -2466,7 +3326,7 @@ Private Function ParseInstruction() As Boolean
     If token.TType <> TokenOperator Then
         SetError "Operator expected", token.Line, token.Section
     Else
-        udtInstr.Mnemonic = token.content
+        udtInstr.Mnemonic = token.Content
         udtInstr.Line = token.Line
         udtInstr.Section = token.Section
         
@@ -2521,7 +3381,7 @@ Private Function ParseArguments(udtInstr As ASMInstruction) As Boolean
             Case TokenEndOfInstruction:
                 Exit Do
             Case Else:
-                SetError "Unexpected: " & token.content, udtInstr.Line, udtInstr.Section
+                SetError "Unexpected: " & token.Content, udtInstr.Line, udtInstr.Section
                 Exit Function
         End Select
         
@@ -2588,11 +3448,11 @@ Private Function ParseArgumentSymbol( _
     Dim lngLblIdx   As Long
     Dim blnExtern   As Boolean
     
-    lngLblIdx = GetLabelIndex(token.content)
+    lngLblIdx = GetLabelIndex(token.Content)
     If lngLblIdx = -1 Then
-        lngLblIdx = GetExternIndex(token.content)
+        lngLblIdx = GetExternIndex(token.Content)
         If lngLblIdx = -1 Then
-            SetError "Unknown label: " & token.content, udtInstr.Line, udtInstr.Section
+            SetError "Unknown label: " & token.Content, udtInstr.Line, udtInstr.Section
             Exit Function
         Else
             blnExtern = True
@@ -2627,7 +3487,7 @@ Private Function ParseArgumentMMReg( _
 ) As Boolean
 
     arg.TType = ParamMM
-    arg.MMRegister = MMRegStrToNum(token.content)
+    arg.MMRegister = MMRegStrToNum(token.Content)
     
     If arg.Size <> BitsUnknown Then
         If (arg.Size And (Bits32 Or Bits64 Or Bits80 Or Bits128)) = 0 Then
@@ -2653,7 +3513,7 @@ Private Function ParseArgumentFPUReg( _
 ) As Boolean
 
     arg.TType = ParamSTX
-    arg.FPURegister = FPURegStrToNum(token.content)
+    arg.FPURegister = FPURegStrToNum(token.Content)
     
     If arg.Size <> BitsUnknown Then
         If (arg.Size And (Bits32 Or Bits64 Or Bits80)) = 0 Then
@@ -2675,7 +3535,7 @@ Private Function ParseArgumentRegister( _
 ) As Boolean
 
     arg.TType = ParamReg
-    arg.Register = RegStrToReg(token.content)
+    arg.Register = RegStrToReg(token.Content)
     
     If arg.Size <> BitsUnknown Then
         If arg.Size <> RegisterSize(arg.Register) Then
@@ -2697,14 +3557,14 @@ Private Function ParseKeywords( _
     argidx As Long _
 ) As Boolean
 
-    Select Case UCase$(token.content)
+    Select Case UCase$(token.Content)
         Case "BYTE":                udtInstr.Args(argidx).Size = Bits8
         Case "WORD":                udtInstr.Args(argidx).Size = Bits16
         Case "DWORD", "FLOAT":      udtInstr.Args(argidx).Size = Bits32
         Case "QWORD", "DOUBLE":     udtInstr.Args(argidx).Size = Bits64
         Case "EXTENDED":            udtInstr.Args(argidx).Size = Bits80
         Case "DQWORD":              udtInstr.Args(argidx).Size = Bits128
-        Case Else:                  SetError "At this position invalid: " & token.content, udtInstr.Line, udtInstr.Section
+        Case Else:                  SetError "At this position invalid: " & token.Content, udtInstr.Line, udtInstr.Section
                                     Exit Function
     End Select
     
@@ -2775,12 +3635,12 @@ Private Function ValidateExpr( _
                         Exit Function
                     End If
                     
-                    If RegStrToReg(token.content) < RegEAX Then
+                    If RegStrToReg(token.Content) < RegEAX Then
                         SetError "Only 32 bit registers allowed in pointer", udtInstr.Line, udtInstr.Section
                         Exit Function
                     End If
                     
-                    lngReg = RegToIdx(RegStrToReg(token.content))
+                    lngReg = RegToIdx(RegStrToReg(token.Content))
                     blnHasRegister = True
                     Match TokenRegister
                 
@@ -2794,8 +3654,8 @@ Private Function ValidateExpr( _
                         Exit Function
                     End If
                     
-                    If GetLabelIndex(token.content) = -1 Then
-                        SetError "Unknown symbol: " & token.content, udtInstr.Line, udtInstr.Section
+                    If GetLabelIndex(token.Content) = -1 Then
+                        SetError "Unknown symbol: " & token.Content, udtInstr.Line, udtInstr.Section
                         Exit Function
                     End If
                                         
@@ -2804,7 +3664,7 @@ Private Function ValidateExpr( _
                     Match tokensymbol
                 
                 Case Else:
-                    SetError "Invalid in pointer: " & token.content, udtInstr.Line, udtInstr.Section
+                    SetError "Invalid in pointer: " & token.Content, udtInstr.Line, udtInstr.Section
                     Exit Function
                     
             End Select
@@ -2897,7 +3757,7 @@ Private Function ParseSegmentReg(udtInstr As ASMInstruction) As Boolean
     If udtInstr.Segment <> SegUnknown Then
         SetError "Only one segment override per instruction", udtInstr.Line, udtInstr.Section
     Else
-        udtInstr.Segment = SegStrToSeg(token.content)
+        udtInstr.Segment = SegStrToSeg(token.Content)
         Match TokenSegmentReg
      
         If Match(TokenOpColon) Then
@@ -3265,49 +4125,49 @@ Private Sub ScannerGetNextToken()
                             
                     Case CHAR_SEPARATOR:
                         clsToken.TType = TokenSeparator
-                        clsToken.content = ","
+                        clsToken.Content = ","
                         
                     Case CHAR_COLON:
                         clsToken.TType = TokenOpColon
-                        clsToken.content = ":"
+                        clsToken.Content = ":"
                         
                     Case CHAR_PLUS:
                         clsToken.TType = TokenOpAdd
-                        clsToken.content = "+"
+                        clsToken.Content = "+"
                     
                     Case CHAR_MINUS:
                         clsToken.TType = TokenOpSub
-                        clsToken.content = "-"
+                        clsToken.Content = "-"
                     
                     Case CHAR_ASTERISK:
                         clsToken.TType = TokenOpMul
-                        clsToken.content = "*"
+                        clsToken.Content = "*"
                     
                     Case CHAR_BRACKET_L:
                         clsToken.TType = TokenBracketLeft
-                        clsToken.content = "["
+                        clsToken.Content = "["
                     
                     Case CHAR_BRACKET_R:
                         clsToken.TType = TokenBracketRight
-                        clsToken.content = "]"
+                        clsToken.Content = "]"
                     
                     Case CHAR_NUMBER_0 To CHAR_NUMBER_9:
                         Select Case ChrW$(.Source(.Position + 1))
                             Case "x", "X", "÷", "×"
-                                clsToken.content = "**"
+                                clsToken.Content = "**"
                                 .Position = .Position + 2
                         End Select
-                        If clsToken.content = "**" Then
+                        If clsToken.Content = "**" Then
                             
                             If Not IsHexChar(.Source(.Position)) Then
                             clsToken.TType = tokensymbol
                             GoTo cont1231
                             End If
-                            clsToken.content = "&H"
+                            clsToken.Content = "&H"
                             Do
                                 If .Source(.Position) <> 95 Then
                                 
-                                clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
                                 End If
                                 .Position = .Position + 1
                             Loop While IsHexChar(.Source(.Position)) Or .Source(.Position) = 95
@@ -3315,7 +4175,7 @@ Private Sub ScannerGetNextToken()
                         Else
                             Do
                                 If .Source(.Position) <> 95 Then
-                                    clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                    clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
                                 End If
                                 .Position = .Position + 1
                             Loop While IsDigit(.Source(.Position)) Or .Source(.Position) = 95
@@ -3329,13 +4189,13 @@ cont1231:
                         Select Case ChrW$(.Source(.Position + 1))
                         
                             Case "O", "o"
-                                clsToken.content = ""
+                                clsToken.Content = ""
                                 .Position = .Position + 2
                                 If IsOctChar(.Source(.Position)) Then
                                     Do
                                         If .Source(.Position) <> 95 Then
                                         
-                                        clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                        clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
                                         End If
                                         .Position = .Position + 1
                                     Loop While IsOctChar(.Source(.Position)) Or .Source(.Position) = 95
@@ -3343,20 +4203,20 @@ cont1231:
                                         .Position = .Position - 1
                                     End If
                     
-                                    clsToken.content = "&H" + PACKLNG$(val("&O" + clsToken.content))
+                                    clsToken.Content = "&H" + PACKLNG$(val("&O" + clsToken.Content))
                                 clsToken.TType = TokenValue
                                 Else
                                     clsToken.TType = TokenInvalid
-                                    clsToken.content = "&"
+                                    clsToken.Content = "&"
                                 End If
                                 
                             Case "H", "h":
-                                clsToken.content = "&H"
+                                clsToken.Content = "&H"
                                 .Position = .Position + 2
                                 If IsHexChar(.Source(.Position)) Then
                                     Do
                                         If .Source(.Position) <> 95 Then
-                                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                                            clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
                                         End If
                                         .Position = .Position + 1
                                     Loop While IsHexChar(.Source(.Position)) Or .Source(.Position) = 95
@@ -3366,11 +4226,11 @@ cont1231:
                                     clsToken.TType = TokenValue
                                 Else
                                     clsToken.TType = TokenInvalid
-                                    clsToken.content = "&"
+                                    clsToken.Content = "&"
                                 End If
                             Case Else:
                                 clsToken.TType = TokenInvalid
-                                clsToken.content = "&"
+                                clsToken.Content = "&"
                                 
                         End Select
                         
@@ -3380,22 +4240,22 @@ cont1231:
                                  .Source(.Position) <> CHAR_CARRIAGE And _
                                  .Source(.Position) <> CHAR_LINEFEED
                         
-                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                            clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
                         Loop
                         clsToken.TType = TokenString
                     Case CHAR_AT
                         Do
-                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                            clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
                         Loop While IsAlphaNumeric(.Source(.Position))
                         Dim p
-                            If IsNumberNew(Basestack1, Mid$(clsToken.content, 2), p, True) Then
+                            If IsNumberNew(Basestack1, Mid$(clsToken.Content, 2), p, True) Then
                                 If MemInt(VarPtr(p)) = vbString Then
-                                    SwapVariant clsToken.content, p
+                                    SwapVariant clsToken.Content, p
                                     clsToken.TType = TokenString
                                 Else
-                                    clsToken.content = Trim(str$(CLng(p)))
+                                    clsToken.Content = Trim(str$(CLng(p)))
                                     clsToken.TType = TokenValue
                                 End If
                             Else
@@ -3404,33 +4264,33 @@ cont1231:
                             .Position = .Position - 1
                         Case CHAR_AT, CHAR_ALPHA_UA To CHAR_ALPHA_UZ, CHAR_ALPHA_LA To CHAR_ALPHA_LZ, 128 To 32767:
                         Do
-                            clsToken.content = clsToken.content & ChrW$(.Source(.Position))
+                            clsToken.Content = clsToken.Content & ChrW$(.Source(.Position))
                             .Position = .Position + 1
                         Loop While IsAlphaNumeric(.Source(.Position))
                         
-                        If IsRegister(clsToken.content) Then
+                        If IsRegister(clsToken.Content) Then
                             clsToken.TType = TokenRegister
-                        ElseIf IsSegmentReg(clsToken.content) Then
+                        ElseIf IsSegmentReg(clsToken.Content) Then
                             clsToken.TType = TokenSegmentReg
-                        ElseIf IsFPUReg(clsToken.content) Then
+                        ElseIf IsFPUReg(clsToken.Content) Then
                             clsToken.TType = TokenFPUReg
-                        ElseIf IsKeyword(clsToken.content) Then
+                        ElseIf IsKeyword(clsToken.Content) Then
                             clsToken.TType = TokenKeyword
-                        ElseIf IsRawDataOp(clsToken.content) Then
+                        ElseIf IsRawDataOp(clsToken.Content) Then
                             clsToken.TType = TokenRawData
-                        ElseIf IsMMReg(clsToken.content) Then
+                        ElseIf IsMMReg(clsToken.Content) Then
                             clsToken.TType = TokenMMRegister
-                        ElseIf StrComp(clsToken.content, "extern", vbTextCompare) = 0 Then
+                        ElseIf StrComp(clsToken.Content, "extern", vbTextCompare) = 0 Then
                             clsToken.TType = TokenExtern
                             
                         Else
-                            If GetlocalVar(clsToken.content, i) Then
+                            If GetlocalVar(clsToken.Content, i) Then
                                 If MemInt(VarPtr(var(i))) = vbString Then
-                                    clsToken.content = var(i)
+                                    clsToken.Content = var(i)
                                 
                                     clsToken.TType = TokenString
                                 Else
-                                    clsToken.content = Trim(str$(CLng(var(i))))
+                                    clsToken.Content = Trim(str$(CLng(var(i))))
                                 
                                     clsToken.TType = TokenValue
                                 End If
@@ -3443,7 +4303,7 @@ cont1231:
                         
                     Case Else:
                         clsToken.TType = TokenInvalid
-                        clsToken.content = ChrW$(.Source(.Position))
+                        clsToken.Content = ChrW$(.Source(.Position))
                         
                 End Select
                 
@@ -3491,14 +4351,14 @@ cont1231:
             End If
         ElseIf .TType = TokenValue Then
             On Error Resume Next
-            .Value = CLng(.content)
+            .Value = CLng(.Content)
             If Err Then .TType = TokenInvalid
             On Error GoTo 0
         End If
 
         .Line = m_udtScanner.Line
         .Section = m_udtScanner.Section
-        .Position = (m_udtScanner.Position - Len(.content)) - m_udtScanner.LinePos + 1
+        .Position = (m_udtScanner.Position - Len(.Content)) - m_udtScanner.LinePos + 1
     End With
 
     Set m_udtScanner.NextToken = clsToken

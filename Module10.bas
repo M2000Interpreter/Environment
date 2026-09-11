@@ -18559,6 +18559,9 @@ jumphere1:
                                 If bb$ = vbCrLf Then bb$ = vbNullString: w3 = 1: GoTo cont111
                                 If bb$ = " " Then bb$ = vbNullString: w3 = 1: GoTo cont111
                             End If
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         Else
                             bb$ = Mid$(b$, p + 1, ex2 - p)
@@ -18836,6 +18839,9 @@ AGAINGOTO:
                             Exit Do
                         Else
                             bb$ = Mid$(b$, i, ex2 - i + 1)
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         End If
                     Else
@@ -18861,6 +18867,9 @@ AGAINGOTO:
                         
                             subs.ItemCreator2 bb$, i, 0
                             bb$ = Mid$(b$, i, ex2 - i + 1)
+                            If bstack.UseofIf > 0 Then
+                                DropMark2 bstack, ex2 - i
+                            End If
                             GoTo fromfirst0
                         End If
                     End If

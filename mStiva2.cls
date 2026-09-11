@@ -295,6 +295,19 @@ If mstack.Count > 0 Then
     End If
 End If
 End Function
+Public Function LookPop2LongAt(where, ByRef Long2 As Long) As Long
+If mstack.Count >= where And where > 0 Then
+    Dim PackLoad As Variant, t As Byte
+    PackLoad = mstack.item(where)
+    GetMem1 VarPtr(PackLoad), t
+    If t = 6 Then
+        GetMem4 VarPtr(PackLoad) + 4, LookPop2LongAt
+        GetMem4 VarPtr(PackLoad) + 8, Long2
+    Else
+        LookPop2LongAt = 0
+    End If
+End If
+End Function
 Public Function IsPop2Long(ByRef Long2 As Long) As Long
 If mstack.Count > 0 Then
     Dim PackLoad As Variant, t As Byte
