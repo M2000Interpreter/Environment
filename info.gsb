@@ -54025,11 +54025,121 @@ print
 
 
 }
-MODULE ASM2 {
-' ====================================================================
-' DYNAMIC RESOURCE LOADING USING INLINE BASE64 AND STRINGS
-' ====================================================================
-' Define and load the icon using inline Base64 Binary block
+MODULE ASM2 {function versionInfo(v1, v2) {
+	Function global Padding(address) {
+		a=address mod 4
+		if a=0 then =a else =4-a
+	}
+	function fix(v1, v2) {
+		structure FIXEDFILEINFO {
+			dwSignature as Long
+			{	minor as Integer,
+				major as Integer
+			}
+			dwStrucVersion as Long
+			dwFileVersionMSlow as Integer
+			dwFileVersionMShigh as Integer
+			dwFileVersionLS as Long
+			dwProductVersionMSlow as Integer
+			dwProductVersionMShigh as Integer
+		
+			dwProductVersionLS as Long
+			dwFileFlagsMask as Long
+			dwFileFlags as Long
+			dwFileOS as Long
+			dwFileType as Long
+			dwFileSubtype as Long
+			dwFileDateMS as Long
+			dwFileDateLS as Long
+			function init (v1, v2){
+				const VOS__WINDOWS32=4, VFT_APP=1
+				FIXEDFILEINFO|dwSignature=0xFEEF04BD
+				FIXEDFILEINFO|major=1
+				FIXEDFILEINFO|minor=0
+				FIXEDFILEINFO|dwFileVersionMShigh=1
+				FIXEDFILEINFO|dwProductVersionMShigh=v1
+				FIXEDFILEINFO|dwProductVersionMSlow=v2 
+				FIXEDFILEINFO|dwFileOS=VOS__WINDOWS32
+				FIXEDFILEINFO|dwFileType=VFT_APP
+				structure myDate {
+					{ low as long, high as long}
+					mydate as double
+				}
+				myDate ThisDate
+				ThisDate|mydate=today+now
+				FIXEDFILEINFO|dwFileDateMS=ThisDate|high
+				FIXEDFILEINFO|dwFileDateLS=ThisDate|low
+				=FIXEDFILEINFO
+			}
+		}
+		FIXEDFILEINFO fix#init(v1, v2)
+		=fix
+	}
+	ver.size=2000
+	addr=0
+	buffer clear ver as byte*ver.size
+	return ver, 2:=52 as Integer, 4:=0 as Integer
+	addr=6
+	ver[addr]="VS_VERSION_INFO"+chr$(0)
+	addr+=32
+	addr+=padding(addr)
+	ver[addr]=fix(v1,v2)
+	addr+=52
+	addr+=padding(addr)
+	block1=addr  ' open sub block
+		' addr+2 =0 ' addr+4 =0  ' for VarFileInfo
+		addr+=6 ' 6 bytes header
+		ver[addr]="VarFileInfo"
+		addr+=24  ' 11*2+2
+		addr+=padding(addr)
+		block2=addr ' open sub block
+			ver[addr+2]=4  ' 4 word  ' addr+4 = 0  (type=0)
+			ver[addr+6]="Translation"
+			addr+=24+6  ' 11*2+2
+			addr+=padding(addr)
+			return ver, addr:= 0x409 as integer, addr+2:=1200 as integer
+			addr+=4
+		return ver, Block2:= addr-Block2 as integer  ' close sub block
+		return ver, Block1:= addr-Block1 as integer  ' close sub block
+	
+		block2=addr ' open sub block
+			ver[addr+4]=1  ' type text  ' addr+2 = 0  (length value=0)
+			ver[addr+6]="StringFileInfo"
+			addr+=30+6  ' 11*2+2
+			addr+=padding(addr)
+			block3=addr ' open sub block
+			
+			ver[addr+4]=1  ' type text  ' addr+2 = 0  (length value=0)
+			ver[addr+6]="040904B0"
+			addr+=16+8
+			addr+=padding(addr)
+			old=addr
+			AddString(&addr, ver, "Comments", "Example")
+			AddString(&addr, ver, "CompanyName","George's Software House")
+			AddString(&addr, ver, "FileDescription", "M2000 Native Win32 Window Application")
+			AddString(&addr, ver, "FileVersion", "1.0.0.0")
+			AddString(&addr, ver, "InternalName", "testAsm3.exe")
+			AddString(&addr, ver, "LegalCopyright", "Copyright (C) 2026 George")
+			AddString(&addr, ver, "OriginalFilename", "testAsm3.exe")
+			AddString(&addr, ver, "ProductName", "M2000 Assembly Window Project")
+			AddString(&addr, ver, "ProductVersion", v1+"."+v2+".0.0")
+		return ver, Block3:= addr-Block3 as integer  ' close sub block
+		return ver, Block2:= addr-Block2 as integer  ' close sub block
+	return ver, 0:=addr as integer
+	buffer ver as byte*addr ' redim and preserve bytes
+	=ver
+sub AddString(&w, buf, v1 as string, v2 as string)
+	v1+=chr(0)
+	v2+=chr(0)
+	local block=w
+	return buf, w+2:=len(v2)*2 as integer, w+4:=1 as integer
+	w+=6:buf[w]=v1: w+=len(v1)*2
+	w+=padding(w)	
+	buf[w]=v2: w+=len(v2)*2
+	return buf, block:=w-block as integer
+	w+=padding(w)	
+end sub
+}
 Binary {
       AAABAAMAICAQAAAAAADoAgAANgAAACAgAgAAAAAAMAEAAB4DAAAQEBAAAAAAACgB
       AABOBAAAKAAAACAAAABAAAAAAQAEAAAAAACAAgAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -54068,10 +54178,11 @@ icoCount= Eval(buffer1, 4 as Integer)
 Buffer grpIconData as Byte*(6 + (icoCount * 14))
 grpIconData[0] = buffer1[0, 6]
 Assembler =getobject("","m2000.x86")
-' Register the binary icon resource data (Type 3 = Icon Group, ID = 1)
 Assembler=>ClearResources
-' Loop through each image inside the .ico file
-'Local i, entryOffset, bytesInRes, imageOffset, targetID
+
+ver=versionInfo(1,1)
+Assembler=>AddRawResource 16, 1, ver(0), len(ver)
+
 buffer targetID as integer
 For i = 0 to icoCount - 1
     entryOffset = 6 + (i * 16) ' Each ICO entry in file is 16 bytes
@@ -54097,10 +54208,6 @@ Next
 ' 4. Register the full compiled group header as Type 14 (RT_GROUP_ICON), ID 1
 Assembler=>AddRawResource 14, 1, grpIconData(0), Len(grpIconData)
 
-' (Το υπόλοιπο κομμάτι για το Manifest παραμένει ακριβώς το ίδιο...)
-' ====================================================================
-
-
 ' Inject the Application Manifest XML String (Type 24 = Manifest, ID = 1)
 manifest$ = {<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
@@ -54118,6 +54225,7 @@ manifest$ = {<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     </dependentAssembly>
   </dependency>
 </assembly>}
+
 Buffer manifestData as Byte*Len(manifest$)
 manifestData[0]=STR$(manifest$)  ' UTF16LE TO ANSI 
 
@@ -54127,9 +54235,10 @@ Enum PESubsystem {
     Subsystem_GUI = 2
     Subsystem_CUI = 3
 }
-'Assembler=>AddRawResource 3, 1, buffer1(0), Len(buffer1)
-Assembler=>AddRawResource 24, 1, manifestData(0), Len(manifestData)
-
+'''''''''''Assembler=>AddRawResource 3, 1, buffer1(0), Len(buffer1)
+//	buffer clear emptybuffer as byte*4096
+//	Assembler=>AddRawResource 21, 1, emptybuffer(0), 4096 
+Assembler=>AddRawResource 24, 1, manifestData(0), Len(manifestData) 
 Assembler=>Subsystem=Subsystem_GUI
 Assembler=>PEHeader=true
 long WM_SETTEXT = &HC
@@ -54299,7 +54408,6 @@ WndProcNext:
    ret 16
 
 })
-
 killit()
 open "testAsm3.exe" for output as #f
 	put #f, Buffer2export
@@ -54308,7 +54416,7 @@ close #f
 //	Print ShellExecute(0, 0, dir$+"testAsm3.exe", 0, 0, 1&)
 //	
 win dir$+"testAsm3.exe"
-
+if module(asm22) then asm22
 Sub killit(name$="testAsm3.exe")
 	local out$=quote$(dir$+"out.txt")
 	Dos "del "+out$, 500;
@@ -55878,5 +55986,129 @@ class beta {
 }
 beta=beta(10)
 print beta.kappa[3]#str()="(90, 120)", beta.kappa=>items=10, len(beta.kappa)=160 ' bytes
+}
+MODULE ASM22 {module OtherWay (file$){
+Print "SECOND WAY"
+	thatDir$=file.path$(file$)
+	thatFile$=file.name$(file$)
+	if thatDir$="" then Error "I Need Path"
+	FSO = GetObject("","Scripting.FileSystemObject")
+	objShell = GetObject("","Shell.Application")
+	objFolder = objShell=>Namespace(thatDir$)^    // ret object
+	objFolderItem = objFolder=>ParseName(thatFile$)^  // ret object
+	for i=1 to 40   
+		zz= objFolder=>GetDetailsOf(objFolder=>Items, i)
+		if zz="" then exit for
+		if len(objFolder=>GetDetailsOf(objFolderItem, i))>0 then
+			Print zz, @(30), " : "; objFolder=>GetDetailsOf(objFolderItem, i)
+		end if
+	next
+Print "THIRD WAY"
+Print GetVersionInfo(file$, "ProductName")
+Print GetVersionInfo(file$, "ProductVersion")
+
+function GetVersionInfo(Path as string, id as string)
+	local shell, file
+	shell = GetObject("","Shell.Application")
+	local  ssfDesktop = 0&
+	try ok  {
+		file = shell=>Namespace(ssfDesktop)=>ParseName(Path)^
+	}
+	if ok then
+		=id+" : "+file=>ExtendedProperty("System.Software."+id)
+	else
+		="<???>"
+	end if
+end function
+
+}
+
+structure FIXEDFILEINFO {
+	dwSignature as Long
+	{	minor as Integer,
+		major as Integer
+	}
+	dwStrucVersion as Long
+	dwFileVersionMSlow as Integer
+	dwFileVersionMShigh as Integer
+	dwFileVersionLS as Long	
+	{
+		dwProductVersionMSlow as Integer,
+		dwProductVersionMShigh as Integer
+	}  ' union
+	dwProductVersionMS as long
+	
+	{dwProductVersionLSlow as Integer,
+	dwProductVersionLSHigh as Integer
+	} ' union
+	dwProductVersionLS as Long
+	
+	dwFileFlagsMask as Long
+	dwFileFlags as Long
+	dwFileOS as Long
+	dwFileType as Long
+	dwFileSubtype as Long
+	dwFileDateMS as Long
+	dwFileDateLS as Long
+	function init (v1, v2){
+		const VOS__WINDOWS32=4, VFT_APP=1
+		FIXEDFILEINFO|dwSignature=0xFEEF04BD
+		FIXEDFILEINFO|major=1
+		FIXEDFILEINFO|minor=0
+		FIXEDFILEINFO|dwFileVersionMShigh=1
+		FIXEDFILEINFO|dwProductVersionMShigh=v1
+		FIXEDFILEINFO|dwProductVersionMSlow=v2 
+		FIXEDFILEINFO|dwFileOS=VOS__WINDOWS32
+		FIXEDFILEINFO|dwFileType=VFT_APP
+		structure myDate {
+			{ low as long, high as long}
+			mydate as double
+		}
+		myDate ThisDate
+		ThisDate|mydate=today+now
+		FIXEDFILEINFO|dwFileDateMS=ThisDate|high
+		FIXEDFILEINFO|dwFileDateLS=ThisDate|low
+		=FIXEDFILEINFO
+	}
+}
+
+file$=dir$+"testAsm3.exe"
+if exist(file$) then
+	Declare GetFileVersionInfoSize lib "Api-ms-win-core-version-l1-1-0.GetFileVersionInfoSizeW" {lptstrFilename$, long  &handle} as long
+	long that
+	long zz=GetFileVersionInfoSize(file$, &that)	
+	Declare GetFileVersionInfo lib "Api-ms-win-core-version-l1-1-0.GetFileVersionInfoW" {lptstrFilename$, long Zero, long dwLen, long buffer1} as integer
+	buffer VersionInfo as byte *zz
+	boolean ret=GetFileVersionInfo(file$, 0&, zz,  VersionInfo(0))
+	if ret then
+		declare  VerQueryValue lib "Api-ms-win-core-version-l1-1-0.VerQueryValueW" {long pblock, SubBloc$,  long &lVerPointer, long  &lVerbufferLen } as integer
+		long p, blen
+		If VerQueryValue(VersionInfo(0), "\", &p, &bLen) then
+//				?  p, blen
+			FIXEDFILEINFO fix
+			if blen=len(fix) then
+				fix=>FillDataFromMem p
+				' press F1 in Editor to tongle wrap
+				print "ProductVersion = ";fix|dwProductVersionMShigh+"."+fix|dwProductVersionMSlow+"."+fix|dwProductVersionLShigh+"."+fix|dwProductVersionLSlow
+			end if
+		else
+			? "failed"
+		end if
+		If VerQueryValue(VersionInfo(0), "\StringFileInfo\040904b0\CompanyName", &p, &bLen) then
+			buffer strRet as byte * blen
+			strRet=>FillDataFromMem p
+			Print "CompanyName : ";leftpart(eval$(strRet), 0)
+		else
+			? "failed"		
+		end if
+	else
+		? "????"
+	end if
+
+OtherWay file$
+' another way...
+	
+end if
+//clipboard string$(eval$(VersionInfo) as encode64, 0, 6)
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

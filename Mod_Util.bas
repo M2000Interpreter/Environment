@@ -2641,6 +2641,8 @@ CHECK100:
                     End If
                 End If
                 c$ = ChrW(AscW(c$) + &H2400)
+                DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+
             End If
             r = r + 1
             With nr
@@ -2854,6 +2856,7 @@ check1:
                 End If
                 c$ = ChrW(AscW(c$) + &H2400)
             End If
+            
             DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             realR& = realR + 1
 contNew:
