@@ -5884,7 +5884,7 @@ Pen 0 {
 	Print
 	Normal
 	italic
-	Report " A collection of modules for tests version 65 for M2000 Interpreter version 15, revision 42 and above"
+	Report " A collection of modules for tests version 66 for M2000 Interpreter version 15, revision 45 and above"
 	italic
 	Pen 5{
 		cursor 0, row-1
@@ -9219,13 +9219,17 @@ print foo()=4
 }
 MODULE TR {\\ goto no_random_mode
 set fast !
-m=random(700,1100)/1000
+m=random(700,1100)/1200
+window 8, window
 mode 8, scale.x*m, scale.y*m
 
 no_random_mode:
 \\ Version 2 we make the drawing to scale based to height
 let sc=scale.y/14000, yoffset=100
 mode 11*scale.y/14000
+//	window mode, window
+
+
 Escape Off
 Flush
 Global alfa=60*4
@@ -9298,7 +9302,7 @@ Every 1000/120 {
             i+=k
             i=i mod# alfa
       }
-      If inkey$<>"" Then Exit
+      If inkey$="1" Then Exit
 }
 Threads Erase
 Escape off
@@ -9424,7 +9428,7 @@ Sub Print.Info(x)
 		Report 2, {
 			Press
 			Keyboard
-			any key - exit
+			key 1 - exit
 			Mouse buttons
 			left - Acc. left
 			right - Acc. right
@@ -56110,5 +56114,187 @@ OtherWay file$
 	
 end if
 //clipboard string$(eval$(VersionInfo) as encode64, 0, 6)
+}
+MODULE CLIPMANAGER {Module Clipboard_Manager {
+	Declare SetWindowPos Lib "User32.SetWindowPos" {
+		Long hwnd, Long hWnd,
+		Long x, Long y,
+		Long nWidth, Long nHeight,
+		Long uFlags
+	}	
+	title "", 0 ' hide console
+	font "Courier new"
+	mode 16.5
+	cls #003300, 0 ' paper color
+	pen  #ccffdd 
+	last1=""
+	s=stack
+	boolean pinme
+	declare Form1 form
+	declare button1 button form Form1
+	declare button2 button form Form1
+	Form1=>PreviewKey=true
+	function PureStr(a$){
+		if len(a$)>20 then a$=left$(a$,20)+"..." 
+		=a$
+	}
+	function form1.mousemove (new MouseKey, ControlKeys, X, Y) {
+		if mouseKey<>0 and ControlKeys=0 then
+			move X, Y: Cursor !
+			select case Row
+			case 2 to 11
+				Form1=>SendScanCode ""+(row-1)
+			case 12
+				Form1=>SendScanCode	"0"			
+			end select
+		else
+			try {button1=>GetFocus}
+		end if
+	}
+	function Form1.KeyPreview(New &Char$) {
+		local where=val(Char$)
+		select case Char$
+		case "1" to "9"
+			try {
+				last1=stackitem$(s, where)
+				clipboard last1
+				Char$=""
+			}
+		case "0" ' for ten
+			try {
+				last1=stackitem$(s, 10)
+				clipboard last1
+				Char$=""
+				where=10
+			}
+		end select
+		if Char$="" then
+			Layer Form1 {
+				cls, 2
+				if len(S)>0 then					
+					? $(,4)
+					for i=1 to len(s)
+						print i,". ";
+						if i=where then print "(clipboard): ";
+						print PureStr(stackitem$(s, i))
+					next
+				end if
+				refresh
+			}
+		end if
+	}
+	function button1.click {
+        Try {Clipboard !}  ' clear clipboard
+		s=stack
+		last1=""
+		layer Form1	{
+			cls, 2
+		}
+	}
+	function button2.click {
+		if pinme then
+			button2=>caption="Pin Window"
+			layer Form1 {
+				Form1=>opacity 255
+				Call void SetWindowPos(hwnd, -2, 0, 0, 0, 0, 3)
+			}		
+		else
+			button2=>caption="Unpin Window"
+			layer Form1 {
+				Form1=>opacity 192
+				Call void SetWindowPos(hwnd, -1, 0, 0, 0, 0, 3)
+			}
+		end if
+		pinme~
+	}
+	function Form1.Unload (new &cancel) {
+		if pinme then cancel=true: call local button2.click()
+	}
+	function button1.blink {
+		layer Form1 {		
+			try {
+				last=clipboard$			
+				if last<>"" then
+					if last<>last1 then
+						stack s {
+							push last
+							swap last, last1		
+							while stack.size>10
+								shift 11: drop
+							end while
+						}			
+						cls, 2
+						if len(S)>0 then					
+							? $(,4)
+							for i=1 to len(s)
+								print i,". ";PureStr(stackitem$(s, i))
+							next
+						end if
+						refresh
+					end if	
+				end if
+			}
+		}
+	}
+	Form1=>title="Clipboard List"
+	Form1=>move 3000,3000, 10000, 7000 
+	button1=>default=true
+	button1=>move 600,6000,5300-2*600, 600
+	button2=>move 5300,6000,5300-2*600, 600
+	button1=>caption="Clear List"
+	button2=>caption="Pin Window"
+	button1=>blink=100  ' timer from button
+	method Form1, "show", true  ' show modal - here listen evants and when we close the form we went to next statement.
+	title "M2000", 1 ' show again console
+	declare Form1 nothing	
+}
+Clipboard_Manager
+}
+MODULE ITER2 {Module Iterators (f as long=-2) {
+	NameOfDay=("Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday")
+	NameOfColor=Stack:="Red","Orange","Yellow","Green","Blue","Purple"
+	Positions=list:="first":=1,"fourth":=4,"fifth":=5
+	
+	Print #f, "All days:"
+	m=each(NameOfDay)
+	while m {
+		print #f, (m^+1)+". "+array$(m)
+	}
+	Print #f
+	Print #f, "All colors:"
+	m=each(NameOfColor)
+	while m {
+		print #f, (m^+1)+". "+StackItem$(m)
+	}
+	Print #f
+	Print #f, "Print from positions from the first:"
+	a=each(Positions)
+	while a {
+		m=each(NameOfDay, eval(a))
+		n=each(NameOfColor, eval(a))
+		while m, n {
+			Print #f, format$("{0:10} {1:10} {2:10}", eval$(a!), array$(m), stackitem$(n))
+			exit
+		}
+	}
+	Print #f
+	Print #f, "Print from positions from the last:"
+	a=each(Positions)
+	while a {
+		m=each(NameOfDay, -eval(a))
+		n=each(NameOfColor, -eval(a))
+		while m, n {
+			Print #f, format$("{0:10} {1:10} {2:10}", eval$(a!), array$(m), stackitem$(n))
+			exit
+		}
+	}
+}
+open "" for wide output as #c
+Iterators c
+close #c
+open "output1.txt" for wide output as #c
+Iterators c
+close #c
+win dir$+"output1.txt"
 }
 UseThis : InfoBasic : C1: ShowKeys : Pen 15 {Print "Press F3 now"}

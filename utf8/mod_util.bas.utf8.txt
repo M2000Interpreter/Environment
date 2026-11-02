@@ -2641,6 +2641,8 @@ CHECK100:
                     End If
                 End If
                 c$ = ChrW(AscW(c$) + &H2400)
+                DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
+
             End If
             r = r + 1
             With nr
@@ -2854,6 +2856,7 @@ check1:
                 End If
                 c$ = ChrW(AscW(c$) + &H2400)
             End If
+            
             DrawText DDD.hDC, StrPtr(c$), -1, nr, DT_SINGLELINE Or DT_CENTER Or DT_NOPREFIX + DT_NOCLIP
             realR& = realR + 1
 contNew:
@@ -17315,13 +17318,30 @@ If s.LookTopVal = -5 Then s.drop 2
 End If
 End Sub
 
+Sub DropMark2(bstack As basetask, jumpto As Long)
 
+Dim s As mStiva2, blockstart As Long ' from the end
+Set s = bstack.RetStack
+Do While s.Total >= 3
+    If s.LookTopVal = -3 Then
+        s.LookPop2LongAt 2, blockstart
+        If blockstart < jumpto Then
+            s.drop 3
+            bstack.UseofIf = bstack.UseofIf - 1
+        Else
+            Exit Do
+        End If
+    Else
+        Exit Do
+    End If
+Loop
+End Sub
 Function HaveMark(bstack As basetask, a As Long, b As Boolean) As Boolean
-Dim s As mStiva2
+Dim s As mStiva2, dummy As Long
 Set s = bstack.RetStack
 If s.Total >= 3 Then
 HaveMark = s.LookTopVal = -3
-a = s.StackItem(2)
+a = s.LookPop2LongAt(2, dummy)
 b = s.StackItem(3)
 End If
 End Function
@@ -23304,6 +23324,24 @@ contLib:
                     stdFunc.RetType = CLng(vbInteger)
                 ElseIf IsLabelSymbolNewExp(rest$, "ΑΤΥΠΟΣ", "VARIANT", Lang, s1$) Then
                     stdFunc.RetType = CLng(vbVariant)
+                ElseIf IsLabelSymbolNewExp(rest$, "ΓΡΑΜΜΑ", "STRING", Lang, s1$) Then
+                    If IsLabelSymbolNewExp(rest$, "ΔΕΙΚΤΗΣ", "POINTER", Lang, s1$) Then
+                        stdFunc.ConvertCstring2BSTR = True
+                        stdFunc.RetType = CLng(vbLong)
+                        x1 = 3
+                    Else
+                        stdFunc.RetType = CLng(vbString)
+                    End If
+                    If Fast2LabelNoNum(rest$, "ANSI", 4, "", 0, 4) Then
+                        stdFunc.ConvertCstring2BSTR = True
+                        stdFunc.ANSI = True
+                        stdFunc.RetType = CLng(vbLong)
+                        x1 = 3
+                    End If
+                    
+                ElseIf Fast2LabelNoNum(rest$, "ANSI", 4, "", 0, 4) Then
+                        stdFunc.ConvertCstring2BSTR = True
+                        stdFunc.ANSI = True
                 Else
                     If groupok And s1$ <> "" Then
                         If GetVar(bstack, bstack.GroupName + s1$, i, True) Then
@@ -23354,37 +23392,28 @@ entry10:
             Set var(i) = stdFunc
             s$ = W$
             If groupok Then
-'            If Left$(s$, 1) = ChrW(&HFFBF) Then Mid$(s$, 1, 1) = " ": W$ = s$
-                If x1 = 3 Then
-                    rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = LETTER$'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
+               If x1 = 3 Then
+                    If stdFunc.RetType = 0 Then stdFunc.ConvertCstring2BSTR = True
+                    
+                    rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = @LETTER$'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
                 Else
-                    If stdFunc.RetType = 9 Or stdFunc.RetType = 13 Then
-                        rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = STACKITEM() : DROP'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
-                    Else
-                        rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = NUMBER'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
-                    End If
+                    rest$ = vbCrLf & "FUNCTION FINAL " & s$ & "() {" + vbCrLf + "CALL EXTERN ." & W$ & " : = @ANY'" & ChrW(&H1FFD) & vbCrLf & "}" & vbCrLf & rest$
                 End If
                 Exit Function
             Else
                 If x1 = 3 Then
+                    '
+                    If stdFunc.RetType = 0 Then stdFunc.ConvertCstring2BSTR = True
                     If here$ = vbNullString Or y1 Then
-                        y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = LETTER$'" & ChrW(&H1FFD))
+                        y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = @LETTER$'" & ChrW(&H1FFD))
                     Else
-                        y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = LETTER$'" & ChrW(&H1FFD))
+                        y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = @LETTER$'" & ChrW(&H1FFD))
                     End If
                 Else
                     If here$ = vbNullString Or y1 Then
-                        If stdFunc.RetType = 9 Or stdFunc.RetType = 13 Then
-                            y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = STACKITEM():DROP'" & ChrW(&H1FFD))
-                        Else
-                            y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = NUMBER'" & ChrW(&H1FFD))
-                        End If
+                        y1 = GlobalSub(s$ + "()", "CALL EXTERN " & (i) & " : = @ANY'" & ChrW(&H1FFD))
                     Else
-                        If stdFunc.RetType = 9 Or stdFunc.RetType = 13 Then
-                            y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = STACKITEM() : DROP'" & ChrW(&H1FFD))
-                        Else
-                            y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = NUMBER'" & ChrW(&H1FFD))
-                        End If
+                        y1 = GlobalSub(here$ + "." + bstack.GroupName + s$ + "()", "CALL EXTERN " & (i) & " : = @ANY'" & ChrW(&H1FFD))
                     End If
                 End If
             End If
@@ -23393,7 +23422,6 @@ entry10:
             Set stdFunc = Nothing
             Exit Function
         Else
-        
         
             BadObjectDecl
             MyDeclare = False
@@ -34013,7 +34041,14 @@ makeitnow:
         comhash.ItemCreator3 what$, 0, 44, usehandler.objref
     End If
     Set usehandler = var(i)
+    If usehandler.t1 = 2 Then
+    MyEr "not a structure", "δεν είναι δομή"
+    makestruct = False
+    'Set offsetlist = usehandler.objref.structref
+    Exit Function
+    Else
     Set offsetlist = usehandler.objref
+    End If
     Dim mm As Long, oo As StructCollection
     If Fast2LabelNoNum(rest$, "APPEND", 6, "ΠΡΟΣΘΗΚΗ", 8, 8) Then
         offsetlist.CopyCollection oo
@@ -38250,7 +38285,9 @@ foundit:
         If uni Then
         
     Else
-        If prv Then W$ = ChrW(&HFFBF) + W$
+        If prv Then
+        W$ = ChrW(&HFFBF) + W$
+        End If
     End If
     End If
 Else
@@ -38267,6 +38304,11 @@ If uni Then
 Else
     If prv Then W$ = ChrW(&HFFBF) + W$
 End If
+End If
+If CheckStruct(bstack, rest$, W$, here$ = "", False, "") Then
+
+ GoTo continuehere
+
 End If
 VarOnly:
 W$ = ohere$ + "." + W$

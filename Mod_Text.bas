@@ -100,7 +100,7 @@ Public TestShowBypass As Boolean, TestShowSubLast As String
 Public feedback$, FeedbackExec$, feednow$ ' for about$
 Global Const VerMajor = 15
 Global Const VerMinor = 0
-Global Const Revision = 45
+Global Const Revision = 46
 Private Const doc = "Document"
 Public UserCodePage As Long, DefCodePage As Long
 Public cLine As String  ' it was public in form1
@@ -47766,6 +47766,10 @@ enterasstring:
             dd = AscW(GetDeflocaleString(14))
         End If
         If MaybeIsSymbol(s$, "¡·ÿ¯TtFf") Then
+            dd = Len(s$)
+            If Not IsNumeric(pp) Then
+                pp = 0
+            End If
             If CDbl(pp) = 0 Then
                 If Fast3NoSpace(s$, "¡À«»≈”", 6, "¡À«»«”", 6, "TRUE", 4, 6) Then
                     r = CBool(True)
@@ -47791,8 +47795,11 @@ enterasstring:
                     Else
                         r = 0
                     End If
+                
                 End If
             End If
+            dd = dd - Len(s$)
+            If dd <> 0 Then GoTo j01
         ElseIf dd = 46 Then
             If Not VALFUNC((s$), r) Then
                 r = val(s$)
@@ -47832,14 +47839,19 @@ enterasstring:
             WrongArgument a$
             Exit Function
         End If
+        dd = -1
+j01:
         On Error GoTo a100
+
         If FastSymbol(a$, ",") Then
             Dim mm As mStiva
             Set mm = NewmStiva
             Dim oldm As mStiva
             Set oldm = bstack.soros
             Set bstack.Sorosref = mm
-            dd = ValidNumberOnlyClean(s$, r, Len(ex$) > 1)
+            If dd = -1 Then
+                dd = ValidNumberOnlyClean(s$, r, Len(ex$) > 1)
+            End If
             If dd > 2 And Abs(r) = 1 Then
                 If Mid$(s$, dd - 1, 2) = ".#" Then
                     If UCase(Mid$(s$, dd + 1, 3)) = "INF" Then

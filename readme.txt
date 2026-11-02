@@ -1,17 +1,14 @@
 ﻿M2000 Interpreter and Environment
-Version 15 Revision 45
+Version 15 Revision 46
 
-1. Upgrade Asm2  example
-Now we can make Version Resource using M2000 code 
+Fix for VAL() function. This is an example:
 
-So now we can make an exe with resources: manifest, ico and Version info.
-
-2. I found two things and fixit:
-
-2.1 A missing functionallity in Print statement. Normally if we pass code 0 to 31 we get unicode characters which show something lik FF (for 12). When a string was bigger than the width of console only the last part show these characters (the other just move the cursor). Now I fix it to work ok. Note that this not work using  Report (which process the CR+LF), or whaen we use PRINT to file (and PRINT #-2, "print to screen as file" which also CR + LF working as in any console).
-
-2.2 If buf1 is a buffer object and also buf2 is another one we can do this buf1[0]=buf2 to copy bytes drom buf2 to buf1 at offset 0.  The problem was inside M2000 code the object buf1 copied in pad object and that pad was not cleared (until a numeric expression starts). So a Print "alfa" found the object and return "Buffer" and not "alfa". Now a fix it (in an interanl TakeOffset function).
-
+VARIANT K=VAL("TRUE 199","",M)
+LIST  ' K=TRUE M=5    ' k now is type Boolean
+K=VAL("TRUE 199",1032,M)
+LIST  ' K=0% M=-1 ' 0% is 16bit Integer, M=-1 means number not found
+K=VAL("12 TRUE","",M)
+LIST  ' K=12 M=3  ' k now is type Double
  
 George Karras, Kallithea Attikis, Greece.
 fotodigitallab@gmail.com

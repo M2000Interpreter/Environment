@@ -19,6 +19,9 @@ Dim RetType2Stack As Long   ' 0 is long, 1 is string without zeros
 Dim mCallType As Long
 Dim t() As Long
 Dim paramnum As Long
+Public ConvertCstring2BSTR As Boolean
+Public ANSI As Boolean
+
 Public FreeHere As Boolean
 Public CallAddr As Long
 Public IsInterfaceCall As Boolean
@@ -36,6 +39,7 @@ Private Declare Function DispCallFunc Lib "oleaut32" ( _
                          ByRef prgVt As Any, _
                          ByRef prgpVarg As Any, _
                          ByRef pvargResult As Variant) As Long
+
 Property Get Funcoffset() As Long
 Funcoffset = funcAddrOffset
 End Property

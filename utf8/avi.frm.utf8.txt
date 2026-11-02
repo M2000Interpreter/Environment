@@ -57,7 +57,7 @@ SetWindowPos Me.hWnd, HWND_TOPMOST, aviX / dv15, _
 End If
 End If
 ElseIf AVIRUN Then
-Debug.Print mouse
+'Debug.Print mouse
 If mouse <> 2 Then
 If Me.Height > 0 Then getout = True
 End If

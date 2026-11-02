@@ -1,8 +1,8 @@
 Attribute VB_Name = "PicHandler"
 Option Explicit
 Private Declare Function HashData Lib "shlwapi" (ByVal straddr As Long, ByVal ByteSize As Long, ByVal res As Long, ByVal ressize As Long) As Long
-Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, retval As Any)
-Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, retval As Long)
+Private Declare Sub GetMem1 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Any)
+Private Declare Sub GetMem4 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Long)
 Private Declare Sub PutMem4 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Long)
 Private Declare Sub PutMem1 Lib "msvbvm60" (ByVal Addr As Long, ByVal NewVal As Byte)
 Public Const KEYEVENTF_EXTENDEDKEY = &H1
@@ -55,7 +55,7 @@ Private Const SM_CXSCREEN = 0
 Private Const SM_CYSCREEN = 1
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
-Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, retval As Integer)
+Private Declare Sub GetMem2 Lib "msvbvm60" (ByVal Addr As Long, RetVal As Integer)
 Private Declare Function GetEnhMetaFileBits Lib "gdi32" (ByVal hmf As Long, ByVal nSize As Long, lpvData As Any) As Long
 Private Declare Function CopyEnhMetaFile Lib "gdi32.dll" Alias "CopyEnhMetaFileW" (ByVal hemfSrc As Long, lpszFile As Long) As Long
 Private Declare Function IsClipboardFormatAvailable Lib "user32" (ByVal wFormat As Long) As Long
@@ -4149,7 +4149,7 @@ ismine = True
 a$ = myUcase(a$, True)
 Select Case a$
 Case "@(", "$(", "~(", "?", "->", "[]"
-Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
+Case "ABOUT", "ABOUT$", "ABS(", "ADDRESSOF", "ADD.LICENSE$(", "AFTER", "ALWAYS", "AND", "ANGLE", "ANY", "APPDIR$", "APPEND", "APPEND.DOC", "APPLICATION"
 Case "ARG(", "ARRAY", "ARRAY$(", "ARRAY(", "AS", "ASSEMBLY(", "ASC(", "ASCENDING", "ASK$(", "ASK(", "ASSERT", "ATN("
 Case "BACK", "BACKGROUND", "BACKWARD(", "BANK(", "BASE", "BASIC", "BEEP", "BIGINTEGER", "BIGINTEGER(", "BIGINTEGER[", "BINARY", "BINARY.ADD(", "BIT64.ADD(", "BINARY.AND(", "BIT64.AND(", "BIT64.NEG(", "BINARY.NEG(", "BIT64.NOT(", "BINARY.NOT("
 Case "BINARY.OR(", "BIT64.OR(", "BIT64.RESET(", "BINARY.RESET(", "BIT64.ROTATE(", "BINARY.ROTATE(", "BIT64.SHIFT(", "BINARY.SHIFT(", "BIT64.SET(", "BINARY.SET(", "BIT64.SUB(", "BINARY.SUB(", "BIT64.TEST(", "BINARY.TEST(", "BIT64.XOR(", "BINARY.XOR(", "BITMAPS", "BMP$(", "BOLD"
@@ -4200,7 +4200,7 @@ Case "SEEK", "SEEK(", "SELECT", "SEQUENTIAL", "SET", "SETTINGS", "SGN(", "SHIFT"
 Case "SHOW", "SHOW$(", "SIN(", "SINGLE", "SINGLE[", "SINT(", "SIZE", "SIZE.X(", "SIZE.Y(", "SLICE(", "SLOW", "SMOOTH"
 Case "SND$(", "SORT", "SORT(", "SOUND", "SOUNDREC", "SOUNDREC.LEVEL", "SOUNDS", "SPEECH", "SPEECH$(", "SPLIT", "SPRITE"
 Case "SPRITE$", "SQRT(", "STACK", "STACK(", "STACK$(", "STACK.SIZE", "STACKITEM$(", "STACKITEM(", "STACKTYPE$(", "START", "START(", "STATIC"
-Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STR(", "STREAM", "STRING", "STRING[", "STRING$(", "STRREV$(", "STRUCTURE", "STUFF(", "SUB", "SUBDIR", "SUM(", "SUPERCLASS", "SYMBOL"
+Case "STEP", "STEREO", "STOCK", "STOP", "STR$(", "STR(", "STREAM", "STRING", "STRING(", "STRING$(", "STRREV$(", "STRUCTURE", "STUFF(", "SUB", "SUBDIR", "SUM(", "SUPERCLASS", "SYMBOL"
 Case "SWAP", "SWEEP", "SWITCHES", "TAB", "TAB(", "TABLE", "TAN(", "TARGET"
 Case "TARGETS", "TASK.MAIN", "TEMPNAME$", "TEMPORARY$", "TEST", "TEST(", "TEXT", "THEN", "THIS"
 Case "THREAD", "THREAD.PLAN", "THREADS", "THREADS$", "TICK", "TIME$(", "TIME(", "TIMECOUNT", "TITLE", "TITLE$(", "TITLE("
@@ -4235,7 +4235,7 @@ Case "ΕΠΙΛΕΞΕ.ΟΡΓΑΝΟ", "ΕΠΙΛΕΞΕ.ΧΡΩΜΑ", "ΕΠΙΛΟΓΕ
 Case "ΕΠΙΣΤΡΟΦΗ", "ΕΠΙΦΑΝΕΙΑ", "ΕΠΟΜΕΝΟ", "ΕΠΟΜΕΝΑ(", "ΕΤΙΚΕΤΑ.ΦΟΡΜΑΣ", "ΕΤΟΙΜΟ(", "ΕΥΡΕΙΑ", "ΕΥΡΕΣΗ", "ΕΥΡΙΑ", "ΕΦΑΠ(", "ΕΦΑΡΜΟΓΗ.ΑΡΧΕΙΟΥ$(", "ΕΦΑΡΜΟΓΗ.ΚΑΤ$", "ΕΦΑΡΜΟΓΗ"
 Case "ΕΧΕΙ(", "ΕΩΣ", "Η", "ΗΜ(", "ΗΜΕΡΑ$(", "ΗΜΕΡΑ(", "ΗΜΕΡΟΜΗΝΙΑ", "ΗΧΟ$(", "ΗΧΟΓΡΑΦΗΣΗ", "ΗΧΟΓΡΑΦΗΣΗΣ.ΕΠΙΠΕΔΟ"
 Case "ΗΧΟΙ", "ΗΧΟΣ", "ΘΕΣΕ", "ΘΕΣΕ(", "ΘΕΣΗ", "ΘΕΣΗ(", "ΘΕΣΗ.Ψ", "ΘΕΣΗ.Υ", "ΘΕΣΗ.Χ", "ΘΕΣΗΔΕΞΙΑ(", "ΙΔΙΟΤΗΤΑ", "ΙΔΙΟΤΗΤΑ(", "ΙΔΙΟΤΗΤΑ$("
-Case "ΙΔΙΟΤΗΤΕΣ", "ΙΔΙΟΤΗΤΕΣ$", "ΙΔΙΩΤΙΚΟ", "ΙΣΧΝΗ", "ΙΣΧΝΗ$(", "ΙΧΝΟΣ", "ΚΑΘΑΡΗ", "ΚΑΘΑΡΟ", "ΚΑΘΑΡΙΣΕ", "ΚΑΘΕ", "ΚΑΘΕΤΗ", "ΚΑΘΕ(", "ΚΑΙ", "ΚΑΛΕΣΕ", "ΚΑΜΠΥΛΗ"
+Case "ΙΔΙΟΤΗΤΕΣ", "ΙΔΙΟΤΗΤΕΣ$", "ΙΔΙΩΤΙΚΟ", "ΙΣΧΝΗ", "ΙΣΧΝΗ$(", "ΙΧΝΟΣ", "ΚΑΤΙ", "ΚΑΘΑΡΗ", "ΚΑΘΑΡΟ", "ΚΑΘΑΡΙΣΕ", "ΚΑΘΕ", "ΚΑΘΕΤΗ", "ΚΑΘΕ(", "ΚΑΙ", "ΚΑΛΕΣΕ", "ΚΑΜΠΥΛΗ"
 Case "ΚΑΝΕ", "ΚΑΝΟΝΙΚΑ", "ΚΑΤ", "ΚΑΤ$", "ΚΑΤΑΛΟΓΟΙ", "ΚΑΤΑΛΟΓΟΣ", "ΚΑΤΑΣΤΑΣΗ", "ΚΑΤΑΣΤΑΣΗ.ΤΑΙΝΙΑΣ$", "ΚΑΤΑΧΩΡΗΣΗ", "ΚΑΤΩ"
 Case "ΚΑΤΩΜΙΣΟ(", "ΚΑΤΩΜΙΣΟ64(", "ΚΕΙΜΕΝΟ", "ΚΕΝΗ", "ΚΕΝΟ", "ΚΕΝΤΡΟ", "ΚΕΦ$(", "ΚΕΦ(", "ΚΙΝΗΣΗ", "ΚΙΝΗΣΗ.Π", "ΚΙΝΗΣΗ.ΠΥ"
 Case "ΚΙΝΗΣΗ.ΠΧ", "ΚΙΝΗΣΗ.Υ", "ΚΙΝΗΣΗ.ΥΠ", "ΚΙΝΗΣΗ.Ψ", "ΚΙΝΗΣΗ.ΨΠ", "ΚΙΝΗΣΗ.Χ", "ΚΙΝΗΣΗ.ΧΠ", "ΚΛΑΣΗ", "ΚΛΕΙΔΙ", "ΚΛΕΙΣΕ", "ΚΛΙΜΑΞ.Υ", "ΚΛΙΜΑΞ.Ψ"
@@ -5168,7 +5168,7 @@ myfun() = Array("FORMAT$(", 1, "ΜΟΡΦΗ$(", 1, "EVAL$(", 2, "ΕΚΦΡ$(", 2, 
 , "RTRIM$(", 69, "ΑΠΟΚ.ΔΕ$(", 69, "LTRIM$(", 70, "ΑΠΟΚ.ΑΡ$(", 70, "STACKITEM(", 1, "ΤΙΜΗΣΩΡΟΥ(", 1, "ARRAY(", 2, "ΠΙΝΑΚΑΣ(", 2, "CONS(", 3, "ΕΝΩΣΗ(", 3, "CAR(", 4, "ΠΡΩΤΟ(", 4, "CDR(", 5, "ΕΠΟΜΕΝΑ(", 5, "VAL(", 6, "ΤΙΜΗ(", 6, "ΑΞΙΑ(", 6, "EVAL(", 7 _
 , "ΕΚΦΡ(", 7, "ΕΚΦΡΑΣΗ(", 7, "MID(", 8, "ΜΕΣ(", 8, "LEFT(", 9, "ΑΡΙΣ(", 9, "RIGHT(", 10, "ΔΕΞΙ(", 10 _
 , "RIGHTPART(", 12, "ΑΡΙΣΤΕΡΟΜΕΡΟΣ(", 12, "LEFTPART(", 11, "ΔΕΞΙΜΕΡΟΣ(", 11, "STR(", 13, "ΓΡΑΦΗ(", 13, "CHR(", 14, "ΧΑΡ(", 14, "FORMAT(", 15, "ΜΟΡΦΗ(", 15, "TRIM(", 16, "ΑΠΟΚ(", 16, "RTRIM(", 17, "ΑΠΟΚ.ΔΕ(", 17, "LTRIM(", 18, "ΑΠΟΚ.ΑΡ(", 18 _
-, "HEX(", 19, "ΔΕΚΑΕΞ(", 19, "REPLACE(", 20, "ΑΛΛΑΓΗ(", 20, "FILTER(", 21, "ΦΙΛΤΡΟ(", 21, "UCASE(", 22, "ΚΕΦ(", 22, "LCASE(", 23, "ΠΕΖ(", 23, "TYPE(", 24, "ΤΥΠΟΣ(", 24, "TITLE(", 25, "ΤΙΤΛΟΣ(", 25)
+, "HEX(", 19, "ΔΕΚΑΕΞ(", 19, "REPLACE(", 20, "ΑΛΛΑΓΗ(", 20, "FILTER(", 21, "ΦΙΛΤΡΟ(", 21, "UCASE(", 22, "ΚΕΦ(", 22, "LCASE(", 23, "ΠΕΖ(", 23, "TYPE(", 24, "ΤΥΠΟΣ(", 24, "TITLE(", 25, "ΤΙΤΛΟΣ(", 25, "STRING(", 26, "ΕΠΑΝ(", 26)
 
 
 If Not bhashbackup Is Nothing Then
@@ -5204,7 +5204,7 @@ myid() = Array("THIS", 1, "ΑΥΤΟ", 1, "RND", 2, "ΤΥΧΑΙΟΣ", 2, "PEN", 3
 , "MENU", 78, "ΕΠΙΛΟΓΗ", 78, "NUMBER", 79, "ΑΡΙΘΜΟΣ", 79, "ΤΙΜΗ", 79, "LAMBDA", 80, "ΛΑΜΔΑ", 81, "GROUP", 83, "ΟΜΑΔΑ", 83, "ARRAY", 84, "ΠΙΝΑΚΑΣ", 84, "[]", 85 _
 , "ΣΩΡΟΣ", 86, "STACK", 86, "ISWINE", 87, "SHOW", 88, "ΟΘΟΝΗ", 88, "OSBIT", 89, "WINDOW", 90, "ΣΥΣΚΕΥΗ", 90, "MONITOR.STACK", 91, "ΕΛΕΓΧΟΣ.ΣΩΡΟΥ", 91, "MONITOR.STACK.SIZE", 92, "ΕΛΕΓΧΟΣ.ΜΕΓΕΘΟΣ.ΣΩΡΟΥ", 92, "?", 93, "ΔΙΑΡΘΡΩΣΗ", 94, "BUFFER", 94, "ΚΑΤΑΣΤΑΣΗ", 95, "INVENTORY", 95, "LIST", 96, "ΛΙΣΤΑ", 96, "QUEUE", 97, "ΟΥΡΑ", 97, "INFINITY", 82, "ΑΠΕΙΡΟ", 82, "ΕΛΛΗΝΙΚΑ", 98, "GREEK", 98 _
 , "INTERNET", 99, "ΔΙΑΔΙΚΤΥΟ", 99, "CLIPBOARD.IMAGE", 100, "ΠΡΟΧΕΙΡΟ.ΕΙΚΟΝΑ", 100, "CLIPBOARD.DRAWING", 101, "ΠΡΟΧΕΙΡΟ.ΣΧΕΔΙΟ", 101, "MONITORS", 102, "ΟΘΟΝΕΣ", 102, "DOS", 103, "ΚΟΝΣΟΛΑ", 103, "SOUNDREC.LEVEL", 104, "ΗΧΟΓΡΑΦΗΣΗΣ.ΕΠΙΠΕΔΟ", 104, "ADDRESSOF", 105, "ΔΙΕΥΘΥΝΣΗΑΠΟ", 105, "ΠΛΑΤΟΣ.ΤΑΙΝΙΑΣ", 106, "MOVIE.WIDTH", 106, "ΥΨΟΣ.ΤΑΙΝΙΑΣ", 107, "MOVIE.HEIGHT", 107, "PAGE.WIDTH", 108, "ΠΛΑΤΟΣ.ΣΕΛΙΔΑΣ", 108, "PAGE.HEIGHT", 109, "ΥΨΟΣ.ΣΕΛΙΔΑΣ", 109, "PRINTING", 110, "ΕΚΤΥΠΩΣΗ", 110 _
-, "SOUNDREC", 111, "ΗΧΟΓΡΑΦΗΣΗ", 111, "PRINTER.QUALITY", 112, "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", 112, "SYMBOL", 113, "ΣΥΜΒΟΛΟ", 113, "EAX", 114, "ΕΑΧ", 114)
+, "SOUNDREC", 111, "ΗΧΟΓΡΑΦΗΣΗ", 111, "PRINTER.QUALITY", 112, "ΠΟΙΟΤΗΤΑ.ΕΚΤΥΠΩΣΗΣ", 112, "SYMBOL", 113, "ΣΥΜΒΟΛΟ", 113, "EAX", 114, "ΕΑΧ", 114, "ANY", 115, "ΚΑΤΙ", 115)
 If Not ahashbackup Is Nothing Then
 For i = 0 To UBound(myid()) Step 2
     ahashbackup.ItemCreator CStr(myid(i)), CLng(myid(i + 1))
@@ -5232,7 +5232,7 @@ myfun() = Array("PARAM(", 1, "ΠΑΡΑΜ(", 1, "STACKITEM(", 2, "ΤΙΜΗΣΩΡ�
 , "HEX(", 144, "ΔΕΚΑΕΞ(", 144, "REPLACE(", 145, "ΑΛΛΑΓΗ(", 145, "FILTER(", 146, "ΦΙΛΤΡΟ(", 146, "UCASE(", 147, "ΚΕΦ(", 147, "LCASE(", 148, "ΠΕΖ(", 148, "TYPE(", 149, "ΤΥΠΟΣ(", 149, "TITLE(", 150, "ΤΙΤΛΟΣ(", 150, "BIT64.XOR(", 151, "ΔΥΑΔ64.ΑΠΟ(", 151, "BIT64.AND(", 152, "ΔΥΑΔ64.ΚΑΙ(", 152, "BIT64.OR(", 153, "ΔΥΑΔ64.Η(", 153 _
 , "BIT64.ADD(", 154, "ΔΥΑΔ64.ΠΡΟ(", 154, "ΔΥΑΔ64.ΠΡΟΣΘΕΣΗ(", 154, "BIT64.SHIFT(", 155, "ΔΥΑΔ64.ΟΛΙΣΘΗΣΗ(", 155, "BIT64.ROTATE(", 156, "ΔΥΑΔ64.ΠΕΡΙΣΤΡΟΦΗ(", 156, "BIT64.NOT(", 157, "ΔΥΑΔ64.ΟΧΙ(", 157, "BIT64.NEG(", 158, "ΔΥΑΔ64.ΑΝΤΙ(", 158, "ΔΥΑΔ64.ΑΝΤΙΣΤΡΟΦΟ(", 158 _
 , "HILOWLONG(", 159, "ΔΥΟΜΙΣΑ64(", 159, "HILONG(", 160, "ΠΑΝΩΜΙΣΟ64(", 160, "HIGHLONG(", 160, "LOLONG(", 161, "LOWLONG(", 161, "ΚΑΤΩΜΙΣΟ64(", 161, "BINARY.TEST(", 162, "ΔΥΑΔΙΚΟ.ΕΧΕΙ(", 162, "BINARY.SET(", 163, "ΔΥΑΔΙΚΟ.ΒΑΛΕ(", 163, "BINARY.RESET(", 164, "ΔΥΑΔΙΚΟ.ΒΓΑΛΕ(", 164, "BIT64.TEST(", 165, "ΔΥΑΔ64.ΕΧΕΙ(", 165, "BIT64.SET(", 166, "ΔΥΑΔ64.ΒΑΛΕ(", 166, "BIT64.RESET(", 167, "ΔΥΑΔ64.ΒΓΑΛΕ(", 167 _
-, "BINARY.SUB(", 168, "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", 168, "ΔΥΑΔΙΚΟ.ΑΦ(", 168, "ΔΥΑΔ64.ΑΦ(", 169, "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", 169, "BIT64.SUB(", 169, "ΔΥΑΔ64(", 170, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "ΑΝΤΙΓΡΑΦΟ.ΠΙΝ(", 171, "MIDI.OUT(", 172, "ΕΞΟΔΟΣ.MIDI(", 172, "ΚΩΔΙΚΑΣ(", 173, "ASSEMBLY(", 173)
+, "BINARY.SUB(", 168, "ΔΥΑΔΙΚΟ.ΑΦΑΙΡΕΣΗ(", 168, "ΔΥΑΔΙΚΟ.ΑΦ(", 168, "ΔΥΑΔ64.ΑΦ(", 169, "ΔΥΑΔ64.ΑΦΑΙΡΕΣΗ(", 169, "BIT64.SUB(", 169, "ΔΥΑΔ64(", 170, "ΔΥΑΔΙΚΟ.ΑΚΕΡΑΙΟ64(", 170, "UINT64(", 170, "COPY.ARR(", 171, "ΑΝΤΙΓΡΑΦΟ.ΠΙΝ(", 171, "MIDI.OUT(", 172, "ΕΞΟΔΟΣ.MIDI(", 172, "ΚΩΔΙΚΑΣ(", 173, "ASSEMBLY(", 173, "STRING(", 174, "ΕΠΑΝ(", 174)
 
 
 
